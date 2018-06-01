@@ -6,16 +6,10 @@ using System.Threading.Tasks;
 
 namespace PD.Models
 {
-    public class PositionAccount
+    public class PositionAccount : ChartString
     {
-        [Key]
-        public int Id { get; set; }
-
         [Range(0.0, 1.0)]
         public decimal Proportion { get; set; }
-
-        public int ChartStringId { get; set; }
-        public ChartString ChartString { get; set; }
 
         public int PositionId { get; set; }
         public Position Position { get; set; }
