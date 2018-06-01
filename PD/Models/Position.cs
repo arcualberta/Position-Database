@@ -37,7 +37,7 @@ namespace PD.Models
         /// The start date of this position record. There can be multiple positions
         /// with the same position number but covering different time periods.
         /// </value>
-        public DateTime StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
 
         /// <summary>
         /// Gets or sets the end date.
@@ -46,7 +46,7 @@ namespace PD.Models
         /// The end date of this position record. There can be multiple positions
         /// with the same position number but covering different time periods.
         /// </value>
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         /// <summary>
         /// Gets or sets the effective date.
@@ -56,7 +56,7 @@ namespace PD.Models
         /// than the start date in situations where a change is made to the position but
         /// make this effective from the past (backdated)
         /// </value>
-        public DateTime EffectiveDate { get; set; }
+        public DateTime? EffectiveDate { get; set; }
 
 
         /// <summary>
@@ -65,9 +65,10 @@ namespace PD.Models
         /// <value>
         /// The accounts that funds this position
         /// </value>
-        public virtual ICollection<PositionAccount> Accounts { get; set; }
+        public virtual ICollection<PositionAccount> PositionAccounts { get; set; }
 
-        public int CurrentPersonId { get; set; }
+        public int PersonId { get; set; }
+        public Person Person { get; set; }
 
         /// <summary>
         /// Gets or sets the current person.

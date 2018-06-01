@@ -10,11 +10,11 @@ using PD.Data;
 using PD.Models;
 using System;
 
-namespace PD.Data.Migrations
+namespace PD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180530231809_CreatedBasicDataModels")]
-    partial class CreatedBasicDataModels
+    [Migration("20180601224409_MadeStartAndEndDatesNullable")]
+    partial class MadeStartAndEndDatesNullable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -265,27 +265,31 @@ namespace PD.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("CurrentPersonId");
+                    b.Property<int?>("CurrentPersonId");
 
                     b.Property<string>("Description");
 
-                    b.Property<DateTime>("EffectiveDate");
+                    b.Property<DateTime?>("EffectiveDate");
 
-                    b.Property<DateTime>("EndDate");
+                    b.Property<DateTime?>("EndDate");
 
                     b.Property<bool>("IsActive");
 
                     b.Property<string>("Number");
 
+                    b.Property<int>("PersonId");
+
                     b.Property<int>("PositionType");
 
-                    b.Property<DateTime>("StartDate");
+                    b.Property<DateTime?>("StartDate");
 
                     b.Property<string>("Title");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CurrentPersonId");
+
+                    b.HasIndex("PersonId");
 
                     b.ToTable("Positions");
                 });
@@ -297,9 +301,15 @@ namespace PD.Data.Migrations
 
                     b.Property<int>("ChartStringId");
 
+                    b.Property<DateTime?>("EndDate");
+
+                    b.Property<bool>("IsPercentage");
+
                     b.Property<int>("PositionId");
 
-                    b.Property<decimal>("Proportion");
+                    b.Property<DateTime?>("StartDate");
+
+                    b.Property<decimal>("Value");
 
                     b.HasKey("Id");
 
@@ -307,7 +317,7 @@ namespace PD.Data.Migrations
 
                     b.HasIndex("PositionId");
 
-                    b.ToTable("PositionAccounts");
+                    b.ToTable("PositionAccount");
                 });
 
             modelBuilder.Entity("PD.Models.SalaryScales.SalaryScale", b =>
@@ -317,13 +327,13 @@ namespace PD.Data.Migrations
 
                     b.Property<decimal>("ATBPercentatge");
 
-                    b.Property<DateTime>("EndDate");
+                    b.Property<DateTime?>("EndDate");
 
                     b.Property<string>("Guid");
 
                     b.Property<string>("Name");
 
-                    b.Property<DateTime>("StartDate");
+                    b.Property<DateTime?>("StartDate");
 
                     b.HasKey("Id");
 
@@ -475,19 +485,23 @@ namespace PD.Data.Migrations
                 {
                     b.HasOne("PD.Models.PersonPosition", "CurrentPerson")
                         .WithMany("Positions")
-                        .HasForeignKey("CurrentPersonId")
+                        .HasForeignKey("CurrentPersonId");
+
+                    b.HasOne("PD.Models.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("PD.Models.PositionAccount", b =>
                 {
                     b.HasOne("PD.Models.ChartString", "ChartString")
-                        .WithMany()
+                        .WithMany("PositionAccounts")
                         .HasForeignKey("ChartStringId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("PD.Models.Position", "Position")
-                        .WithMany("Accounts")
+                        .WithMany("PositionAccounts")
                         .HasForeignKey("PositionId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

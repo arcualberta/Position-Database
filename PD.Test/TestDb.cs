@@ -69,15 +69,14 @@ namespace PD.Test
             for (int i = 0; i < numChartStrings; ++i)
             {
                 csrv.CreateChartString(
-                    accounts[mRand.Next(accounts.Count)],
                     businessUnits[mRand.Next(businessUnits.Count)],
-                    classes[mRand.Next(classes.Count)],
-                    deptIds[mRand.Next(deptIds.Count)],
+                    accounts[mRand.Next(accounts.Count)],
                     funds[mRand.Next(funds.Count)],
+                    deptIds[mRand.Next(deptIds.Count)],
                     programs[mRand.Next(programs.Count)],
+                    classes[mRand.Next(classes.Count)],
                     projects[mRand.Next(projects.Count)],
-                    sponsors[mRand.Next(sponsors.Count)],
-                    true
+                    sponsors[mRand.Next(sponsors.Count)]
                     ).Id = i + 1;
             }
         }
@@ -113,15 +112,14 @@ namespace PD.Test
             for (int i =0; i<numChartStrings; ++i)
             {
                 csrv.CreateChartString(
-                    accounts[mRand.Next(accounts.Count)],
                     businessUnits[mRand.Next(businessUnits.Count)],
-                    classes[mRand.Next(classes.Count)],
-                    deptIds[mRand.Next(deptIds.Count)],
+                    accounts[mRand.Next(accounts.Count)],
                     funds[mRand.Next(funds.Count)],
+                    deptIds[mRand.Next(deptIds.Count)],
                     programs[mRand.Next(programs.Count)],
+                    classes[mRand.Next(classes.Count)],
                     projects[mRand.Next(projects.Count)],
-                    sponsors[mRand.Next(sponsors.Count)],
-                    true
+                    sponsors[mRand.Next(sponsors.Count)]
                     ).Id = i + 1;
             }
         }

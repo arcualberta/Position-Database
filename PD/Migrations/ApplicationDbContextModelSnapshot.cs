@@ -5,16 +5,17 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 using PD.Data;
+using PD.Models;
 using System;
 
-namespace PD.Data.Migrations
+namespace PD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180516220732_InitialMigration")]
-    partial class InitialMigration
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -185,11 +186,16 @@ namespace PD.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired();
+
                     b.Property<string>("Value");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ChartField");
+                    b.ToTable("ChartFields");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("ChartField");
                 });
 
             modelBuilder.Entity("PD.Models.ChartField2ChartStringJoin", b =>
@@ -212,7 +218,208 @@ namespace PD.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ChartString");
+                    b.ToTable("ChartStrings");
+                });
+
+            modelBuilder.Entity("PD.Models.Department", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Departments");
+                });
+
+            modelBuilder.Entity("PD.Models.Person", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("BirthDate");
+
+                    b.Property<string>("EmployeeId");
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Persons");
+                });
+
+            modelBuilder.Entity("PD.Models.PersonPosition", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PersonPositions");
+                });
+
+            modelBuilder.Entity("PD.Models.Position", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("CurrentPersonId");
+
+                    b.Property<string>("Description");
+
+                    b.Property<DateTime?>("EffectiveDate");
+
+                    b.Property<DateTime?>("EndDate");
+
+                    b.Property<bool>("IsActive");
+
+                    b.Property<string>("Number");
+
+                    b.Property<int>("PersonId");
+
+                    b.Property<int>("PositionType");
+
+                    b.Property<DateTime?>("StartDate");
+
+                    b.Property<string>("Title");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CurrentPersonId");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("Positions");
+                });
+
+            modelBuilder.Entity("PD.Models.PositionAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("ChartStringId");
+
+                    b.Property<DateTime?>("EndDate");
+
+                    b.Property<bool>("IsPercentage");
+
+                    b.Property<int>("PositionId");
+
+                    b.Property<DateTime?>("StartDate");
+
+                    b.Property<decimal>("Value");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChartStringId");
+
+                    b.HasIndex("PositionId");
+
+                    b.ToTable("PositionAccount");
+                });
+
+            modelBuilder.Entity("PD.Models.SalaryScales.SalaryScale", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<decimal>("ATBPercentatge");
+
+                    b.Property<DateTime?>("EndDate");
+
+                    b.Property<string>("Guid");
+
+                    b.Property<string>("Name");
+
+                    b.Property<DateTime?>("StartDate");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SalaryScales");
+                });
+
+            modelBuilder.Entity("PD.Models.ChartFields.Account", b =>
+                {
+                    b.HasBaseType("PD.Models.ChartField");
+
+
+                    b.ToTable("Account");
+
+                    b.HasDiscriminator().HasValue("Account");
+                });
+
+            modelBuilder.Entity("PD.Models.ChartFields.BusinessUnit", b =>
+                {
+                    b.HasBaseType("PD.Models.ChartField");
+
+
+                    b.ToTable("BusinessUnit");
+
+                    b.HasDiscriminator().HasValue("BusinessUnit");
+                });
+
+            modelBuilder.Entity("PD.Models.ChartFields.Class", b =>
+                {
+                    b.HasBaseType("PD.Models.ChartField");
+
+
+                    b.ToTable("Class");
+
+                    b.HasDiscriminator().HasValue("Class");
+                });
+
+            modelBuilder.Entity("PD.Models.ChartFields.DeptID", b =>
+                {
+                    b.HasBaseType("PD.Models.ChartField");
+
+                    b.Property<int>("DepartmentId");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.ToTable("DeptID");
+
+                    b.HasDiscriminator().HasValue("DeptID");
+                });
+
+            modelBuilder.Entity("PD.Models.ChartFields.Fund", b =>
+                {
+                    b.HasBaseType("PD.Models.ChartField");
+
+
+                    b.ToTable("Fund");
+
+                    b.HasDiscriminator().HasValue("Fund");
+                });
+
+            modelBuilder.Entity("PD.Models.ChartFields.Program", b =>
+                {
+                    b.HasBaseType("PD.Models.ChartField");
+
+
+                    b.ToTable("Program");
+
+                    b.HasDiscriminator().HasValue("Program");
+                });
+
+            modelBuilder.Entity("PD.Models.ChartFields.Project", b =>
+                {
+                    b.HasBaseType("PD.Models.ChartField");
+
+
+                    b.ToTable("Project");
+
+                    b.HasDiscriminator().HasValue("Project");
+                });
+
+            modelBuilder.Entity("PD.Models.ChartFields.Sponsor", b =>
+                {
+                    b.HasBaseType("PD.Models.ChartField");
+
+
+                    b.ToTable("Sponsor");
+
+                    b.HasDiscriminator().HasValue("Sponsor");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -263,13 +470,46 @@ namespace PD.Data.Migrations
             modelBuilder.Entity("PD.Models.ChartField2ChartStringJoin", b =>
                 {
                     b.HasOne("PD.Models.ChartField", "ChartField")
-                        .WithMany("ChartField2ChartStringJoin")
+                        .WithMany("ChartStrings")
                         .HasForeignKey("ChartFieldId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("PD.Models.ChartString", "ChartString")
-                        .WithMany("ChartField2ChartStringJoin")
+                        .WithMany("ChartFields")
                         .HasForeignKey("ChartStringId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("PD.Models.Position", b =>
+                {
+                    b.HasOne("PD.Models.PersonPosition", "CurrentPerson")
+                        .WithMany("Positions")
+                        .HasForeignKey("CurrentPersonId");
+
+                    b.HasOne("PD.Models.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("PD.Models.PositionAccount", b =>
+                {
+                    b.HasOne("PD.Models.ChartString", "ChartString")
+                        .WithMany("PositionAccounts")
+                        .HasForeignKey("ChartStringId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("PD.Models.Position", "Position")
+                        .WithMany("PositionAccounts")
+                        .HasForeignKey("PositionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("PD.Models.ChartFields.DeptID", b =>
+                {
+                    b.HasOne("PD.Models.Department", "Department")
+                        .WithMany("DeptIDs")
+                        .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

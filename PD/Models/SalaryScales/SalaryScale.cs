@@ -22,7 +22,7 @@ namespace PD.Models.SalaryScales
         [Range(0.0, 100)]
         public decimal ATBPercentatge { get; set; }
 
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 }

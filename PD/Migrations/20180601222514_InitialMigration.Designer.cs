@@ -10,12 +10,13 @@ using PD.Data;
 using PD.Models;
 using System;
 
-namespace PD.Data.Migrations
+namespace PD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180601222514_InitialMigration")]
+    partial class InitialMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -216,14 +217,9 @@ namespace PD.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired();
-
                     b.HasKey("Id");
 
                     b.ToTable("ChartStrings");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("ChartString");
                 });
 
             modelBuilder.Entity("PD.Models.Department", b =>
@@ -269,7 +265,7 @@ namespace PD.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("CurrentPersonId");
+                    b.Property<int?>("CurrentPersonId");
 
                     b.Property<string>("Description");
 
@@ -281,6 +277,8 @@ namespace PD.Data.Migrations
 
                     b.Property<string>("Number");
 
+                    b.Property<int>("PersonId");
+
                     b.Property<int>("PositionType");
 
                     b.Property<DateTime>("StartDate");
@@ -291,7 +289,35 @@ namespace PD.Data.Migrations
 
                     b.HasIndex("CurrentPersonId");
 
+                    b.HasIndex("PersonId");
+
                     b.ToTable("Positions");
+                });
+
+            modelBuilder.Entity("PD.Models.PositionAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("ChartStringId");
+
+                    b.Property<DateTime?>("EndDate");
+
+                    b.Property<bool>("IsPercentage");
+
+                    b.Property<int>("PositionId");
+
+                    b.Property<DateTime?>("StartDate");
+
+                    b.Property<decimal>("Value");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChartStringId");
+
+                    b.HasIndex("PositionId");
+
+                    b.ToTable("PositionAccount");
                 });
 
             modelBuilder.Entity("PD.Models.SalaryScales.SalaryScale", b =>
@@ -397,21 +423,6 @@ namespace PD.Data.Migrations
                     b.HasDiscriminator().HasValue("Sponsor");
                 });
 
-            modelBuilder.Entity("PD.Models.PositionAccount", b =>
-                {
-                    b.HasBaseType("PD.Models.ChartString");
-
-                    b.Property<int>("PositionId");
-
-                    b.Property<decimal>("Proportion");
-
-                    b.HasIndex("PositionId");
-
-                    b.ToTable("PositionAccount");
-
-                    b.HasDiscriminator().HasValue("PositionAccount");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
@@ -474,7 +485,24 @@ namespace PD.Data.Migrations
                 {
                     b.HasOne("PD.Models.PersonPosition", "CurrentPerson")
                         .WithMany("Positions")
-                        .HasForeignKey("CurrentPersonId")
+                        .HasForeignKey("CurrentPersonId");
+
+                    b.HasOne("PD.Models.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("PD.Models.PositionAccount", b =>
+                {
+                    b.HasOne("PD.Models.ChartString", "ChartString")
+                        .WithMany("PositionAccounts")
+                        .HasForeignKey("ChartStringId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("PD.Models.Position", "Position")
+                        .WithMany("PositionAccounts")
+                        .HasForeignKey("PositionId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -483,14 +511,6 @@ namespace PD.Data.Migrations
                     b.HasOne("PD.Models.Department", "Department")
                         .WithMany("DeptIDs")
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("PD.Models.PositionAccount", b =>
-                {
-                    b.HasOne("PD.Models.Position", "Position")
-                        .WithMany("Accounts")
-                        .HasForeignKey("PositionId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

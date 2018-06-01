@@ -17,6 +17,8 @@ namespace PD.Models
 
         public virtual ICollection<ChartField2ChartStringJoin> ChartFields { get; } = new List<ChartField2ChartStringJoin>();
 
+        public virtual ICollection<PositionAccount> PositionAccounts { get; set; }
+
         public ChartString()
         {
 
