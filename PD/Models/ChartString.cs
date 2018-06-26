@@ -14,6 +14,8 @@ namespace PD.Models
     {
         [Key]
         public int Id { get; set; }
+        public string SpeedCode { get; set; }
+        public string ComboCode { get; set; }
 
         public virtual ICollection<ChartField2ChartStringJoin> ChartFields { get; } = new List<ChartField2ChartStringJoin>();
 
