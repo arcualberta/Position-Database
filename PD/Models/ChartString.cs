@@ -80,16 +80,48 @@ namespace PD.Models
                 + separator + GetChartField<Sponsor>().Value;
         }
 
-        /*
-        public Account Account { get { return GetChartField<Account>(); } }
-        public BusinessUnit BusinessUnit { get { return GetChartField<BusinessUnit>(); } }
-        public Class Class { get { return GetChartField<Class>(); } }
-        public DeptID DeptID { get { return GetChartField<DeptID>(); } }
-        public Fund Fund { get { return GetChartField<Fund>(); } }
-        public ChartFields.Program Program { get { return GetChartField<ChartFields.Program>(); } }
-        public Project Project { get { return GetChartField<Project>(); } }
-        public Sponsor Sponsor { get { return GetChartField<Sponsor>(); } }
-        */
+        [Display(Name ="Business Unit")]
+        public BusinessUnit BusinessUnit
+        {
+            get { return GetChartField<BusinessUnit>(); }
+            set { SetChartField<BusinessUnit>(value); }
+        }
 
+        public Account Account
+        {
+            get { return GetChartField<Account>(); }
+            set { SetChartField<Account>(value); }
+        }
+        public Class Class
+        {
+            get { return GetChartField<Class>(); }
+            set { SetChartField<Class>(value); }
+        }
+        [Display(Name ="Dept ID")]
+        public DeptID DeptID
+        {
+            get { return GetChartField<DeptID>(); }
+            set { SetChartField<DeptID>(value); }
+        }
+        public Fund Fund
+        {
+            get { return GetChartField<Fund>(); }
+            set { SetChartField<Fund>(value); }
+        }
+        public ChartFields.Program Program
+        {
+            get { return GetChartField<ChartFields.Program>(); }
+            set { SetChartField<ChartFields.Program>(value); }
+        }
+        public Project Project
+        {
+            get { return GetChartField<Project>(); }
+            set { SetChartField<Project>(value); }
+        }
+        public Sponsor Sponsor
+        {
+            get { return GetChartField<Sponsor>(); }
+            set { SetChartField<Sponsor>(value); }
+        }
     }
 }
