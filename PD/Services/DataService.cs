@@ -14,8 +14,9 @@ namespace PD.Services
 
         }
 
-        public void ImportData(string fileName)
+        public void FacultySalaryAdjustmentData(string fileName)
         {
+
 
         }
     }
