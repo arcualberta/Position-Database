@@ -13,9 +13,10 @@ using System;
 namespace PD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180815191126_RemovedPersonFromPosition")]
+    partial class RemovedPersonFromPosition
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -373,18 +374,6 @@ namespace PD.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SalaryScales");
-                });
-
-            modelBuilder.Entity("PD.Models.Speedcode", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Value");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Speedcodes");
                 });
 
             modelBuilder.Entity("PD.Models.ChartFields.Account", b =>

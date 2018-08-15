@@ -32,6 +32,7 @@ namespace PD.Data
         public DbSet<SalaryScale> SalaryScales { get; set; }
         public DbSet<Person> Persons { get; set; }
         public DbSet<Department> Departments { get; set; }
+        public DbSet<Speedcode> Speedcodes { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -72,5 +73,11 @@ namespace PD.Data
                 .HasForeignKey(join => join.ChartStringId);
 
         }
+
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder
+        //    .UseLazyLoadingProxies();
+        //}
     }
 }

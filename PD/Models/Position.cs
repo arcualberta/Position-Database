@@ -67,9 +67,6 @@ namespace PD.Models
         /// </value>
         public virtual ICollection<PositionAccount> PositionAccounts { get; set; }
 
-        public int PersonId { get; set; }
-        public Person Person { get; set; }
-
         /// <summary>
         /// Gets or sets the current person.
         /// </summary>

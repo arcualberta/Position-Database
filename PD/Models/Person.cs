@@ -11,5 +11,8 @@ namespace PD.Models
         public string Name { get; set; }
         public string EmployeeId { get; set; }
         public DateTime BirthDate { get; set; }
+
+        public virtual ICollection<PersonPosition> PersonPositions { get; set; }
+
     }
 }

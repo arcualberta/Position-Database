@@ -45,7 +45,7 @@ namespace PD.Controllers
 
                     //processing the uploaded file
                     DataService ds = new DataService(_context);
-                    ds.FacultySalaryAdjustmentData(tmpFile);
+                    ds.InjestFacultySalaryAdjustmentData(tmpFile);
 
                     //Deleting the temporary file
                     System.IO.File.Delete(tmpFile);
