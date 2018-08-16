@@ -60,7 +60,7 @@ namespace PD.Services
                 using (ExcelPackage package = new ExcelPackage(file))
                 {
                     StringBuilder sb = new StringBuilder();
-                    ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
                     int rowCount = worksheet.Dimension.Rows;
                     int ColCount = worksheet.Dimension.Columns;
 
@@ -99,8 +99,10 @@ namespace PD.Services
         
                     for(int i=1; i<=Enum.GetValues(typeof(ColIndex)).Length; ++i)
                     {
+                        string val = worksheet.Cells[1, i].Value.ToString().Trim();
+
                         if (worksheet.Cells[1, i].Value.ToString().Trim() != expectedHeadings[i-1])
-                            errors.Add("Column " + i + " must be " + expectedHeadings[i] + ". Found " + worksheet.Cells[1, i].Value.ToString());
+                            errors.Add("Column " + i + " must be " + expectedHeadings[i-1] + ". Found " + worksheet.Cells[1, i].Value.ToString());
                     }
     
                     //Making sure past and current salaries are in the correct columns

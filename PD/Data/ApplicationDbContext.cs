@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PD.Models;
@@ -10,7 +10,7 @@ using PD.Models.SalaryScales;
 
 namespace PD.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext
     {
         #region Chart Fields and Chart Strings
         public DbSet<ChartField> ChartFields { get; set; }
@@ -38,7 +38,6 @@ namespace PD.Data
             : base(options)
         {
         }
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
