@@ -8,8 +8,8 @@
     public class ChartField2ChartStringJoin
     {
         public int ChartStringId { get; set; }
-        public ChartString ChartString { get; set; }
+        public virtual ChartString ChartString { get; set; }
         public int ChartFieldId { get; set; }
-        public ChartField ChartField { get; set; }
+        public virtual ChartField ChartField { get; set; }
     }
 }

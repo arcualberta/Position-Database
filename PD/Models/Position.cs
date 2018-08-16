@@ -73,6 +73,6 @@ namespace PD.Models
         /// <value>
         /// The current person who is associated with this position at the moment.
         /// </value>
-        public PersonPosition CurrentPerson { get; set; }
+        public virtual PersonPosition CurrentPerson { get; set; }
     }
 }

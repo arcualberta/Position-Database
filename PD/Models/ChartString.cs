@@ -81,47 +81,61 @@ namespace PD.Models
         }
 
         [Display(Name ="Business Unit")]
-        public BusinessUnit BusinessUnit
+        public virtual BusinessUnit BusinessUnit
         {
             get { return GetChartField<BusinessUnit>(); }
             set { SetChartField<BusinessUnit>(value); }
         }
+        private BusinessUnit _BusinessUnit;
 
-        public Account Account
+        public virtual Account Account
         {
             get { return GetChartField<Account>(); }
             set { SetChartField<Account>(value); }
         }
-        public Class Class
+        private Account _Account;
+
+        public virtual Class Class
         {
             get { return GetChartField<Class>(); }
             set { SetChartField<Class>(value); }
         }
+        private Class _Class;
+
         [Display(Name ="Dept ID")]
-        public DeptID DeptID
+        public virtual DeptID DeptID
         {
             get { return GetChartField<DeptID>(); }
             set { SetChartField<DeptID>(value); }
         }
-        public Fund Fund
+        private DeptID _DeptID;
+
+        public virtual Fund Fund
         {
             get { return GetChartField<Fund>(); }
             set { SetChartField<Fund>(value); }
         }
-        public ChartFields.Program Program
+        private Fund _Fund;
+
+        public virtual Program Program
         {
             get { return GetChartField<ChartFields.Program>(); }
             set { SetChartField<ChartFields.Program>(value); }
         }
-        public Project Project
+        private Program _Program;
+
+        public virtual Project Project
         {
             get { return GetChartField<Project>(); }
             set { SetChartField<Project>(value); }
         }
-        public Sponsor Sponsor
+        private Project _Project;
+
+        public virtual Sponsor Sponsor
         {
             get { return GetChartField<Sponsor>(); }
             set { SetChartField<Sponsor>(value); }
         }
+        private Sponsor _Sponsor;
     }
 }

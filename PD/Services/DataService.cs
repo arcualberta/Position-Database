@@ -198,8 +198,7 @@ namespace PD.Services
                             empl.FacultySalary.Fund = Db.ChartFields.Where(cf => cf is Fund && cf.Value == empl.FacultySalary.Fund.Value).FirstOrDefault() as Fund;
 
                         //DeptID
-                        Department dept2 = Db.Departments.Where(d => d.Name == empl.DeptName).FirstOrDefault();
-                        Department dept = Db.Departments.Include(d => d.DeptIDs).Where(d => d.Name == empl.DeptName).FirstOrDefault();
+                        Department dept = Db.Departments.Where(d => d.Name == empl.DeptName).FirstOrDefault();
                         if (!Db.ChartFields.Where(cf => cf is DeptID && cf.Value == empl.FacultySalary.DeptId.Value).Any())
                         {
                             Db.ChartFields.Add(empl.FacultySalary.DeptId);

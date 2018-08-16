@@ -15,7 +15,7 @@ namespace PD.Models
         public int Id { get; set; }
 
         public int? PersonId { get; set; }
-        public Person Person { get; set; }
+        public virtual Person Person { get; set; }
 
         /// <summary>
         /// List of position records that are attached to the current person position.

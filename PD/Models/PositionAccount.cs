@@ -12,10 +12,10 @@ namespace PD.Models
         public int Id { get; set; }
 
         public int ChartStringId { get; set; }
-        public ChartString ChartString { get; set; }
+        public virtual ChartString ChartString { get; set; }
 
         public int PositionId { get; set; }
-        public Position Position { get; set; }
+        public virtual Position Position { get; set; }
 
         public decimal Value { get; set; }
         public bool IsPercentage { get; set; }
