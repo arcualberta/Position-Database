@@ -33,7 +33,8 @@ namespace PD.Data
         public DbSet<Person> Persons { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Speedcode> Speedcodes { get; set; }
-
+        public DbSet<ChartField2ChartStringJoin> ChartField2ChartStringJoins { get; set; }
+        
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
