@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -8,6 +9,7 @@ namespace PD.Models.SalaryScales
 {
     public class SalaryScale
     {
+        [Key]
         public int Id { get; set; }
 
         public string Guid { get; set; }
@@ -20,7 +22,7 @@ namespace PD.Models.SalaryScales
         /// The ATB proportion; minimum 0 and maximum 100.
         /// </value>
         [Range(0.0, 100)]
-        public decimal ATBPercentatge { get; set; }
+        public double ATBPercentatge { get; set; }
 
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }

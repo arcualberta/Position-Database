@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PD.Data.Migrations
 {
-    public partial class CreateAppDataModels : Migration
+    public partial class CreatedAppDataModels : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -44,7 +44,7 @@ namespace PD.Data.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Guid = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
-                    ATBPercentatge = table.Column<decimal>(nullable: false),
+                    ATBPercentatge = table.Column<double>(nullable: false),
                     StartDate = table.Column<DateTime>(nullable: true),
                     EndDate = table.Column<DateTime>(nullable: true)
                 },
@@ -228,29 +228,28 @@ namespace PD.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PositionAccount",
+                name: "PositionAccounts",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     ChartStringId = table.Column<int>(nullable: false),
                     PositionId = table.Column<int>(nullable: false),
-                    Value = table.Column<decimal>(nullable: false),
-                    IsPercentage = table.Column<bool>(nullable: false),
+                    Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     StartDate = table.Column<DateTime>(nullable: true),
                     EndDate = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PositionAccount", x => x.Id);
+                    table.PrimaryKey("PK_PositionAccounts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PositionAccount_ChartStrings_ChartStringId",
+                        name: "FK_PositionAccounts_ChartStrings_ChartStringId",
                         column: x => x.ChartStringId,
                         principalTable: "ChartStrings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PositionAccount_Positions_PositionId",
+                        name: "FK_PositionAccounts_Positions_PositionId",
                         column: x => x.PositionId,
                         principalTable: "Positions",
                         principalColumn: "Id",
@@ -313,13 +312,13 @@ namespace PD.Data.Migrations
                 column: "PersonId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PositionAccount_ChartStringId",
-                table: "PositionAccount",
+                name: "IX_PositionAccounts_ChartStringId",
+                table: "PositionAccounts",
                 column: "ChartStringId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PositionAccount_PositionId",
-                table: "PositionAccount",
+                name: "IX_PositionAccounts_PositionId",
+                table: "PositionAccounts",
                 column: "PositionId");
 
             migrationBuilder.CreateIndex(
@@ -334,7 +333,7 @@ namespace PD.Data.Migrations
                 name: "ChartField2ChartStringJoin");
 
             migrationBuilder.DropTable(
-                name: "PositionAccount");
+                name: "PositionAccounts");
 
             migrationBuilder.DropTable(
                 name: "SalaryScales");

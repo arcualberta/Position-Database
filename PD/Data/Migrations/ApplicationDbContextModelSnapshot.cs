@@ -348,13 +348,12 @@ namespace PD.Data.Migrations
 
                     b.Property<DateTime?>("EndDate");
 
-                    b.Property<bool>("IsPercentage");
-
                     b.Property<int>("PositionId");
 
                     b.Property<DateTime?>("StartDate");
 
-                    b.Property<decimal>("Value");
+                    b.Property<decimal>("Value")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -362,7 +361,7 @@ namespace PD.Data.Migrations
 
                     b.HasIndex("PositionId");
 
-                    b.ToTable("PositionAccount");
+                    b.ToTable("PositionAccounts");
                 });
 
             modelBuilder.Entity("PD.Models.SalaryScales.SalaryScale", b =>
@@ -371,7 +370,7 @@ namespace PD.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<decimal>("ATBPercentatge");
+                    b.Property<double>("ATBPercentatge");
 
                     b.Property<DateTime?>("EndDate");
 

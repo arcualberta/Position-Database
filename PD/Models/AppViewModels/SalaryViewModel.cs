@@ -1,6 +1,7 @@
 ﻿using PD.Models.ChartFields;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,7 +10,9 @@ namespace PD.Models.AppViewModels
     public class SalaryViewModel
     {
         public string FiscalYear { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
         public decimal LastSalary { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
         public decimal CurrentSalary { get; set; }
         public string BargUnit { get; set; }
         public Speedcode Speedcode { get; set; }

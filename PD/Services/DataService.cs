@@ -227,6 +227,35 @@ namespace PD.Services
                         Db.SaveChanges();
                     }
 
+                    //Creating chart strings
+                    foreach (var empl in employees)
+                    {
+                        //var chartString = Db.ChartStrings
+                        //    .Where(cs => cs.fi)
+                        ////////var deptIdParentIds = Db.ChartField2ChartStringJoins.Where(join => join.ChartFieldId == empl.Salary.DeptId.Id).Select(join => join.ChartStringId).ToList();
+                        ////////var fundParentIds = Db.ChartField2ChartStringJoins.Where(join => join.ChartFieldId == empl.Salary.Fund.Id).Select(join => join.ChartStringId);
+                        ////////var progParentIds = Db.ChartField2ChartStringJoins.Where(join => join.ChartFieldId == empl.Salary.Program.Id).Select(join => join.ChartStringId);
+                        ////////var accountParentIds = Db.ChartField2ChartStringJoins.Where(join => join.ChartFieldId == empl.Salary.Account.Id).Select(join => join.ChartStringId);
+
+                        ////////int? csId = deptIdParentIds.Intersect(fundParentIds).Intersect(progParentIds).Intersect(accountParentIds).FirstOrDefault();
+
+                        ////////ChartString cs;
+                        ////////if (!csId.HasValue)
+                        ////////{
+                        ////////    cs = new ChartString();
+                        ////////    cs.DeptID = empl.Salary.DeptId;
+                        ////////    cs.Fund = empl.Salary.Fund;
+                        ////////    cs.Program = empl.Salary.Program;
+                        ////////    cs.Account = empl.Salary.Account;
+
+                        ////////    Db.ChartStrings.Add(cs);
+                        ////////    Db.SaveChanges();
+                        ////////}
+                        ////////else
+                        ////////    cs = Db.ChartStrings.Find(csId);
+
+                    }
+
 
                     //Creating / Updating position records
                     foreach (var empl in employees)
@@ -242,7 +271,7 @@ namespace PD.Services
                         if (position != null && position.CurrentPerson.PersonId != person.Id)
                             throw new Exception("The Position Number " + empl.PositionNumber + " has already been assigned to another person (system ID: " + position.CurrentPerson.PersonId);
 
-                        if(position == null)
+                        if (position == null)
                         {
                             //Creating a position record and attaching it to the current person record
                             //========================================================================
