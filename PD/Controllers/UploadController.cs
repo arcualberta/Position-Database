@@ -28,6 +28,7 @@ namespace PD.Controllers
         public async Task<IActionResult> FacultySalaryAdjustmentData(List<IFormFile> files)
         {
             long size = files.Sum(f => f.Length);
+            string worksheetName = "ARC Academic Salary Adj2015 16";
 
             // full path to file in temp location
             string path = Path.GetTempPath();
@@ -45,7 +46,7 @@ namespace PD.Controllers
 
                     //processing the uploaded file
                     DataService ds = new DataService(_context);
-                    ds.InjestFacultySalaryAdjustmentData(tmpFile);
+                    ds.InjestFacultySalaryAdjustmentData(tmpFile, worksheetName);
 
                     //Deleting the temporary file
                     System.IO.File.Delete(tmpFile);

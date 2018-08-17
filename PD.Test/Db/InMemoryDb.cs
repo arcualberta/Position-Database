@@ -8,9 +8,9 @@ using PD.Models.ChartFields;
 using PD.Services;
 using System.Linq;
 
-namespace PD.Test
+namespace PD.Test.Db
 {
-    public class MemoryDb
+    public class InMemoryDb
     {
         public ApplicationDbContext Db
         {

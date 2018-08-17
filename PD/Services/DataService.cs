@@ -52,15 +52,20 @@ namespace PD.Services
             bargUnitCol
         };
 
-        public void InjestFacultySalaryAdjustmentData(string fileName)
+        public void InjestFacultySalaryAdjustmentData(string fileName, string worksheetName)
         {
             FileInfo file = new FileInfo(fileName);
             //try
             {
-                using (ExcelPackage package = new ExcelPackage(file))
+                byte[] dataBytes = File.ReadAllBytes(fileName);
+                using (MemoryStream ms = new MemoryStream(dataBytes))
+                using (ExcelPackage package = new ExcelPackage(ms))
                 {
                     StringBuilder sb = new StringBuilder();
-                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets
+                        .Where(ws => ws.Name == worksheetName)
+                        .FirstOrDefault();
+
                     int rowCount = worksheet.Dimension.Rows;
                     int ColCount = worksheet.Dimension.Columns;
 
@@ -96,26 +101,26 @@ namespace PD.Services
                         "Check1",
                         "Barg_Unit"
                     };
-        
-                    for(int i=1; i<=Enum.GetValues(typeof(ColIndex)).Length; ++i)
+
+                    for (int i = 1; i <= Enum.GetValues(typeof(ColIndex)).Length; ++i)
                     {
                         string val = worksheet.Cells[1, i].Value.ToString().Trim();
 
-                        if (worksheet.Cells[1, i].Value.ToString().Trim() != expectedHeadings[i-1])
-                            errors.Add("Column " + i + " must be " + expectedHeadings[i-1] + ". Found " + worksheet.Cells[1, i].Value.ToString());
+                        if (worksheet.Cells[1, i].Value.ToString().Trim() != expectedHeadings[i - 1])
+                            errors.Add("Column " + i + " must be " + expectedHeadings[i - 1] + ". Found " + worksheet.Cells[1, i].Value.ToString());
                     }
-    
+
                     //Making sure past and current salaries are in the correct columns
-                    int[] pastYearRange = worksheet.Cells[2, (int) ColIndex.pastSalaryCol].Value.ToString().Split("/").Select(x => int.Parse(x)).ToArray();
+                    int[] pastYearRange = worksheet.Cells[2, (int)ColIndex.pastSalaryCol].Value.ToString().Split("/").Select(x => int.Parse(x)).ToArray();
                     int[] currentYearRange = worksheet.Cells[2, (int)ColIndex.currSalaryCol].Value.ToString().Split("/").Select(x => int.Parse(x)).ToArray();
                     if (pastYearRange[1] != currentYearRange[0])
                         errors.Add("The ending year of the past fiscal year must be as same as the begining year of the current fiscal year.");
 
-                    for(int row = 3; row <= rowCount; ++row)
+                    for (int row = 3; row <= rowCount; ++row)
                     {
                         eFtPtStatus ftptStatus = Enum.Parse<eFtPtStatus>(worksheet.Cells[row, (int)ColIndex.ftPtStatusCol].Value.ToString());
                         eFundingSource fundingSource = Enum.Parse<eFundingSource>(worksheet.Cells[row, (int)ColIndex.fundSrcCol].Value.ToString());
-                        
+
                         FacultyEmployeeViewModel empl = new FacultyEmployeeViewModel()
                         {
                             DeptName = worksheet.Cells[row, (int)ColIndex.deptNameCol].Value.ToString().Trim(),
@@ -153,7 +158,7 @@ namespace PD.Services
 
                     //Adding new departments that are in the data file but not in the database to the database
                     string[] deptNames = employees.Select(empl => empl.DeptName).Distinct().ToArray();
-                    foreach(string deptName in deptNames)
+                    foreach (string deptName in deptNames)
                     {
                         if (!Db.Departments.Where(dept => dept.Name == deptName).Any())
                             Db.Departments.Add(new Department() { Name = deptName });
@@ -206,7 +211,7 @@ namespace PD.Services
                             //Adding this DeptID to the current department of the employee
                             dept.DeptIDs.Add(empl.FacultySalary.DeptId);
                         }
-                        else 
+                        else
                         {
                             //reload the field so that it contains all relationships and 
                             //ensure that the reloaded DeptID belongs to the current employee's department
@@ -288,15 +293,15 @@ namespace PD.Services
                     }
 
 
-                        //Updating employee salary information
-                        foreach (var empl in employees)
+                    //Updating employee salary information
+                    foreach (var empl in employees)
                     {
 
                     }
 
-                        //Updating 
+                    //Updating 
 
-                    }
+                }
             }
             //catch (Exception ex)
             //{

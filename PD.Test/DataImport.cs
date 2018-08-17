@@ -9,59 +9,23 @@ using System.Text;
 using Xunit;
 using System.Configuration;
 using System.Linq;
+using PD.Test.Db;
+using System.IO;
 
 namespace PD.Test
 {
     public class DataImport
     {
-        private ApplicationDbContext Db;
-
-        public static IConfiguration InitConfiguration()
-        {
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.test.json")
-                .Build();
-            return config;
-        }
-
-        public DataImport()
-        {
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.test.json")
-                .Build();
-
-            var serviceProvider = new ServiceCollection()
-                .AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    config.GetConnectionString("DefaultConnection")));
-
-            var builder = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseSqlServer(config.GetConnectionString("DefaultConnection"));
-
-            Db = new ApplicationDbContext(builder.Options);
-            //Db.Database.Migrate();
-        }
-
         [Fact]
         public void ImportFacultyData()
         {
-            string dataFile = @"C:\Users\Kamal\Documents\Projects\Position-Database-Data\Arts_2016_Faculty_FSO_Salary_Adjustment_Report_with_ChartString.xlsx";
+            ApplicationDbContext db = new SqlServerDb().Db;
+            DataService ds = new DataService(db);
 
-            var departments = Db.Departments.ToList();
-            var chartStrings = Db.ChartStrings.ToList();
-
-            //var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            //    .UseApplicationServiceProvider(new Se)
-            //          .UseInMemoryDatabase(Guid.NewGuid().ToString())
-            //          .Options;
-            //mDb = new ApplicationDbContext(options);
-
-            //ApplicationDbContext db = new ApplicationDbContext(options =>
-            //    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
-            //DatabaseContext ctx = new DatabaseContext();
-            //DataService ds = new DataService()
-            //DataService.ImportData(dataFile);
+            string dataFile = @"C:\Users\Kamal\Documents\Projects\Position-Database-Data\Arts 2016 Faculty FSO Salary Adjustment Report with ChartString.xlsx";
+            string worksheet2015_16 = "ARC Academic Salary Adj2015 16";
+            Assert.True(File.Exists(dataFile));
+            ds.InjestFacultySalaryAdjustmentData(dataFile, worksheet2015_16);
         }
     }
 }
