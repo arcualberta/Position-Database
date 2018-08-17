@@ -80,62 +80,70 @@ namespace PD.Models
                 + separator + GetChartField<Sponsor>().Value;
         }
 
+        [NotMapped]
         [Display(Name ="Business Unit")]
         public virtual BusinessUnit BusinessUnit
         {
             get { return GetChartField<BusinessUnit>(); }
             set { SetChartField<BusinessUnit>(value); }
         }
-        private BusinessUnit _BusinessUnit;
+        //private BusinessUnit _BusinessUnit;
 
+        [NotMapped]
         public virtual Account Account
         {
             get { return GetChartField<Account>(); }
             set { SetChartField<Account>(value); }
         }
-        private Account _Account;
+        //private Account _Account;
 
+        [NotMapped]
         public virtual Class Class
         {
             get { return GetChartField<Class>(); }
             set { SetChartField<Class>(value); }
         }
-        private Class _Class;
+        //private Class _Class;
 
         [Display(Name ="Dept ID")]
+        [NotMapped]
         public virtual DeptID DeptID
         {
             get { return GetChartField<DeptID>(); }
             set { SetChartField<DeptID>(value); }
         }
-        private DeptID _DeptID;
+        //private DeptID _DeptID;
 
+        [NotMapped]
         public virtual Fund Fund
         {
             get { return GetChartField<Fund>(); }
             set { SetChartField<Fund>(value); }
         }
-        private Fund _Fund;
+        //private Fund _Fund;
 
+        [NotMapped]
         public virtual Program Program
         {
             get { return GetChartField<ChartFields.Program>(); }
             set { SetChartField<ChartFields.Program>(value); }
         }
-        private Program _Program;
+        //private Program _Program;
 
+        [NotMapped]
         public virtual Project Project
         {
             get { return GetChartField<Project>(); }
             set { SetChartField<Project>(value); }
         }
-        private Project _Project;
+        //private Project _Project;
 
+        [NotMapped]
         public virtual Sponsor Sponsor
         {
             get { return GetChartField<Sponsor>(); }
             set { SetChartField<Sponsor>(value); }
         }
-        private Sponsor _Sponsor;
+        //private Sponsor _Sponsor;
     }
 }

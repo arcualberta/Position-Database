@@ -10,8 +10,8 @@ using PD.Data;
 namespace PD.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180817065838_CreatedAppDataModels")]
-    partial class CreatedAppDataModels
+    [Migration("20180817072527_CreatedAppModels")]
+    partial class CreatedAppModels
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -214,7 +214,7 @@ namespace PD.Data.Migrations
 
                     b.HasIndex("ChartStringId");
 
-                    b.ToTable("ChartField2ChartStringJoin");
+                    b.ToTable("ChartField2ChartStringJoins");
                 });
 
             modelBuilder.Entity("PD.Models.ChartString", b =>
@@ -223,43 +223,11 @@ namespace PD.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("AccountId");
-
-                    b.Property<int?>("BusinessUnitId");
-
-                    b.Property<int?>("ClassId");
-
                     b.Property<string>("ComboCode");
-
-                    b.Property<int?>("DeptIDId");
-
-                    b.Property<int?>("FundId");
-
-                    b.Property<int?>("ProgramId");
-
-                    b.Property<int?>("ProjectId");
 
                     b.Property<string>("SpeedCode");
 
-                    b.Property<int?>("SponsorId");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("AccountId");
-
-                    b.HasIndex("BusinessUnitId");
-
-                    b.HasIndex("ClassId");
-
-                    b.HasIndex("DeptIDId");
-
-                    b.HasIndex("FundId");
-
-                    b.HasIndex("ProgramId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.HasIndex("SponsorId");
 
                     b.ToTable("ChartStrings");
                 });
@@ -539,41 +507,6 @@ namespace PD.Data.Migrations
                         .WithMany("ChartFields")
                         .HasForeignKey("ChartStringId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("PD.Models.ChartString", b =>
-                {
-                    b.HasOne("PD.Models.ChartFields.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId");
-
-                    b.HasOne("PD.Models.ChartFields.BusinessUnit", "BusinessUnit")
-                        .WithMany()
-                        .HasForeignKey("BusinessUnitId");
-
-                    b.HasOne("PD.Models.ChartFields.Class", "Class")
-                        .WithMany()
-                        .HasForeignKey("ClassId");
-
-                    b.HasOne("PD.Models.ChartFields.DeptID", "DeptID")
-                        .WithMany()
-                        .HasForeignKey("DeptIDId");
-
-                    b.HasOne("PD.Models.ChartFields.Fund", "Fund")
-                        .WithMany()
-                        .HasForeignKey("FundId");
-
-                    b.HasOne("PD.Models.ChartFields.Program", "Program")
-                        .WithMany()
-                        .HasForeignKey("ProgramId");
-
-                    b.HasOne("PD.Models.ChartFields.Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectId");
-
-                    b.HasOne("PD.Models.ChartFields.Sponsor", "Sponsor")
-                        .WithMany()
-                        .HasForeignKey("SponsorId");
                 });
 
             modelBuilder.Entity("PD.Models.PersonPosition", b =>

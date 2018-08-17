@@ -8,6 +8,10 @@
   <ItemGroup>
     <Compile Remove="Data\Migrations\20180817065717_CreatedAppDataModels.cs" />
     <Compile Remove="Data\Migrations\20180817065717_CreatedAppDataModels.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180817065838_CreatedAppDataModels.cs" />
+    <Compile Remove="Data\Migrations\20180817065838_CreatedAppDataModels.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180817070704_AddedChartField2ChartStringJoinModel.cs" />
+    <Compile Remove="Data\Migrations\20180817070704_AddedChartField2ChartStringJoinModel.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

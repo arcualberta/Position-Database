@@ -4,10 +4,24 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PD.Data.Migrations
 {
-    public partial class CreatedAppDataModels : Migration
+    public partial class CreatedAppModels : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "ChartStrings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    SpeedCode = table.Column<string>(nullable: true),
+                    ComboCode = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChartStrings", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Departments",
                 columns: table => new
@@ -107,73 +121,27 @@ namespace PD.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ChartStrings",
+                name: "ChartField2ChartStringJoins",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    SpeedCode = table.Column<string>(nullable: true),
-                    ComboCode = table.Column<string>(nullable: true),
-                    BusinessUnitId = table.Column<int>(nullable: true),
-                    AccountId = table.Column<int>(nullable: true),
-                    ClassId = table.Column<int>(nullable: true),
-                    DeptIDId = table.Column<int>(nullable: true),
-                    FundId = table.Column<int>(nullable: true),
-                    ProgramId = table.Column<int>(nullable: true),
-                    ProjectId = table.Column<int>(nullable: true),
-                    SponsorId = table.Column<int>(nullable: true)
+                    ChartStringId = table.Column<int>(nullable: false),
+                    ChartFieldId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ChartStrings", x => x.Id);
+                    table.PrimaryKey("PK_ChartField2ChartStringJoins", x => new { x.ChartFieldId, x.ChartStringId });
                     table.ForeignKey(
-                        name: "FK_ChartStrings_ChartFields_AccountId",
-                        column: x => x.AccountId,
+                        name: "FK_ChartField2ChartStringJoins_ChartFields_ChartFieldId",
+                        column: x => x.ChartFieldId,
                         principalTable: "ChartFields",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ChartStrings_ChartFields_BusinessUnitId",
-                        column: x => x.BusinessUnitId,
-                        principalTable: "ChartFields",
+                        name: "FK_ChartField2ChartStringJoins_ChartStrings_ChartStringId",
+                        column: x => x.ChartStringId,
+                        principalTable: "ChartStrings",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ChartStrings_ChartFields_ClassId",
-                        column: x => x.ClassId,
-                        principalTable: "ChartFields",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ChartStrings_ChartFields_DeptIDId",
-                        column: x => x.DeptIDId,
-                        principalTable: "ChartFields",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ChartStrings_ChartFields_FundId",
-                        column: x => x.FundId,
-                        principalTable: "ChartFields",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ChartStrings_ChartFields_ProgramId",
-                        column: x => x.ProgramId,
-                        principalTable: "ChartFields",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ChartStrings_ChartFields_ProjectId",
-                        column: x => x.ProjectId,
-                        principalTable: "ChartFields",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ChartStrings_ChartFields_SponsorId",
-                        column: x => x.SponsorId,
-                        principalTable: "ChartFields",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -201,30 +169,6 @@ namespace PD.Data.Migrations
                         principalTable: "PersonPositions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ChartField2ChartStringJoin",
-                columns: table => new
-                {
-                    ChartStringId = table.Column<int>(nullable: false),
-                    ChartFieldId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ChartField2ChartStringJoin", x => new { x.ChartFieldId, x.ChartStringId });
-                    table.ForeignKey(
-                        name: "FK_ChartField2ChartStringJoin_ChartFields_ChartFieldId",
-                        column: x => x.ChartFieldId,
-                        principalTable: "ChartFields",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ChartField2ChartStringJoin_ChartStrings_ChartStringId",
-                        column: x => x.ChartStringId,
-                        principalTable: "ChartStrings",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -257,54 +201,14 @@ namespace PD.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ChartField2ChartStringJoin_ChartStringId",
-                table: "ChartField2ChartStringJoin",
+                name: "IX_ChartField2ChartStringJoins_ChartStringId",
+                table: "ChartField2ChartStringJoins",
                 column: "ChartStringId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ChartFields_DepartmentId",
                 table: "ChartFields",
                 column: "DepartmentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartStrings_AccountId",
-                table: "ChartStrings",
-                column: "AccountId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartStrings_BusinessUnitId",
-                table: "ChartStrings",
-                column: "BusinessUnitId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartStrings_ClassId",
-                table: "ChartStrings",
-                column: "ClassId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartStrings_DeptIDId",
-                table: "ChartStrings",
-                column: "DeptIDId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartStrings_FundId",
-                table: "ChartStrings",
-                column: "FundId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartStrings_ProgramId",
-                table: "ChartStrings",
-                column: "ProgramId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartStrings_ProjectId",
-                table: "ChartStrings",
-                column: "ProjectId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartStrings_SponsorId",
-                table: "ChartStrings",
-                column: "SponsorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PersonPositions_PersonId",
@@ -330,7 +234,7 @@ namespace PD.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ChartField2ChartStringJoin");
+                name: "ChartField2ChartStringJoins");
 
             migrationBuilder.DropTable(
                 name: "PositionAccounts");
@@ -342,19 +246,19 @@ namespace PD.Data.Migrations
                 name: "Speedcodes");
 
             migrationBuilder.DropTable(
+                name: "ChartFields");
+
+            migrationBuilder.DropTable(
                 name: "ChartStrings");
 
             migrationBuilder.DropTable(
                 name: "Positions");
 
             migrationBuilder.DropTable(
-                name: "ChartFields");
+                name: "Departments");
 
             migrationBuilder.DropTable(
                 name: "PersonPositions");
-
-            migrationBuilder.DropTable(
-                name: "Departments");
 
             migrationBuilder.DropTable(
                 name: "Persons");
