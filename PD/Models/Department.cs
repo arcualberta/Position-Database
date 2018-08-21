@@ -12,6 +12,7 @@ namespace PD.Models
         [Key]
         public int Id { get; set; }
         public string Name { get; set; }
-        public virtual ICollection<DeptID> DeptIDs { get; set; }
+        public virtual ICollection<DeptID> DeptIDs { get; set; } = new List<DeptID>();
+
     }
 }

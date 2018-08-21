@@ -12,9 +12,9 @@ namespace PD.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string EmployeeId { get; set; }
-        public DateTime BirthDate { get; set; }
+        public DateTime? BirthDate { get; set; }
 
-        public virtual ICollection<PersonPosition> PersonPositions { get; set; }
+        public virtual ICollection<PersonPosition> PersonPositions { get; set; } = new List<PersonPosition>();
 
     }
 }

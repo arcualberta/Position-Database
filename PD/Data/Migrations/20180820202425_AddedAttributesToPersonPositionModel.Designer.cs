@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PD.Data;
 
 namespace PD.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180820202425_AddedAttributesToPersonPositionModel")]
+    partial class AddedAttributesToPersonPositionModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -230,31 +232,6 @@ namespace PD.Data.Migrations
                     b.ToTable("ChartStrings");
                 });
 
-            modelBuilder.Entity("PD.Models.Compensations.Compensation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime?>("EffectiveDate");
-
-                    b.Property<DateTime?>("EndDate");
-
-                    b.Property<int>("PersonPositionId");
-
-                    b.Property<decimal>("Salary");
-
-                    b.Property<DateTime?>("StartDate");
-
-                    b.Property<string>("Year");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PersonPositionId");
-
-                    b.ToTable("Compensations");
-                });
-
             modelBuilder.Entity("PD.Models.Department", b =>
                 {
                     b.Property<int>("Id")
@@ -274,7 +251,7 @@ namespace PD.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime?>("BirthDate");
+                    b.Property<DateTime>("BirthDate");
 
                     b.Property<string>("EmployeeId");
 
@@ -291,23 +268,21 @@ namespace PD.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime?>("EndDate");
+                    b.Property<DateTime>("EffectiveDate");
+
+                    b.Property<DateTime>("EndDate");
 
                     b.Property<double>("Percentage");
 
                     b.Property<int?>("PersonId");
 
-                    b.Property<int?>("PositionId");
-
-                    b.Property<DateTime?>("StartDate");
+                    b.Property<DateTime>("StartDate");
 
                     b.Property<int>("Status");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PersonId");
-
-                    b.HasIndex("PositionId");
 
                     b.ToTable("PersonPositions");
                 });
@@ -317,6 +292,8 @@ namespace PD.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("CurrentPersonId");
 
                     b.Property<string>("Description");
 
@@ -335,6 +312,8 @@ namespace PD.Data.Migrations
                     b.Property<string>("Title");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CurrentPersonId");
 
                     b.ToTable("Positions");
                 });
@@ -540,23 +519,18 @@ namespace PD.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("PD.Models.Compensations.Compensation", b =>
-                {
-                    b.HasOne("PD.Models.PersonPosition", "PersonPosition")
-                        .WithMany("Compensations")
-                        .HasForeignKey("PersonPositionId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
             modelBuilder.Entity("PD.Models.PersonPosition", b =>
                 {
                     b.HasOne("PD.Models.Person", "Person")
                         .WithMany("PersonPositions")
                         .HasForeignKey("PersonId");
+                });
 
-                    b.HasOne("PD.Models.Position", "Position")
-                        .WithMany("PersonPositions")
-                        .HasForeignKey("PositionId");
+            modelBuilder.Entity("PD.Models.Position", b =>
+                {
+                    b.HasOne("PD.Models.PersonPosition", "CurrentPerson")
+                        .WithMany("Positions")
+                        .HasForeignKey("CurrentPersonId");
                 });
 
             modelBuilder.Entity("PD.Models.PositionAccount", b =>

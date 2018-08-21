@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PD.Models;
 using PD.Models.ChartFields;
+using PD.Models.Compensations;
 using PD.Models.SalaryScales;
 
 namespace PD.Data
@@ -34,7 +35,9 @@ namespace PD.Data
         public DbSet<Department> Departments { get; set; }
         public DbSet<Speedcode> Speedcodes { get; set; }
         public DbSet<ChartField2ChartStringJoin> ChartField2ChartStringJoins { get; set; }
-        
+        public DbSet<Compensation> Compensations { get; set; }
+
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {

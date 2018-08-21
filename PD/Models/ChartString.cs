@@ -17,14 +17,10 @@ namespace PD.Models
         public string SpeedCode { get; set; }
         public string ComboCode { get; set; }
 
-        public virtual ICollection<ChartField2ChartStringJoin> ChartFields { get; } = new List<ChartField2ChartStringJoin>();
+        public virtual ICollection<ChartField2ChartStringJoin> ChartFields { get; set; } = new List<ChartField2ChartStringJoin>();
 
-        public virtual ICollection<PositionAccount> PositionAccounts { get; set; }
+        public virtual ICollection<PositionAccount> PositionAccounts { get; set; } = new List<PositionAccount>();
 
-        public ChartString()
-        {
-
-        }
 
         protected ChartField2ChartStringJoin GetChartFieldHolder<T>() where T : ChartField
         {

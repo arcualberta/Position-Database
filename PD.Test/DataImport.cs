@@ -25,7 +25,8 @@ namespace PD.Test
             string dataFile = @"C:\Users\Kamal\Documents\Projects\Position-Database-Data\Arts 2016 Faculty FSO Salary Adjustment Report with ChartString.xlsx";
             string worksheet2015_16 = "ARC Academic Salary Adj2015 16";
             Assert.True(File.Exists(dataFile));
-            ds.InjestFacultySalaryAdjustmentData(dataFile, worksheet2015_16);
+            ds.InjestFacultySalaryAdjustmentData(dataFile, worksheet2015_16, new DateTime(2015, 7, 1).Date,
+                        new DateTime(2016, 06, 30).Date, new DateTime(2015, 07, 02).Date);
         }
     }
 }

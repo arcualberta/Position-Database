@@ -22,6 +22,22 @@ namespace PD.Services
 
         }
 
+        public IQueryable<PersonPosition> GetPositionAssociations(int personId, int? positionId = null, DateTime? date = null)
+        {
+            if (!date.HasValue)
+                date = DateTime.Now.Date;
+
+            IQueryable<PersonPosition> associations = Db.PersonPositions
+                .Where(a => a.PersonId == personId
+                    && (!a.StartDate.HasValue || a.StartDate.Value <= date)
+                    && (!a.EndDate.HasValue || a.EndDate.Value >= date));
+
+            if (positionId.HasValue)
+                associations = associations.Where(a => a.PositionId == positionId);
+
+            return associations;
+        }
+
         private enum ColIndex
         {
             deptNameCol = 1,
@@ -52,7 +68,7 @@ namespace PD.Services
             bargUnitCol
         };
 
-        public void InjestFacultySalaryAdjustmentData(string fileName, string worksheetName)
+        public void InjestFacultySalaryAdjustmentData(string fileName, string worksheetName, DateTime periodStartDate, DateTime periodEndDate, DateTime sampleDate)
         {
             FileInfo file = new FileInfo(fileName);
             //try
@@ -118,7 +134,7 @@ namespace PD.Services
 
                     for (int row = 3; row <= rowCount; ++row)
                     {
-                        eFtPtStatus ftptStatus = Enum.Parse<eFtPtStatus>(worksheet.Cells[row, (int)ColIndex.ftPtStatusCol].Value.ToString());
+                        Position.ePositionWorkload ftptStatus = Enum.Parse<Position.ePositionWorkload>(worksheet.Cells[row, (int)ColIndex.ftPtStatusCol].Value.ToString());
                         eFundingSource fundingSource = Enum.Parse<eFundingSource>(worksheet.Cells[row, (int)ColIndex.fundSrcCol].Value.ToString());
 
                         FacultyEmployeeViewModel empl = new FacultyEmployeeViewModel()
@@ -151,7 +167,8 @@ namespace PD.Services
                         empl.FacultySalary.Program = new Program() { Value = worksheet.Cells[row, (int)ColIndex.progCol].Value.ToString().Trim() };
                         empl.FacultySalary.SpecialAdjustment = decimal.Parse(worksheet.Cells[row, (int)ColIndex.specialAdjustCol].Value.ToString().Trim());
                         empl.FacultySalary.Speedcode = new Speedcode() { Value = worksheet.Cells[row, (int)ColIndex.scCol].Value.ToString().Trim() };
-
+                        empl.ContractStatus = Enum.Parse<Position.ePositionContract>(worksheet.Cells[row, (int)ColIndex.statusCol].Value.ToString().Trim());
+                        
                         employees.Add(empl);
                     }
 
@@ -235,12 +252,7 @@ namespace PD.Services
                     //Creating chart strings
                     foreach (var empl in employees)
                     {
-                        var deptIdParentIds = Db.ChartField2ChartStringJoins.Where(join => join.ChartFieldId == empl.Salary.DeptId.Id).Select(join => join.ChartStringId).ToList();
-                        var fundParentIds = Db.ChartField2ChartStringJoins.Where(join => join.ChartFieldId == empl.Salary.Fund.Id).Select(join => join.ChartStringId);
-                        var progParentIds = Db.ChartField2ChartStringJoins.Where(join => join.ChartFieldId == empl.Salary.Program.Id).Select(join => join.ChartStringId);
-                        var accountParentIds = Db.ChartField2ChartStringJoins.Where(join => join.ChartFieldId == empl.Salary.Account.Id).Select(join => join.ChartStringId);
-
-                        int? csId = deptIdParentIds.Intersect(fundParentIds).Intersect(progParentIds).Intersect(accountParentIds).FirstOrDefault();
+                        int? csId = GetChartStringIds(empl.Salary.DeptId.Id, empl.Salary.Fund.Id, empl.Salary.Program.Id, empl.Salary.Account.Id).FirstOrDefault();
 
                         ChartString cs;
                         if (!csId.HasValue || csId.Value == 0)
@@ -259,36 +271,62 @@ namespace PD.Services
 
                     }
 
-
-                    //Creating / Updating position records
+                    //Creating / updating position records
                     foreach (var empl in employees)
                     {
                         //Retrieve the person record of this employee from the database
                         Person person = Db.Persons.Where(p => p.EmployeeId == empl.EmployeeId).FirstOrDefault();
 
                         //Retrieve the active position record with the given position number from the database
-                        Position position = Db.Positions.Where(p => p.IsActive && p.Number == empl.PositionNumber).FirstOrDefault();
-
-                        //If the position record exists, then it should belong to this employee. This data ingestion does not
-                        //handle changing positions from one employee to another.
-                        if (position != null && position.CurrentPerson.PersonId != person.Id)
-                            throw new Exception("The Position Number " + empl.PositionNumber + " has already been assigned to another person (system ID: " + position.CurrentPerson.PersonId);
+                        Position position = Db.Positions
+                            .Where(p => p.IsActive
+                                && p.Number == empl.PositionNumber
+                                && (p.StartDate.HasValue == false || p.StartDate <= DateTime.Today)
+                                && (p.EndDate.HasValue == false || p.EndDate > DateTime.Today)
+                                )
+                            .FirstOrDefault();
 
                         if (position == null)
                         {
-                            //Creating a position record and attaching it to the current person record
-                            //========================================================================
+                            //Create a new position record
+                            position = new Position();
+                            position.StartDate = null;
+                            position.EndDate = null;
+                            position.Number = empl.PositionNumber;
+                            position.IsActive = true;
+                            position.Title = empl.Rank;
+                            position.PositionWorkload = empl.FtPtStatus;
+                            position.PositionContract = empl.ContractStatus;
 
-                            ////////    if(person.PersonPositions.)
+                            Db.Positions.Add(position);
+                            Db.SaveChanges();
+                        }
+                    }
+                    
 
-                            ////////    position = new Position();
-                            ////////    position.IsActive = true;
-                            ////////    position.Number = empl.PositionNumber;
+                    //Adding positions to employees
+                    foreach (var empl in employees)
+                    {
+                        var position = Db.Positions.Where(pos => pos.Number == empl.PositionNumber).FirstOrDefault();
+                        var person = Db.Persons.Where(per => per.EmployeeId == empl.EmployeeId).FirstOrDefault();
 
+                        IQueryable<PersonPosition> associations = GetPositionAssociations(person.Id, position.Id, sampleDate);
 
-                            ////////    position.CurrentPerson = new PersonPosition();
-                            ////////    position.CurrentPerson.PersonId = person.Id;
-                            ////////    position.CurrentPerson.Positions.Add
+                        if (associations.Count() > 1)
+                            throw new Exception("Data Error: Same position has multiple associations with persons for the same time period containig " + sampleDate.Date);
+
+                        if(associations.Count() == 0)
+                        {
+                            PersonPosition pp = new PersonPosition();
+                            pp.StartDate = periodStartDate;
+                            pp.EndDate = periodEndDate;
+                            pp.Percentage = 100;
+                            pp.Status = PersonPosition.eStatus.Active;
+
+                            person.PersonPositions.Add(pp);
+                            position.PersonPositions.Add(pp);
+
+                            Db.SaveChanges();
                         }
                     }
 
@@ -307,6 +345,17 @@ namespace PD.Services
             //{
             //    throw ex;
             //}
+        }
+
+        protected IEnumerable<int> GetChartStringIds(int deptIdId, int fundId, int programId, int accountId)
+        {
+            var deptIdParentIds = Db.ChartField2ChartStringJoins.Where(join => join.ChartFieldId == deptIdId).Select(join => join.ChartStringId).ToList();
+            var fundParentIds = Db.ChartField2ChartStringJoins.Where(join => join.ChartFieldId == fundId).Select(join => join.ChartStringId);
+            var progParentIds = Db.ChartField2ChartStringJoins.Where(join => join.ChartFieldId == programId).Select(join => join.ChartStringId);
+            var accountParentIds = Db.ChartField2ChartStringJoins.Where(join => join.ChartFieldId == accountId).Select(join => join.ChartStringId);
+
+            IEnumerable<int> csIds = deptIdParentIds.Intersect(fundParentIds).Intersect(progParentIds).Intersect(accountParentIds);
+            return csIds;
         }
 
         public void UpdateEmployee(FacultyEmployeeViewModel empl)

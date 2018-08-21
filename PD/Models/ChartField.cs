@@ -13,6 +13,6 @@ namespace PD.Models
         public int Id { get; set; }
         public string Value { get; set; }
 
-        public virtual ICollection<ChartField2ChartStringJoin> ChartStrings { get; } = new List<ChartField2ChartStringJoin>();
+        public virtual ICollection<ChartField2ChartStringJoin> ChartStrings { get; set; } = new List<ChartField2ChartStringJoin>();
     }
 }
