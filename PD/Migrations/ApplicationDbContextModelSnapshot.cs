@@ -3,17 +3,15 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PD.Data;
 
-namespace PD.Data.Migrations
+namespace PD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180821172339_ChangedBirthDateToNullable")]
-    partial class ChangedBirthDateToNullable
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -232,6 +230,31 @@ namespace PD.Data.Migrations
                     b.ToTable("ChartStrings");
                 });
 
+            modelBuilder.Entity("PD.Models.Compensations.Compensation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime?>("EffectiveDate");
+
+                    b.Property<DateTime?>("EndDate");
+
+                    b.Property<int>("PersonPositionId");
+
+                    b.Property<decimal>("Salary");
+
+                    b.Property<DateTime?>("StartDate");
+
+                    b.Property<string>("Year");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonPositionId");
+
+                    b.ToTable("Compensations");
+                });
+
             modelBuilder.Entity("PD.Models.Department", b =>
                 {
                     b.Property<int>("Id")
@@ -267,8 +290,6 @@ namespace PD.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime?>("EffectiveDate");
 
                     b.Property<DateTime?>("EndDate");
 
@@ -516,6 +537,14 @@ namespace PD.Data.Migrations
                     b.HasOne("PD.Models.ChartString", "ChartString")
                         .WithMany("ChartFields")
                         .HasForeignKey("ChartStringId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("PD.Models.Compensations.Compensation", b =>
+                {
+                    b.HasOne("PD.Models.PersonPosition", "PersonPosition")
+                        .WithMany("Compensations")
+                        .HasForeignKey("PersonPositionId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
