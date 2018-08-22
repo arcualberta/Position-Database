@@ -20,7 +20,7 @@ namespace PD.Models
 
         [Column(TypeName = "decimal(18,2)")]
         [Range(0, 100)]
-        public decimal Value { get; set; }
+        public decimal ValuePercentage { get; set; }
 
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }

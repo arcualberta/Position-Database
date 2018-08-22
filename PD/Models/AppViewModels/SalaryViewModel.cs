@@ -9,11 +9,10 @@ namespace PD.Models.AppViewModels
 {
     public class SalaryViewModel
     {
-        public string FiscalYear { get; set; }
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal LastSalary { get; set; }
         [Column(TypeName = "decimal(18,2)")]
         public decimal CurrentSalary { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal NextSalary { get; set; }
         public string BargUnit { get; set; }
         public Speedcode Speedcode { get; set; }
         public DeptID DeptId { get; set; }

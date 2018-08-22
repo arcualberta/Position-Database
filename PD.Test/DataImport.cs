@@ -26,7 +26,7 @@ namespace PD.Test
             string worksheet2015_16 = "ARC Academic Salary Adj2015 16";
             Assert.True(File.Exists(dataFile));
             ds.InjestFacultySalaryAdjustmentData(dataFile, worksheet2015_16, new DateTime(2015, 7, 1).Date,
-                        new DateTime(2016, 06, 30).Date, new DateTime(2015, 07, 02).Date);
+                        new DateTime(2016, 06, 30).Date, new DateTime(2015, 07, 02).Date, new DateTime(2017, 06, 30).Date);
         }
     }
 }

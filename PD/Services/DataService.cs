@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using static PD.Models.AppViewModels.EmployeeViewModel;
+using PD.Models.Compensations;
 
 namespace PD.Services
 {
@@ -68,7 +69,7 @@ namespace PD.Services
             bargUnitCol
         };
 
-        public void InjestFacultySalaryAdjustmentData(string fileName, string worksheetName, DateTime periodStartDate, DateTime periodEndDate, DateTime sampleDate)
+        public void InjestFacultySalaryAdjustmentData(string fileName, string worksheetName, DateTime fiscalYearStartDate, DateTime fiscalYearEndDate, DateTime sampleDate, DateTime nextFiscalYearEndDate)
         {
             FileInfo file = new FileInfo(fileName);
             //try
@@ -127,10 +128,13 @@ namespace PD.Services
                     }
 
                     //Making sure past and current salaries are in the correct columns
-                    int[] pastYearRange = worksheet.Cells[2, (int)ColIndex.pastSalaryCol].Value.ToString().Split("/").Select(x => int.Parse(x)).ToArray();
-                    int[] currentYearRange = worksheet.Cells[2, (int)ColIndex.currSalaryCol].Value.ToString().Split("/").Select(x => int.Parse(x)).ToArray();
-                    if (pastYearRange[1] != currentYearRange[0])
-                        errors.Add("The ending year of the past fiscal year must be as same as the begining year of the current fiscal year.");
+                    int[] olderYearRange = worksheet.Cells[2, (int)ColIndex.pastSalaryCol].Value.ToString().Split("/").Select(x => int.Parse(x)).ToArray();
+                    int[] latterYearRange = worksheet.Cells[2, (int)ColIndex.currSalaryCol].Value.ToString().Split("/").Select(x => int.Parse(x)).ToArray();
+                    if (olderYearRange[0] != fiscalYearStartDate.Year || olderYearRange[1] != fiscalYearEndDate.Year)
+                        throw new Exception("Specified fiscal year does not match with the data");
+
+                    if (olderYearRange[1] != latterYearRange[0])
+                        throw new Exception("The ending year of the older fiscal year must be as same as the begining year of the latter fiscal year.");
 
                     for (int row = 3; row <= rowCount; ++row)
                     {
@@ -153,12 +157,11 @@ namespace PD.Services
                         empl.FacultySalary.Account = new Account() { Value = worksheet.Cells[row, (int)ColIndex.accCol].Value.ToString().Trim() };
                         empl.FacultySalary.BargUnit = worksheet.Cells[row, (int)ColIndex.bargUnitCol].Value == null ? null : worksheet.Cells[row, (int)ColIndex.bargUnitCol].Value.ToString().Trim();
                         empl.FacultySalary.ContractSettlement = decimal.Parse(worksheet.Cells[row, (int)ColIndex.contractSettlementCol].Value.ToString().Trim());
-                        empl.FacultySalary.CurrentSalary = decimal.Parse(worksheet.Cells[row, (int)ColIndex.currSalaryCol].Value.ToString().Trim());
+                        empl.FacultySalary.NextSalary = decimal.Parse(worksheet.Cells[row, (int)ColIndex.currSalaryCol].Value.ToString().Trim());
                         empl.FacultySalary.DeptId = new DeptID() { Value = worksheet.Cells[row, (int)ColIndex.deptIdCol].Value.ToString().Trim() };
-                        empl.FacultySalary.FiscalYear = currentYearRange[0] + "/" + currentYearRange[1];
                         empl.FacultySalary.Fund = new Fund() { Value = worksheet.Cells[row, (int)ColIndex.fundCol].Value.ToString().Trim() };
                         empl.FacultySalary.IsPromoted = "Yes" == worksheet.Cells[row, (int)ColIndex.promotedCol].Value.ToString().Trim();
-                        empl.FacultySalary.LastSalary = decimal.Parse(worksheet.Cells[row, (int)ColIndex.pastSalaryCol].Value.ToString().Trim());
+                        empl.FacultySalary.CurrentSalary = decimal.Parse(worksheet.Cells[row, (int)ColIndex.pastSalaryCol].Value.ToString().Trim());
                         empl.FacultySalary.MarketSupplement = decimal.Parse(worksheet.Cells[row, (int)ColIndex.marketSupplementCol].Value.ToString().Trim());
                         empl.FacultySalary.Merit = decimal.Parse(worksheet.Cells[row, (int)ColIndex.meritCol].Value.ToString().Trim());
                         empl.FacultySalary.MeritDecision = double.Parse(worksheet.Cells[row, (int)ColIndex.meritDecCol].Value.ToString().Trim());
@@ -268,10 +271,15 @@ namespace PD.Services
                         }
                         else
                             cs = Db.ChartStrings.Find(csId);
-
                     }
 
-                    //Creating / updating position records
+                    //Creating speedcodes
+                    foreach (var empl in employees)
+                    {
+                        
+                    }
+
+                    //Adding position records
                     foreach (var empl in employees)
                     {
                         //Retrieve the person record of this employee from the database
@@ -303,6 +311,22 @@ namespace PD.Services
                         }
                     }
                     
+                    //Creating Position Accounts
+                    foreach (var empl in employees)
+                    {
+                        var position = Db.Positions.Where(pos => pos.Number == empl.PositionNumber).FirstOrDefault();
+                        var chartStringId = GetChartStringIds(empl.Salary.DeptId.Id, empl.Salary.Fund.Id, empl.Salary.Program.Id, empl.Salary.Account.Id).First();
+
+                        if(!Db.PositionAccounts.Where(pa => pa.PositionId == position.Id && pa.ChartStringId == chartStringId).Any())
+                        {
+                            PositionAccount pa = new PositionAccount();
+                            pa.ValuePercentage = 100;
+                            position.PositionAccounts.Add(pa);
+                            pa.ChartStringId = chartStringId;
+
+                            Db.SaveChanges();
+                        }
+                    }
 
                     //Adding positions to employees
                     foreach (var empl in employees)
@@ -318,8 +342,8 @@ namespace PD.Services
                         if(associations.Count() == 0)
                         {
                             PersonPosition pp = new PersonPosition();
-                            pp.StartDate = periodStartDate;
-                            pp.EndDate = periodEndDate;
+                            pp.StartDate = fiscalYearStartDate;
+                            pp.EndDate = fiscalYearEndDate;
                             pp.Percentage = 100;
                             pp.Status = PersonPosition.eStatus.Active;
 
@@ -334,7 +358,44 @@ namespace PD.Services
                     //Updating employee salary information
                     foreach (var empl in employees)
                     {
+                        var position = Db.Positions.Where(pos => pos.Number == empl.PositionNumber).FirstOrDefault();
+                        var person = Db.Persons.Where(per => per.EmployeeId == empl.EmployeeId).FirstOrDefault();
+                        var personPosition = GetPositionAssociations(person.Id, position.Id, sampleDate).FirstOrDefault();
+                        
+                        var currentFiscalYear = fiscalYearStartDate.Year + "/" + fiscalYearEndDate.Year;
+                        var nextFiscalYear = fiscalYearEndDate.Year + "/" + (fiscalYearEndDate.Year + 1);
 
+                        //Add current year's compensation record if it does not exist in the database
+                        if(!personPosition.Compensations.Where(c => c.Year == currentFiscalYear).Any())
+                        {
+                            FacultyCompensation c = new FacultyCompensation();
+                            c.Year = currentFiscalYear;
+                            c.Salary = empl.Salary.CurrentSalary;
+                            c.StartDate = fiscalYearStartDate.Date;
+                            c.EndDate = fiscalYearEndDate.Date;
+                            personPosition.Compensations.Add(c);
+                        }
+
+                        //Add next year's compensation if 
+                        FacultySalaryViewModel salary = empl.Salary as FacultySalaryViewModel;
+                        if (!personPosition.Compensations.Where(c => c.Year == nextFiscalYear).Any())
+                        {
+                            FacultyCompensation c = new FacultyCompensation();
+                            c.Year = nextFiscalYear;
+                            c.StartDate = fiscalYearEndDate.Date.AddDays(1);
+                            c.EndDate = nextFiscalYearEndDate;
+                            c.Salary = salary.NextSalary;
+                            c.MeritDecision = salary.MeritDecision;
+                            c.MeritReason = salary.MeritReason;
+                            c.Merit = salary.Merit;
+                            c.ContractSuppliment = salary.ContractSettlement;
+                            c.SpecialAdjustment = salary.SpecialAdjustment;
+                            c.MarketSupplement = salary.MarketSupplement;
+
+                            personPosition.Compensations.Add(c);
+                        }
+
+                        Db.SaveChanges();
                     }
 
                     //Updating 

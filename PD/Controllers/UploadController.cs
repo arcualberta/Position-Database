@@ -47,7 +47,7 @@ namespace PD.Controllers
                     //processing the uploaded file
                     DataService ds = new DataService(_context);
                     ds.InjestFacultySalaryAdjustmentData(tmpFile, worksheetName, new DateTime(2015, 7, 1).Date,
-                        new DateTime(2016,06,30).Date, new DateTime(2015, 07, 02).Date);
+                        new DateTime(2016,06,30).Date, new DateTime(2015, 07, 02).Date, new DateTime(2017, 06, 30).Date);
 
                     //Deleting the temporary file
                     System.IO.File.Delete(tmpFile);
