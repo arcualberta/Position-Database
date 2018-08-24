@@ -147,7 +147,7 @@ namespace PD.Services
                             Rank = worksheet.Cells[row, (int)ColIndex.rankCol].Value.ToString().Trim(),
                             EmployeeId = worksheet.Cells[row, (int)ColIndex.employeeIdCol].Value.ToString().Trim(),
                             EmployeeName = worksheet.Cells[row, (int)ColIndex.employeeNameCol].Value.ToString().Trim(),
-                            PositionNumber = worksheet.Cells[row, (int)ColIndex.employeeNameCol].Value.ToString().Trim(),
+                            PositionNumber = worksheet.Cells[row, (int)ColIndex.posNumCol].Value.ToString().Trim(),
                             FtPtStatus = ftptStatus,
                             FundingSource = fundingSource,
                             RecordNumber = Int32.Parse(worksheet.Cells[row, (int)ColIndex.recordNumCol].Value.ToString().Trim()),
@@ -305,6 +305,7 @@ namespace PD.Services
                             position.Title = empl.Rank;
                             position.PositionWorkload = empl.FtPtStatus;
                             position.PositionContract = empl.ContractStatus;
+                            position.PositionType = Position.ePositionType.Faculty;
 
                             Db.Positions.Add(position);
                             Db.SaveChanges();

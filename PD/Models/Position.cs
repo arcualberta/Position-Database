@@ -23,6 +23,13 @@ namespace PD.Models
             S
         }
 
+        public enum ePositionType
+        {
+            Faculty = 1,
+            APO,
+            NASA
+        }
+
         /// <summary>
         /// Unique System ID.
         /// </summary>
@@ -30,12 +37,16 @@ namespace PD.Models
         /// </value>
         [Key]
         public int Id { get; set; }
+        [Display(Name = "Position Number")]
         public string Number { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public bool IsActive { get; set; }
+        [Display(Name = "FT/PT")]
         public ePositionWorkload PositionWorkload { get; set; }
+        [Display(Name = "Status")]
         public ePositionContract PositionContract { get; set; }
+        public ePositionType PositionType { get; set; }
         /// <summary>
         /// Gets or sets the start date.
         /// </summary>

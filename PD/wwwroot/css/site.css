@@ -35,3 +35,26 @@ body {
         display: none;
     }
 }
+
+/* Filter */
+.filter{
+}
+    .filter label{
+        width:auto;
+    }
+    .filter div.form-group{
+        float:left;
+        margin: 0 5px;
+    }
+    .filter input[type="date"] {
+        width: 175px;
+    }
+    .filter label.field-name {
+        margin-top: 6px;
+    }
+    .filter input[type="checkbox"] {
+        margin-top: 2px;
+    }
+    .filter select{
+        height:34px;
+    }
