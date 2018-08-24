@@ -17,7 +17,7 @@ namespace PD.Services
             
         }
 
-        public List<FacultyEmployeeViewModel> GetFacultyMembers(PersonFilter filter, int? page = null, int? offset = null)
+        public List<FacultyEmployeeViewModel> GetFacultyMembers(PositionFilter filter, int? page = null, int? offset = null)
         {
             IQueryable<PersonPosition> associations = GetPersonPositionAssociations(filter.PositionType, filter.Date, filter.IsActive);
             associations.OrderBy(a => a.Person.Name);

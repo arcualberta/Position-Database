@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace PD.Models.AppViewModels.Filters
 {
-    public class PersonFilter
+    public class PositionFilter
     {
         [DisplayFormat(ApplyFormatInEditMode = true)]
         [Display(Name = "Date")]

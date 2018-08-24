@@ -18,10 +18,10 @@ namespace PD.Controllers
         {
             _context = context;
         }
-        public IActionResult Positions(PersonFilter filter)
+        public IActionResult Positions(PositionFilter filter)
         {
             if (filter == null)
-                filter = new PersonFilter();
+                filter = new PositionFilter();
 
             ReportService srv = new ReportService(_context);
             List<PersonPosition> positionAssignments = srv.GetPersonPositionAssociations(filter.PositionType, filter.Date, filter.IsActive).ToList();

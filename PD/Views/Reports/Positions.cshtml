@@ -6,7 +6,7 @@
 
 <h2>Employees</h2>
 
-@{ var filter = ViewBag.Filter as PersonFilter; }
+@{ var filter = ViewBag.Filter as PositionFilter; }
 @Html.EditorFor(model => filter, new {controller = "reports", action = "positions" })
 <table class="table">
     <thead>
