@@ -25,12 +25,9 @@ namespace PD.Controllers
 
             ReportService srv = new ReportService(_context);
             List<PersonPosition> positionAssignments = srv.GetPersonPositionAssociations(filter.PositionType, filter.Date, filter.IsActive).ToList();
-            var tmp = positionAssignments.Select(pp => new PositionViewModel(pp));
 
             ViewBag.Filter = filter;
-            return View(tmp);
-            //return View(new List<PersonPosition>().Select(pp => new PositionViewModel(pp)));
-            //return View(positionAssignments.ToList().Select(pp => new PositionViewModel(pp)));
+            return View(positionAssignments.ToList().Select(pp => new PositionViewModel(pp)));
         }
     }
 }
