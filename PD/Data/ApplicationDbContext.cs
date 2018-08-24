@@ -79,8 +79,9 @@ namespace PD.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder
-            .UseLazyLoadingProxies();
+            base.OnConfiguring(optionsBuilder);
+            //optionsBuilder
+            //.UseLazyLoadingProxies();
         }
     }
 }

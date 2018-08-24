@@ -39,12 +39,14 @@ namespace PD.Services
             if (!date.HasValue)
                 date = DateTime.Now.Date;
 
-            IQueryable<PersonPosition> associations = Db.PersonPositions;
-                ////.Where(pp =>
-                ////    pp.Position.PositionType == positionType);
-                    ////&& (!pp.StartDate.HasValue || pp.StartDate.Value <= date)
-                    ////&& (!pp.EndDate.HasValue || pp.EndDate.Value > date)
-                    ////);
+            IQueryable<PersonPosition> associations = Db.PersonPositions
+                .Include(pp => pp.Position)
+                .Include(pp => pp.Person)
+                .Where(pp =>
+                    pp.Position.PositionType == positionType
+                    && (!pp.StartDate.HasValue || pp.StartDate.Value <= date)
+                    && (!pp.EndDate.HasValue || pp.EndDate.Value > date)
+                    );
 
             return associations;
         }
