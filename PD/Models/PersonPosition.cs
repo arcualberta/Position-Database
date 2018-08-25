@@ -35,6 +35,7 @@ namespace PD.Models
         [Display(Name ="Percentage (0 - 100)")]
         public double Percentage { get; set; }
         public eStatus Status { get; set; }
+        public Position.ePositionContract ContractType { get; set; }
 
         public int? PersonId { get; set; }
         public virtual Person Person { get; set; }

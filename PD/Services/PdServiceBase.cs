@@ -3,6 +3,7 @@ using PD.Models;
 using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using PD.Models.AppViewModels.Filters;
 
 namespace PD.Services
 {
@@ -18,18 +19,15 @@ namespace PD.Services
             Db = db;
         }
 
-        public IQueryable<PersonPosition> GetPersonPositionAssociations(Position.ePositionType positionType, DateTime? date, bool isActive = true)
+        public IQueryable<PersonPosition> GetPersonPositionAssociations(PositionFilter filter)
         {
-            if (!date.HasValue)
-                date = DateTime.Now.Date;
-
             IQueryable<PersonPosition> associations = Db.PersonPositions
                 .Include(pp => pp.Position)
                 .Include(pp => pp.Person)
                 .Where(pp =>
-                    pp.Position.PositionType == positionType
-                    && (!pp.StartDate.HasValue || pp.StartDate.Value <= date)
-                    && (!pp.EndDate.HasValue || pp.EndDate.Value > date)
+                    pp.Position.PositionType == filter.PositionType
+                    && (!pp.StartDate.HasValue || pp.StartDate.Value <= filter.Date)
+                    && (!pp.EndDate.HasValue || pp.EndDate.Value > filter.Date)
                     );
 
             return associations;

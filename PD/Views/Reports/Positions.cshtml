@@ -26,9 +26,18 @@
             <th>
                 @Html.DisplayNameFor(model => model.EmployeeId)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkLoad)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ContractType)
+            </th>
             @*<th>
-                @Html.DisplayNameFor(model => model.PersonPositions.First().Position.PositionAccounts.First().)
-            </th>*@
+            @Html.DisplayNameFor(model => model.PersonPositions.First().Position.PositionAccounts.First().)
+        </th>*@
             <th></th>
         </tr>
     </thead>
@@ -38,27 +47,37 @@
         @foreach (var item in Model.ToList())
         {
             //var item = objArray[i];
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Department)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PositionNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PositionTitle)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EmployeeName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EmployeeId)
-                </td>
-                <td>
-                    @*<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a>*@
-                </td>
-            </tr>
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Department)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PositionNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PositionTitle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmployeeName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmployeeId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WorkLoad)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ContractType)
+            </td>
+
+            <td>
+                @*<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+            <a asp-action="Details" asp-route-id="@item.Id">Details</a>*@
+            </td>
+        </tr>
             @*<tr>
                 <td>
                     @item.Person.Name
