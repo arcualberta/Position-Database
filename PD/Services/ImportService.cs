@@ -344,7 +344,7 @@ namespace PD.Services
                         {
                             PersonPosition pp = new PersonPosition();
                             pp.StartDate = fiscalYearStartDate;
-                            pp.EndDate = fiscalYearEndDate;
+                            pp.EndDate = null;// fiscalYearEndDate;
                             pp.Percentage = 100;
                             pp.Status = PersonPosition.eStatus.Active;
                             pp.ContractType = empl.ContractStatus;
