@@ -15,9 +15,9 @@ using PD.Models.Compensations;
 
 namespace PD.Services
 {
-    public class DataService: PdServiceBase
+    public class ImportService: PdServiceBase
     {
-        public DataService(ApplicationDbContext db)
+        public ImportService(ApplicationDbContext db)
             : base(db)
         {
 

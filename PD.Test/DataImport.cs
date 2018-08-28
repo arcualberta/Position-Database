@@ -20,7 +20,7 @@ namespace PD.Test
         public void ImportFacultyData()
         {
             ApplicationDbContext db = new SqlServerDb().Db;
-            DataService ds = new DataService(db);
+            ImportService ds = new ImportService(db);
 
             string dataFile = @"C:\Users\Kamal\Documents\Projects\Position-Database-Data\Arts 2016 Faculty FSO Salary Adjustment Report with ChartString.xlsx";
             string worksheet2015_16 = "ARC Academic Salary Adj2015 16";
