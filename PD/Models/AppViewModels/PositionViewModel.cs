@@ -36,12 +36,12 @@ namespace PD.Models.AppViewModels
 
         }
 
-        public PositionViewModel(PersonPosition pp)
+        public PositionViewModel(PersonPosition pp, DataProtector dp)
         {
             Department = "";
             PositionNumber = pp.Position.Number;
             PositionTitle = pp.Position.Title;
-            EmployeeName = pp.Person.Name;
+            EmployeeName = dp.Decrypt(pp.Person.Name);
             EmployeeId = pp.Person.EmployeeId;
             WorkLoad = pp.Position.PositionWorkload;
             Status = pp.Status;

@@ -1,4 +1,5 @@
-﻿using PD.Data;
+﻿using Microsoft.Extensions.Configuration;
+using PD.Data;
 using PD.Models;
 using PD.Models.ChartFields;
 using System;
@@ -16,7 +17,6 @@ namespace PD.Services
         public ChartStringService(ApplicationDbContext db)
             : base(db)
         {
-
         }
         /// <summary>
         /// Creates a ChartField of a given type and adds it to the database if requested.

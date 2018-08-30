@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using PD.Data;
 using PD.Services;
 
@@ -13,9 +15,11 @@ namespace PD.Controllers
     public class UploadController : Controller
     {
         private readonly ApplicationDbContext _context;
-        public UploadController(ApplicationDbContext context)
+        private readonly IDataProtectionProvider _provider;
+        public UploadController(ApplicationDbContext context, IDataProtectionProvider provider)
         {
             _context = context;
+            _provider = provider;
         }
 
         [HttpGet]

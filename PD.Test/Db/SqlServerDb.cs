@@ -10,13 +10,16 @@ namespace PD.Test.Db
 {
     public class SqlServerDb
     {
-        public ApplicationDbContext Db;
+        public ApplicationDbContext Db { get; private set; }
+        public IConfiguration Configuration { get; private set; }
 
         public SqlServerDb()
         {
             var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.test.json")
                 .Build();
+
+            Configuration = config;
 
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseSqlServer(config.GetConnectionString("DefaultConnection"));

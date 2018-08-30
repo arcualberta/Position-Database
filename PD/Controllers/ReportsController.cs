@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using PD.Data;
 using PD.Models;
 using PD.Models.AppViewModels;
@@ -27,7 +29,7 @@ namespace PD.Controllers
             IQueryable<PersonPosition> positionAssignments = srv.GetPersonPositionAssociations(filter);
 
             ViewBag.Filter = filter;
-            return View(positionAssignments.ToList().Select(pp => new PositionViewModel(pp)));
+            return View(positionAssignments.ToList().Select(pp => new PositionViewModel(pp, srv.DataProtector)));
         }
     }
 }

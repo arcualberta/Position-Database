@@ -4,6 +4,10 @@ using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using PD.Models.AppViewModels.Filters;
+using Microsoft.Extensions.Configuration;
+using System.Text;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace PD.Services
 {
@@ -14,10 +18,29 @@ namespace PD.Services
     {
         public ApplicationDbContext Db { get; }
 
+        private DataProtector _DataProtector;
+        public DataProtector DataProtector
+        {
+            get
+            {
+                if (_DataProtector == null)
+                {
+                    var serviceCollection = new ServiceCollection();
+                    serviceCollection.AddDataProtection();
+                    var services = serviceCollection.BuildServiceProvider();
+
+                    _DataProtector = ActivatorUtilities.CreateInstance<DataProtector>(services);
+                }
+
+                return _DataProtector;
+            }
+        }
+
         public PdServiceBase(ApplicationDbContext db)
         {
             Db = db;
         }
+
 
         public IQueryable<PersonPosition> GetPersonPositionAssociations(PositionFilter filter)
         {

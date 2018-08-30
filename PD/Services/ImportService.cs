@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using static PD.Models.AppViewModels.EmployeeViewModel;
 using PD.Models.Compensations;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace PD.Services
 {
@@ -20,7 +22,6 @@ namespace PD.Services
         public ImportService(ApplicationDbContext db)
             : base(db)
         {
-
         }
 
         public IQueryable<PersonPosition> GetPositionAssociations(int personId, int? positionId = null, DateTime? date = null)
@@ -188,13 +189,13 @@ namespace PD.Services
                     //Adding new employees that are in the data file but not in the database to the database
                     foreach (var empl in employees)
                     {
-                        Person dbPersonRecord = Db.Persons.Where(p => p.EmployeeId == empl.EmployeeId && p.Name == empl.EmployeeName).FirstOrDefault();
+                        Person dbPersonRecord = Db.Persons.Where(p => p.EmployeeId == empl.EmployeeId).FirstOrDefault();
                         if (dbPersonRecord == null)
                         {
                             dbPersonRecord = new Person()
                             {
                                 EmployeeId = empl.EmployeeId,
-                                Name = empl.EmployeeName
+                                Name = DataProtector.Encrypt(empl.EmployeeName)
                             };
                             Db.Persons.Add(dbPersonRecord);
                         }

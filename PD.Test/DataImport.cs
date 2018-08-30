@@ -11,6 +11,7 @@ using System.Configuration;
 using System.Linq;
 using PD.Test.Db;
 using System.IO;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace PD.Test
 {
@@ -19,7 +20,8 @@ namespace PD.Test
         [Fact]
         public void ImportFacultyData()
         {
-            ApplicationDbContext db = new SqlServerDb().Db;
+            SqlServerDb server = new SqlServerDb();
+            ApplicationDbContext db = server.Db;
             ImportService ds = new ImportService(db);
 
             string dataFile = @"C:\Users\Kamal\Documents\Projects\Position-Database-Data\Arts 2016 Faculty FSO Salary Adjustment Report with ChartString.xlsx";

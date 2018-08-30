@@ -1,4 +1,6 @@
-﻿using PD.Data;
+﻿using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Configuration;
+using PD.Data;
 using PD.Models;
 using PD.Models.AppViewModels.Faculty;
 using PD.Models.AppViewModels.Filters;
@@ -12,9 +14,8 @@ namespace PD.Services
     public class ReportService : PdServiceBase
     {
         public ReportService(ApplicationDbContext db)
-            :base(db)
+            : base(db)
         {
-            
         }
     }
 }
