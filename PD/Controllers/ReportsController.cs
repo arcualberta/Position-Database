@@ -29,7 +29,8 @@ namespace PD.Controllers
             IQueryable<PersonPosition> positionAssignments = srv.GetPersonPositionAssociations(filter);
 
             ViewBag.Filter = filter;
-            return View(positionAssignments.ToList().Select(pp => new PositionViewModel(pp, srv.DataProtector)));
+            return View(positionAssignments.ToList().Select(pp => new PositionViewModel(pp, filter.GetFiscalYear(), srv.DataProtector)));
         }
     }
 }
+

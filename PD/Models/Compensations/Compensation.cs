@@ -11,13 +11,19 @@ namespace PD.Models.Compensations
         [Key]
         public int Id { get; set; }
         public string Year { get; set; }
-        public decimal Salary { get; set; }
-        public DateTime? StartDate{get;set;}
-        public DateTime? EndDate{get;set; }
-        public DateTime? EffectiveDate{get;set; }
-
+        public string Type { get; set; }
+        public decimal Value { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
         public int PersonPositionId { get; set; }
         public virtual PersonPosition PersonPosition { get; set; }
+
+
+
+
+        public decimal Salary { get; set; }
+
+
 
     }
 }

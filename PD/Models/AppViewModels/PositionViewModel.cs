@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PD.Models.Compensations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -31,12 +32,16 @@ namespace PD.Models.AppViewModels
         [Display(Name = "Contract")]
         public Position.ePositionContract ContractType { get; set; }
 
+        public Compensation Compensation { get; set; }
+
+
+
         public PositionViewModel()
         {
 
         }
 
-        public PositionViewModel(PersonPosition pp, DataProtector dp)
+        public PositionViewModel(PersonPosition pp, string fiscalYear, DataProtector dp)
         {
             Department = "";
             PositionNumber = pp.Position.Number;
@@ -46,6 +51,8 @@ namespace PD.Models.AppViewModels
             WorkLoad = pp.Position.PositionWorkload;
             Status = pp.Status;
             ContractType = pp.ContractType;
+            Compensation = pp.Compensations.Where(c => c.Year == fiscalYear).FirstOrDefault();
+
         }
     }
 }

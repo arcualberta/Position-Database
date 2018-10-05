@@ -37,6 +37,7 @@ namespace PD.Data
         public DbSet<ChartField2ChartStringJoin> ChartField2ChartStringJoins { get; set; }
         public DbSet<Compensation> Compensations { get; set; }
         public DbSet<FacultyCompensation> FacultyCompensations { get; set; }
+        public DbSet<Adjustment> Adjustmentss { get; set; }
 
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)

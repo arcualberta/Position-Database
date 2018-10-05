@@ -43,5 +43,6 @@ namespace PD.Models
         public virtual Position Position {get;set;}
 
         public virtual ICollection<Compensation> Compensations { get; set; } = new List<Compensation>();
+        public virtual ICollection<Adjustment> Adjustments { get; set; } = new List<Adjustment>();
     }
 }
