@@ -239,23 +239,19 @@ namespace PD.Migrations
                     b.Property<string>("Discriminator")
                         .IsRequired();
 
-                    b.Property<DateTime?>("EffectiveDate");
-
                     b.Property<DateTime?>("EndDate");
 
-                    b.Property<int>("PersonPositionId");
-
-                    b.Property<decimal>("Salary");
-
-                    b.Property<double>("SalaryStep");
+                    b.Property<int>("PositionAssignmentId");
 
                     b.Property<DateTime?>("StartDate");
+
+                    b.Property<decimal>("Value");
 
                     b.Property<string>("Year");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PersonPositionId");
+                    b.HasIndex("PositionAssignmentId");
 
                     b.ToTable("Compensations");
 
@@ -292,64 +288,6 @@ namespace PD.Migrations
                     b.ToTable("Persons");
                 });
 
-            modelBuilder.Entity("PD.Models.PersonPosition", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("ContractType");
-
-                    b.Property<DateTime?>("EndDate");
-
-                    b.Property<double>("Percentage");
-
-                    b.Property<int?>("PersonId");
-
-                    b.Property<int?>("PositionId");
-
-                    b.Property<DateTime?>("StartDate");
-
-                    b.Property<int>("Status");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PersonId");
-
-                    b.HasIndex("PositionId");
-
-                    b.ToTable("PersonPositions");
-                });
-
-            modelBuilder.Entity("PD.Models.Position", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Description");
-
-                    b.Property<DateTime?>("EndDate");
-
-                    b.Property<bool>("IsActive");
-
-                    b.Property<string>("Number");
-
-                    b.Property<int>("PositionContract");
-
-                    b.Property<int>("PositionType");
-
-                    b.Property<int>("PositionWorkload");
-
-                    b.Property<DateTime?>("StartDate");
-
-                    b.Property<string>("Title");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Positions");
-                });
-
             modelBuilder.Entity("PD.Models.PositionAccount", b =>
                 {
                     b.Property<int>("Id")
@@ -374,6 +312,56 @@ namespace PD.Migrations
                     b.HasIndex("PositionId");
 
                     b.ToTable("PositionAccounts");
+                });
+
+            modelBuilder.Entity("PD.Models.PositionAssignment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime?>("EndDate");
+
+                    b.Property<int?>("PositionId");
+
+                    b.Property<DateTime?>("StartDate");
+
+                    b.Property<int>("Status");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PositionId");
+
+                    b.ToTable("PositionAssignments");
+                });
+
+            modelBuilder.Entity("PD.Models.Positions.Position", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ContractType");
+
+                    b.Property<string>("Description");
+
+                    b.Property<DateTime?>("EndDate");
+
+                    b.Property<string>("Number");
+
+                    b.Property<int?>("PersonId");
+
+                    b.Property<DateTime?>("StartDate");
+
+                    b.Property<string>("Title");
+
+                    b.Property<int>("Workload");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("Positions");
                 });
 
             modelBuilder.Entity("PD.Models.SalaryScales.SalaryScale", b =>
@@ -493,25 +481,15 @@ namespace PD.Migrations
                     b.HasDiscriminator().HasValue("Sponsor");
                 });
 
-            modelBuilder.Entity("PD.Models.Compensations.FacultyCompensation", b =>
+            modelBuilder.Entity("PD.Models.Compensations.Adjustment", b =>
                 {
                     b.HasBaseType("PD.Models.Compensations.Compensation");
 
-                    b.Property<decimal>("ContractSuppliment");
+                    b.Property<string>("Name");
 
-                    b.Property<decimal>("MarketSupplement");
+                    b.ToTable("Adjustment");
 
-                    b.Property<decimal>("Merit");
-
-                    b.Property<double>("MeritDecision");
-
-                    b.Property<string>("MeritReason");
-
-                    b.Property<decimal>("SpecialAdjustment");
-
-                    b.ToTable("FacultyCompensation");
-
-                    b.HasDiscriminator().HasValue("FacultyCompensation");
+                    b.HasDiscriminator().HasValue("Adjustment");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -574,21 +552,10 @@ namespace PD.Migrations
 
             modelBuilder.Entity("PD.Models.Compensations.Compensation", b =>
                 {
-                    b.HasOne("PD.Models.PersonPosition", "PersonPosition")
+                    b.HasOne("PD.Models.PositionAssignment", "PositionAssignment")
                         .WithMany("Compensations")
-                        .HasForeignKey("PersonPositionId")
+                        .HasForeignKey("PositionAssignmentId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("PD.Models.PersonPosition", b =>
-                {
-                    b.HasOne("PD.Models.Person", "Person")
-                        .WithMany("PersonPositions")
-                        .HasForeignKey("PersonId");
-
-                    b.HasOne("PD.Models.Position", "Position")
-                        .WithMany("PersonPositions")
-                        .HasForeignKey("PositionId");
                 });
 
             modelBuilder.Entity("PD.Models.PositionAccount", b =>
@@ -598,10 +565,24 @@ namespace PD.Migrations
                         .HasForeignKey("ChartStringId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("PD.Models.Position", "Position")
+                    b.HasOne("PD.Models.Positions.Position", "Position")
                         .WithMany("PositionAccounts")
                         .HasForeignKey("PositionId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("PD.Models.PositionAssignment", b =>
+                {
+                    b.HasOne("PD.Models.Positions.Position", "Position")
+                        .WithMany("PositionAssignments")
+                        .HasForeignKey("PositionId");
+                });
+
+            modelBuilder.Entity("PD.Models.Positions.Position", b =>
+                {
+                    b.HasOne("PD.Models.Person", "Person")
+                        .WithMany("Positions")
+                        .HasForeignKey("PersonId");
                 });
 
             modelBuilder.Entity("PD.Models.ChartFields.DeptID", b =>

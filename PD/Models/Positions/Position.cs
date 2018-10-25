@@ -4,31 +4,25 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PD.Models
+namespace PD.Models.Positions
 {
     public class Position
     {
-        public enum ePositionWorkload {
-            [Display(Name ="Full Time")]
-            F = 1,
+        public enum eWorkload
+        {
+            [Display(Name = "Full Time")]
+            F,
+
             [Display(Name = "Part Time")]
             P
         }
 
-        public enum ePositionContract
+        public enum eContractType
         {
-            [Display(Name = "Regular")]
-            R = 1,
-            [Display(Name = "Sessional")]
+            R,
             S
         }
 
-        public enum ePositionType
-        {
-            Faculty = 1,
-            APO,
-            NASA
-        }
 
         /// <summary>
         /// Unique System ID.
@@ -37,16 +31,18 @@ namespace PD.Models
         /// </value>
         [Key]
         public int Id { get; set; }
+
         [Display(Name = "Position Number")]
         public string Number { get; set; }
+
         public string Title { get; set; }
+
         public string Description { get; set; }
-        public bool IsActive { get; set; }
-        [Display(Name = "FT/PT")]
-        public ePositionWorkload PositionWorkload { get; set; }
-        [Display(Name = "Status")]
-        public ePositionContract PositionContract { get; set; }
-        public ePositionType PositionType { get; set; }
+
+        public eWorkload Workload { get; set; }
+
+        public eContractType ContractType { get; set; }
+
         /// <summary>
         /// Gets or sets the start date.
         /// </summary>
@@ -65,19 +61,11 @@ namespace PD.Models
         /// </value>
         public DateTime? EndDate { get; set; }
 
-        /////// <summary>
-        /////// Gets or sets the effective date.
-        /////// </summary>
-        /////// <value>
-        /////// The effective date of this position record. The effective date can be earlier
-        /////// than the start date in situations where a change is made to the position but
-        /////// make this effective retrospectively. 
-        /////// </value>
-        ////public DateTime? EffectiveDate { get; set; }
-
+        public int? PersonId { get; set; }
+        public Person Person { get; set; }
 
         public virtual ICollection<PositionAccount> PositionAccounts { get; set; } = new List<PositionAccount>();
 
-        public virtual ICollection<PersonPosition> PersonPositions { get; set; } = new List<PersonPosition>();
+        public virtual ICollection<PositionAssignment> PositionAssignments { get; set; } = new List<PositionAssignment>();
     }
 }

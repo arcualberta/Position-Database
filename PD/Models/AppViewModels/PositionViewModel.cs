@@ -1,4 +1,5 @@
 ﻿using PD.Models.Compensations;
+using PD.Models.Positions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -24,13 +25,13 @@ namespace PD.Models.AppViewModels
         public string EmployeeId { get; set; }
 
         [Display(Name = "FT/PT")]
-        public Position.ePositionWorkload WorkLoad { get; set; }
+        public Position.eWorkload WorkLoad { get; set; }
 
         [Display(Name = "Status")]
-        public PersonPosition.eStatus Status { get; set; }
+        public PositionAssignment.eStatus Status { get; set; }
 
         [Display(Name = "Contract")]
-        public Position.ePositionContract ContractType { get; set; }
+        public Position.eContractType ContractType { get; set; }
 
         public Compensation Compensation { get; set; }
 
@@ -41,17 +42,17 @@ namespace PD.Models.AppViewModels
 
         }
 
-        public PositionViewModel(PersonPosition pp, string fiscalYear, DataProtector dp)
+        public PositionViewModel(PositionAssignment pa, string fiscalYear, DataProtector dp)
         {
             Department = "";
-            PositionNumber = pp.Position.Number;
-            PositionTitle = pp.Position.Title;
-            EmployeeName = dp.Decrypt(pp.Person.Name);
-            EmployeeId = pp.Person.EmployeeId;
-            WorkLoad = pp.Position.PositionWorkload;
-            Status = pp.Status;
-            ContractType = pp.ContractType;
-            Compensation = pp.Compensations.Where(c => c.Year == fiscalYear).FirstOrDefault();
+            PositionNumber = pa.Position.Number;
+            PositionTitle = pa.Position.Title;
+            EmployeeName = dp.Decrypt(pa.Position.Person.Name);
+            EmployeeId = pa.Position.Person.EmployeeId;
+            WorkLoad = pa.Position.Workload;
+            Status = pa.Status;
+            ContractType = pa.Position.ContractType;
+            Compensation = pa.Compensations.Where(c => c.Year == fiscalYear).FirstOrDefault();
 
         }
     }

@@ -14,6 +14,7 @@ using static PD.Models.AppViewModels.EmployeeViewModel;
 using PD.Models.Compensations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.DataProtection;
+using PD.Models.Positions;
 
 namespace PD.Services
 {
@@ -22,22 +23,6 @@ namespace PD.Services
         public ImportService(ApplicationDbContext db)
             : base(db)
         {
-        }
-
-        public IQueryable<PersonPosition> GetPositionAssociations(int personId, int? positionId = null, DateTime? date = null)
-        {
-            if (!date.HasValue)
-                date = DateTime.Now.Date;
-
-            IQueryable<PersonPosition> associations = Db.PersonPositions
-                .Where(a => a.PersonId == personId
-                    && (!a.StartDate.HasValue || a.StartDate.Value <= date)
-                    && (!a.EndDate.HasValue || a.EndDate.Value >= date));
-
-            if (positionId.HasValue)
-                associations = associations.Where(a => a.PositionId == positionId);
-
-            return associations;
         }
 
         private enum ColIndex
@@ -139,7 +124,7 @@ namespace PD.Services
 
                     for (int row = 3; row <= rowCount; ++row)
                     {
-                        Position.ePositionWorkload ftptStatus = Enum.Parse<Position.ePositionWorkload>(worksheet.Cells[row, (int)ColIndex.ftPtStatusCol].Value.ToString());
+                        Position.eWorkload ftptStatus = Enum.Parse<Position.eWorkload>(worksheet.Cells[row, (int)ColIndex.ftPtStatusCol].Value.ToString());
                         eFundingSource fundingSource = Enum.Parse<eFundingSource>(worksheet.Cells[row, (int)ColIndex.fundSrcCol].Value.ToString());
 
                         FacultyEmployeeViewModel empl = new FacultyEmployeeViewModel()
@@ -171,7 +156,7 @@ namespace PD.Services
                         empl.FacultySalary.Program = new Program() { Value = worksheet.Cells[row, (int)ColIndex.progCol].Value.ToString().Trim() };
                         empl.FacultySalary.SpecialAdjustment = decimal.Parse(worksheet.Cells[row, (int)ColIndex.specialAdjustCol].Value.ToString().Trim());
                         empl.FacultySalary.Speedcode = new Speedcode() { Value = worksheet.Cells[row, (int)ColIndex.scCol].Value.ToString().Trim() };
-                        empl.ContractStatus = Enum.Parse<Position.ePositionContract>(worksheet.Cells[row, (int)ColIndex.statusCol].Value.ToString().Trim());
+                        empl.ContractStatus = Enum.Parse<Position.eContractType>(worksheet.Cells[row, (int)ColIndex.statusCol].Value.ToString().Trim());
                         
                         employees.Add(empl);
                     }
@@ -288,8 +273,7 @@ namespace PD.Services
 
                         //Retrieve the active position record with the given position number from the database
                         Position position = Db.Positions
-                            .Where(p => p.IsActive
-                                && p.Number == empl.PositionNumber
+                            .Where(p => p.Number == empl.PositionNumber
                                 && (p.StartDate.HasValue == false || p.StartDate <= DateTime.Today)
                                 && (p.EndDate.HasValue == false || p.EndDate > DateTime.Today)
                                 )
@@ -298,17 +282,16 @@ namespace PD.Services
                         if (position == null)
                         {
                             //Create a new position record
-                            position = new Position();
-                            position.StartDate = null;
+                            position = new Faculty();
+                            position.StartDate = fiscalYearStartDate;
                             position.EndDate = null;
                             position.Number = empl.PositionNumber;
-                            position.IsActive = true;
                             position.Title = empl.Rank;
-                            position.PositionWorkload = empl.FtPtStatus;
-                            position.PositionContract = empl.ContractStatus;
-                            position.PositionType = Position.ePositionType.Faculty;
+                            position.Workload = empl.FtPtStatus;
+                            position.ContractType = empl.ContractStatus;
 
                             Db.Positions.Add(position);
+                            person.Positions.Add(position);
                             Db.SaveChanges();
                         }
                     }
@@ -330,28 +313,30 @@ namespace PD.Services
                         }
                     }
 
-                    //Adding positions to employees
+                    //Adding position assignments to positions
                     foreach (var empl in employees)
                     {
-                        var position = Db.Positions.Where(pos => pos.Number == empl.PositionNumber).FirstOrDefault();
-                        var person = Db.Persons.Where(per => per.EmployeeId == empl.EmployeeId).FirstOrDefault();
+                        IQueryable<PositionAssignment> positionAssignments = GetPositionAssignments(null, empl.PositionNumber, sampleDate);
 
-                        IQueryable<PersonPosition> associations = GetPositionAssociations(person.Id, position.Id, sampleDate);
+                        if (positionAssignments.Count() > 1)
+                            throw new Exception("Data Error: Same position has multiple assign,emys at the time period containig " + sampleDate.Date);
 
-                        if (associations.Count() > 1)
-                            throw new Exception("Data Error: Same position has multiple associations with persons for the same time period containig " + sampleDate.Date);
-
-                        if(associations.Count() == 0)
+                        if (positionAssignments.Count() == 0)
                         {
-                            PersonPosition pp = new PersonPosition();
-                            pp.StartDate = fiscalYearStartDate;
-                            pp.EndDate = null;// fiscalYearEndDate;
-                            pp.Percentage = 100;
-                            pp.Status = PersonPosition.eStatus.Active;
-                            pp.ContractType = empl.ContractStatus;
+                            Position position = Db.Positions
+                                .Include(pos => pos.PositionAssignments)
+                                .Where(pos => pos.Number == empl.PositionNumber)
+                                .FirstOrDefault();
 
-                            person.PersonPositions.Add(pp);
-                            position.PersonPositions.Add(pp);
+                            if (position == null)
+                                throw new Exception(string.Format("Data Error: Position with position number {0} does not exist", empl.PositionNumber));
+
+                            PositionAssignment pa = new PositionAssignment();
+                            pa.Status = PositionAssignment.eStatus.Active;
+                            pa.StartDate = fiscalYearStartDate;
+                            pa.EndDate = null;
+
+                            position.PositionAssignments.Add(pa);
 
                             Db.SaveChanges();
                         }
@@ -361,44 +346,45 @@ namespace PD.Services
                     //Updating employee salary information
                     foreach (var empl in employees)
                     {
-                        var position = Db.Positions.Where(pos => pos.Number == empl.PositionNumber).FirstOrDefault();
-                        var person = Db.Persons.Where(per => per.EmployeeId == empl.EmployeeId).FirstOrDefault();
-                        var personPosition = GetPositionAssociations(person.Id, position.Id, sampleDate).FirstOrDefault();
+                        //////KR: Oct 24
+                        ////var position = Db.Positions.Where(pos => pos.Number == empl.PositionNumber).FirstOrDefault();
+                        ////var person = Db.Persons.Where(per => per.EmployeeId == empl.EmployeeId).FirstOrDefault();
+                        ////var personPosition = GetPositionAssociations(person.Id, position.Id, sampleDate).FirstOrDefault();
                         
-                        var currentFiscalYear = fiscalYearStartDate.Year + "/" + fiscalYearEndDate.Year;
-                        var nextFiscalYear = fiscalYearEndDate.Year + "/" + (fiscalYearEndDate.Year + 1);
+                        ////var currentFiscalYear = fiscalYearStartDate.Year + "/" + fiscalYearEndDate.Year;
+                        ////var nextFiscalYear = fiscalYearEndDate.Year + "/" + (fiscalYearEndDate.Year + 1);
 
-                        //Add current year's compensation record if it does not exist in the database
-                        if(!personPosition.Compensations.Where(c => c.Year == currentFiscalYear).Any())
-                        {
-                            FacultyCompensation c = new FacultyCompensation();
-                            c.Year = currentFiscalYear;
-                            c.Salary = empl.Salary.CurrentSalary;
-                            c.StartDate = fiscalYearStartDate.Date;
-                            c.EndDate = fiscalYearEndDate.Date;
-                            personPosition.Compensations.Add(c);
-                        }
+                        //////Add current year's compensation records if it does not exist in the database
+                        ////if(!personPosition.Compensations.Where(c => c.Year == currentFiscalYear).Any())
+                        ////{
+                        ////    FacultyCompensation c = new FacultyCompensation();
+                        ////    c.Year = currentFiscalYear;
+                        ////    c.Salary = empl.Salary.CurrentSalary;
+                        ////    c.StartDate = fiscalYearStartDate.Date;
+                        ////    c.EndDate = fiscalYearEndDate.Date;
+                        ////    personPosition.Compensations.Add(c);
+                        ////}
 
-                        //Add next year's compensation if 
-                        FacultySalaryViewModel salary = empl.Salary as FacultySalaryViewModel;
-                        if (!personPosition.Compensations.Where(c => c.Year == nextFiscalYear).Any())
-                        {
-                            FacultyCompensation c = new FacultyCompensation();
-                            c.Year = nextFiscalYear;
-                            c.StartDate = fiscalYearEndDate.Date.AddDays(1);
-                            c.EndDate = nextFiscalYearEndDate;
-                            c.Salary = salary.NextSalary;
-                            c.MeritDecision = salary.MeritDecision;
-                            c.MeritReason = salary.MeritReason;
-                            c.Merit = salary.Merit;
-                            c.ContractSuppliment = salary.ContractSettlement;
-                            c.SpecialAdjustment = salary.SpecialAdjustment;
-                            c.MarketSupplement = salary.MarketSupplement;
+                        //////Add next year's compensation if 
+                        ////FacultySalaryViewModel salary = empl.Salary as FacultySalaryViewModel;
+                        ////if (!personPosition.Compensations.Where(c => c.Year == nextFiscalYear).Any())
+                        ////{
+                        ////    FacultyCompensation c = new FacultyCompensation();
+                        ////    c.Year = nextFiscalYear;
+                        ////    c.StartDate = fiscalYearEndDate.Date.AddDays(1);
+                        ////    c.EndDate = nextFiscalYearEndDate;
+                        ////    c.Salary = salary.NextSalary;
+                        ////    c.MeritDecision = salary.MeritDecision;
+                        ////    c.MeritReason = salary.MeritReason;
+                        ////    c.Merit = salary.Merit;
+                        ////    c.ContractSuppliment = salary.ContractSettlement;
+                        ////    c.SpecialAdjustment = salary.SpecialAdjustment;
+                        ////    c.MarketSupplement = salary.MarketSupplement;
 
-                            personPosition.Compensations.Add(c);
-                        }
+                        ////    personPosition.Compensations.Add(c);
+                        ////}
 
-                        Db.SaveChanges();
+                        ////Db.SaveChanges();
                     }
 
                     //Updating 

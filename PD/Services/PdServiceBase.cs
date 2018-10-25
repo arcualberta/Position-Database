@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using System.Text;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
+using PD.Models.Positions;
 
 namespace PD.Services
 {
@@ -41,20 +42,55 @@ namespace PD.Services
             Db = db;
         }
 
-
-        public IQueryable<PersonPosition> GetPersonPositionAssociations(PositionFilter filter)
+        public IQueryable<PositionAssignment> GetPositionAssignments(
+            int? positionId = null,
+            string positionNumber = null,
+            DateTime? date = null,
+            bool includePositionInfo = true,
+            bool includePersinInfo = true)
         {
-            IQueryable<PersonPosition> associations = Db.PersonPositions
+            if (!date.HasValue)
+                date = DateTime.Now.Date;
+
+            IQueryable<PositionAssignment> positionAssignments;
+
+            if (includePersinInfo)
+                positionAssignments = Db.PositionAssignments
+                    .Include(a => a.Position)
+                    .Include(a => a.Position.Person);
+            else if (includePositionInfo)
+                positionAssignments = Db.PositionAssignments.Include(a => a.Position);
+            else
+                positionAssignments = Db.PositionAssignments;
+
+            positionAssignments = positionAssignments.Where(a => 
+                (!a.StartDate.HasValue || a.StartDate.Value <= date)
+                && (!a.EndDate.HasValue || a.EndDate.Value >= date));
+
+            if (positionId.HasValue)
+                positionAssignments = positionAssignments.Where(a => a.PositionId == positionId);
+
+            if (!string.IsNullOrEmpty(positionNumber))
+                positionAssignments = positionAssignments.Where(a => a.Position.Number == positionNumber);
+
+            return positionAssignments;
+        }
+
+       public IQueryable<PositionAssignment> GetPositionAssignments(PositionFilter filter)
+        {
+            IQueryable<PositionAssignment> associations = Db.PositionAssignments
                 .Include(pp => pp.Position)
-                .Include(pp => pp.Person)
+                .Include(pp => pp.Position.Person)
                 .Where(pp =>
-                    pp.Position.PositionType == filter.PositionType
-                    && (!pp.StartDate.HasValue || pp.StartDate.Value <= filter.Date)
+                    (!pp.StartDate.HasValue || pp.StartDate.Value <= filter.Date)
                     && (!pp.EndDate.HasValue || pp.EndDate.Value > filter.Date)
                     );
 
             return associations;
         }
+
+        //public Position GetPosition(string positionId, )
+
         ////public IQueryable<Position> GetPositions(Position.ePositionType positionType, DateTime? date = null, bool isActive = true)
         ////{
         ////    if (!date.HasValue)

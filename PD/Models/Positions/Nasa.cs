@@ -4,10 +4,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PD.Models.Compensations
+namespace PD.Models.Positions
 {
-    public class Adjustment : Compensation
+    [Display(Name = "NASA")]
+    public class Nasa: Position
     {
-        public string Name { get; set; }
     }
 }

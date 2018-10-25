@@ -1,4 +1,5 @@
 ﻿using PD.Models.Compensations;
+using PD.Models.Positions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,7 +11,7 @@ namespace PD.Models
     /// <summary>
     /// PersonPosition
     /// </summary>
-    public class PersonPosition
+    public class PositionAssignment
     {
         public enum eStatus
         {
@@ -28,21 +29,14 @@ namespace PD.Models
         [Key]
         public int Id { get; set; }
 
+        public eStatus Status { get; set; }
+
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
-        [Range(0.0, 100)]
-        [Display(Name ="Percentage (0 - 100)")]
-        public double Percentage { get; set; }
-        public eStatus Status { get; set; }
-        public Position.ePositionContract ContractType { get; set; }
-
-        public int? PersonId { get; set; }
-        public virtual Person Person { get; set; }
         public int? PositionId { get; set; }
         public virtual Position Position {get;set;}
 
         public virtual ICollection<Compensation> Compensations { get; set; } = new List<Compensation>();
-        public virtual ICollection<Adjustment> Adjustments { get; set; } = new List<Adjustment>();
     }
 }

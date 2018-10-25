@@ -26,7 +26,7 @@ namespace PD.Controllers
                 filter = new PositionFilter();
 
             ReportService srv = new ReportService(_context);
-            IQueryable<PersonPosition> positionAssignments = srv.GetPersonPositionAssociations(filter);
+            IQueryable<PositionAssignment> positionAssignments = srv.GetPositionAssignments(filter);
 
             ViewBag.Filter = filter;
             return View(positionAssignments.ToList().Select(pp => new PositionViewModel(pp, filter.GetFiscalYear(), srv.DataProtector)));

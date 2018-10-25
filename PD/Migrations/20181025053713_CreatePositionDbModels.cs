@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PD.Migrations
 {
-    public partial class CreatedAppDataModels : Migration
+    public partial class CreatePositionDbModels : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -87,26 +87,6 @@ namespace PD.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Persons", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Positions",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Number = table.Column<string>(nullable: true),
-                    Title = table.Column<string>(nullable: true),
-                    Description = table.Column<string>(nullable: true),
-                    IsActive = table.Column<bool>(nullable: false),
-                    PositionWorkload = table.Column<int>(nullable: false),
-                    PositionContract = table.Column<int>(nullable: false),
-                    StartDate = table.Column<DateTime>(nullable: true),
-                    EndDate = table.Column<DateTime>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Positions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -267,62 +247,29 @@ namespace PD.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PersonPositions",
+                name: "Positions",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Number = table.Column<string>(nullable: true),
+                    Title = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
+                    Workload = table.Column<int>(nullable: false),
+                    ContractType = table.Column<int>(nullable: false),
                     StartDate = table.Column<DateTime>(nullable: true),
                     EndDate = table.Column<DateTime>(nullable: true),
-                    Percentage = table.Column<double>(nullable: false),
-                    Status = table.Column<int>(nullable: false),
-                    PersonId = table.Column<int>(nullable: true),
-                    PositionId = table.Column<int>(nullable: true)
+                    PersonId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PersonPositions", x => x.Id);
+                    table.PrimaryKey("PK_Positions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PersonPositions_Persons_PersonId",
+                        name: "FK_Positions_Persons_PersonId",
                         column: x => x.PersonId,
                         principalTable: "Persons",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_PersonPositions_Positions_PositionId",
-                        column: x => x.PositionId,
-                        principalTable: "Positions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PositionAccounts",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ChartStringId = table.Column<int>(nullable: false),
-                    PositionId = table.Column<int>(nullable: false),
-                    Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    StartDate = table.Column<DateTime>(nullable: true),
-                    EndDate = table.Column<DateTime>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PositionAccounts", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PositionAccounts_ChartStrings_ChartStringId",
-                        column: x => x.ChartStringId,
-                        principalTable: "ChartStrings",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PositionAccounts_Positions_PositionId",
-                        column: x => x.PositionId,
-                        principalTable: "Positions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -350,25 +297,77 @@ namespace PD.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PositionAccounts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ChartStringId = table.Column<int>(nullable: false),
+                    PositionId = table.Column<int>(nullable: false),
+                    ValuePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    StartDate = table.Column<DateTime>(nullable: true),
+                    EndDate = table.Column<DateTime>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PositionAccounts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PositionAccounts_ChartStrings_ChartStringId",
+                        column: x => x.ChartStringId,
+                        principalTable: "ChartStrings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PositionAccounts_Positions_PositionId",
+                        column: x => x.PositionId,
+                        principalTable: "Positions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PositionAssignments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Status = table.Column<int>(nullable: false),
+                    StartDate = table.Column<DateTime>(nullable: true),
+                    EndDate = table.Column<DateTime>(nullable: true),
+                    PositionId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PositionAssignments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PositionAssignments_Positions_PositionId",
+                        column: x => x.PositionId,
+                        principalTable: "Positions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Compensations",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Year = table.Column<string>(nullable: true),
-                    Salary = table.Column<decimal>(nullable: false),
+                    Value = table.Column<decimal>(nullable: false),
                     StartDate = table.Column<DateTime>(nullable: true),
                     EndDate = table.Column<DateTime>(nullable: true),
-                    EffectiveDate = table.Column<DateTime>(nullable: true),
-                    PersonPositionId = table.Column<int>(nullable: false)
+                    PositionAssignmentId = table.Column<int>(nullable: false),
+                    Discriminator = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Compensations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Compensations_PersonPositions_PersonPositionId",
-                        column: x => x.PersonPositionId,
-                        principalTable: "PersonPositions",
+                        name: "FK_Compensations_PositionAssignments_PositionAssignmentId",
+                        column: x => x.PositionAssignmentId,
+                        principalTable: "PositionAssignments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -423,19 +422,9 @@ namespace PD.Migrations
                 column: "DepartmentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Compensations_PersonPositionId",
+                name: "IX_Compensations_PositionAssignmentId",
                 table: "Compensations",
-                column: "PersonPositionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PersonPositions_PersonId",
-                table: "PersonPositions",
-                column: "PersonId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PersonPositions_PositionId",
-                table: "PersonPositions",
-                column: "PositionId");
+                column: "PositionAssignmentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PositionAccounts_ChartStringId",
@@ -446,6 +435,16 @@ namespace PD.Migrations
                 name: "IX_PositionAccounts_PositionId",
                 table: "PositionAccounts",
                 column: "PositionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PositionAssignments_PositionId",
+                table: "PositionAssignments",
+                column: "PositionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Positions_PersonId",
+                table: "Positions",
+                column: "PersonId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -490,7 +489,7 @@ namespace PD.Migrations
                 name: "ChartFields");
 
             migrationBuilder.DropTable(
-                name: "PersonPositions");
+                name: "PositionAssignments");
 
             migrationBuilder.DropTable(
                 name: "ChartStrings");
@@ -499,10 +498,10 @@ namespace PD.Migrations
                 name: "Departments");
 
             migrationBuilder.DropTable(
-                name: "Persons");
+                name: "Positions");
 
             migrationBuilder.DropTable(
-                name: "Positions");
+                name: "Persons");
         }
     }
 }

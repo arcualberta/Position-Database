@@ -1,4 +1,5 @@
 ﻿using PD.Models.ChartFields;
+using PD.Models.Positions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +16,8 @@ namespace PD.Models.AppViewModels
         public string EmployeeName { get; set; }
         public string PositionNumber { get; set; }
         public int RecordNumber { get; set; }
-        public Position.ePositionWorkload FtPtStatus { get; set; }
-        public Position.ePositionContract ContractStatus { get; set; }
+        public Position.eWorkload FtPtStatus { get; set; }
+        public Position.eContractType ContractStatus { get; set; }
         public eFundingSource FundingSource { get; set; }
 
         public SalaryViewModel Salary { get; set; }

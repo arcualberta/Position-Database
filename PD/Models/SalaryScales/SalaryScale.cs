@@ -15,6 +15,15 @@ namespace PD.Models.SalaryScales
         public string Guid { get; set; }
         public string Name { get; set; }
 
+        ////////[Display(Name="Minimum Salary")]
+        ////////public decimal Minimum { get; set; }
+
+        ////////[Display(Name = "Maximum Salary")]
+        ////////public decimal Maximum { get; set; }
+
+        ////////[Display(Name = "Salary Step Dollar Value")]
+        ////////public decimal StepValue { get; set; }
+
         /// <summary>
         /// Gets or sets the ATB (Across the Board) proportion.
         /// </summary>

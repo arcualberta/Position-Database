@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using PD.Models;
 using PD.Models.ChartFields;
 using PD.Models.Compensations;
+using PD.Models.Positions;
 using PD.Models.SalaryScales;
 
 namespace PD.Data
@@ -29,14 +30,13 @@ namespace PD.Data
 
         public DbSet<PositionAccount> PositionAccounts { get; set; }
         public DbSet<Position> Positions { get; set; }
-        public DbSet<PersonPosition> PersonPositions { get; set; }
+        public DbSet<PositionAssignment> PositionAssignments { get; set; }
         public DbSet<SalaryScale> SalaryScales { get; set; }
         public DbSet<Person> Persons { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Speedcode> Speedcodes { get; set; }
         public DbSet<ChartField2ChartStringJoin> ChartField2ChartStringJoins { get; set; }
         public DbSet<Compensation> Compensations { get; set; }
-        public DbSet<FacultyCompensation> FacultyCompensations { get; set; }
         public DbSet<Adjustment> Adjustmentss { get; set; }
 
 

@@ -8,19 +8,19 @@
             <input asp-for="Date" class="form-control" type="date" value="@Model.Date.ToString("yyyy-MM-dd")" />
             <span asp-validation-for="Date" class="text-danger"></span>
         </div>
-        <div class="form-group">
+        @*<div class="form-group">
             <label asp-for="PositionType" class="col-md-4 field-name control-label"></label>
             <select asp-for="PositionType" asp-items="@Model.PositionTypes">
             </select>
             <span asp-validation-for="Date" class="text-danger"></span>
-        </div>
-        <div class="form-group">
+        </div>*@
+        @*<div class="form-group">
             <div class="checkbox">
                 <label>
                     <input asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
                 </label>
             </div>
-        </div>
+        </div>*@
         <div class="form-group">
             <input type="submit" value="Filter" class="btn btn-primary" />
         </div>

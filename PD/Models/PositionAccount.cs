@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PD.Models.Positions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

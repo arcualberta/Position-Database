@@ -26,10 +26,10 @@ namespace PD.Services
         {
             decimal salery = -1;
 
-            var positionAssignment = Db.PersonPositions
+            var positionAssignment = Db.PositionAssignments
                 .Include(p => p.Compensations)
-                .Include(p => p.Person)
                 .Include(p => p.Position)
+                .Include(p => p.Position.Person)
                 .Where(p => p.Id == positionAssignmentId)
                 .FirstOrDefault();
 

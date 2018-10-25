@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PD.Models.Positions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -10,13 +11,16 @@ namespace PD.Models
     {
         [Key]
         public int Id { get; set; }
+
         public string Name { get; set; }
+
         [Display(Name = "Employee Id")]
         public string EmployeeId { get; set; }
+
         [Display(Name = "Birth Date")]
         public DateTime? BirthDate { get; set; }
 
-        public virtual ICollection<PersonPosition> PersonPositions { get; set; } = new List<PersonPosition>();
+        public virtual ICollection<Position> Positions { get; set; } = new List<Position>();
 
     }
 }
