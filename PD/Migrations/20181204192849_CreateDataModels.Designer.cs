@@ -10,8 +10,8 @@ using PD.Data;
 namespace PD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20181025053713_CreatePositionDbModels")]
-    partial class CreatePositionDbModels
+    [Migration("20181204192849_CreateDataModels")]
+    partial class CreateDataModels
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -492,6 +492,23 @@ namespace PD.Migrations
                     b.ToTable("Adjustment");
 
                     b.HasDiscriminator().HasValue("Adjustment");
+                });
+
+            modelBuilder.Entity("PD.Models.Compensations.Salary", b =>
+                {
+                    b.HasBaseType("PD.Models.Compensations.Compensation");
+
+                    b.Property<decimal?>("YearEndMerit");
+
+                    b.Property<decimal?>("YearEndMeritDecision");
+
+                    b.Property<string>("YearEndMeritReason");
+
+                    b.Property<bool>("YearEndPromotionStatus");
+
+                    b.ToTable("Salary");
+
+                    b.HasDiscriminator().HasValue("Salary");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

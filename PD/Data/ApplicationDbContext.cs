@@ -37,7 +37,8 @@ namespace PD.Data
         public DbSet<Speedcode> Speedcodes { get; set; }
         public DbSet<ChartField2ChartStringJoin> ChartField2ChartStringJoins { get; set; }
         public DbSet<Compensation> Compensations { get; set; }
-        public DbSet<Adjustment> Adjustmentss { get; set; }
+        public DbSet<Salary> Salaries { get; set; }
+        public DbSet<Adjustment> Adjustments { get; set; }
 
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)

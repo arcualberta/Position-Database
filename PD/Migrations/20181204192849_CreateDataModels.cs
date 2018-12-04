@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PD.Migrations
 {
-    public partial class CreatePositionDbModels : Migration
+    public partial class CreateDataModels : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -359,7 +359,11 @@ namespace PD.Migrations
                     EndDate = table.Column<DateTime>(nullable: true),
                     PositionAssignmentId = table.Column<int>(nullable: false),
                     Discriminator = table.Column<string>(nullable: false),
-                    Name = table.Column<string>(nullable: true)
+                    Name = table.Column<string>(nullable: true),
+                    YearEndMeritDecision = table.Column<decimal>(nullable: true),
+                    YearEndMeritReason = table.Column<string>(nullable: true),
+                    YearEndMerit = table.Column<decimal>(nullable: true),
+                    YearEndPromotionStatus = table.Column<bool>(nullable: true)
                 },
                 constraints: table =>
                 {

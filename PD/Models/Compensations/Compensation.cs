@@ -15,6 +15,8 @@ namespace PD.Models.Compensations
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
+        public string Notes { get; set; }
+
         public int PositionAssignmentId { get; set; }
         public virtual PositionAssignment PositionAssignment { get; set; }
      }

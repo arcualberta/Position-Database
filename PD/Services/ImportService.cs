@@ -150,7 +150,7 @@ namespace PD.Services
                         empl.FacultySalary.CurrentSalary = decimal.Parse(worksheet.Cells[row, (int)ColIndex.pastSalaryCol].Value.ToString().Trim());
                         empl.FacultySalary.MarketSupplement = decimal.Parse(worksheet.Cells[row, (int)ColIndex.marketSupplementCol].Value.ToString().Trim());
                         empl.FacultySalary.Merit = decimal.Parse(worksheet.Cells[row, (int)ColIndex.meritCol].Value.ToString().Trim());
-                        empl.FacultySalary.MeritDecision = double.Parse(worksheet.Cells[row, (int)ColIndex.meritDecCol].Value.ToString().Trim());
+                        empl.FacultySalary.MeritDecision = decimal.Parse(worksheet.Cells[row, (int)ColIndex.meritDecCol].Value.ToString().Trim());
                         empl.FacultySalary.MeritReason = worksheet.Cells[row, (int)ColIndex.meritReasonCol].Value == null ? null : worksheet.Cells[row, (int)ColIndex.meritReasonCol].Value.ToString().Trim();
                         empl.FacultySalary.Notes = worksheet.Cells[row, (int)ColIndex.notesCol].Value == null ? null : worksheet.Cells[row, (int)ColIndex.notesCol].Value.ToString().Trim();
                         empl.FacultySalary.Program = new Program() { Value = worksheet.Cells[row, (int)ColIndex.progCol].Value.ToString().Trim() };
@@ -346,11 +346,134 @@ namespace PD.Services
                     //Updating employee salary information
                     foreach (var empl in employees)
                     {
+                        //In this data ingestion, there will be only one position assignment for this position number.
+                        IQueryable<PositionAssignment> positionAssignments = Db.PositionAssignments
+                            .Include(a => a.Compensations)
+                            .Where(a => a.Position.Number == empl.PositionNumber
+                                && (!a.StartDate.HasValue || a.StartDate <= sampleDate)
+                                && (!a.EndDate.HasValue || a.EndDate >= sampleDate)
+                            );
+
+                        if (positionAssignments.Count() != 1)
+                            throw new Exception(string.Format("There must be one and only one position assignment. Found {0}", positionAssignments.Count()));
+
+                        PositionAssignment pa = positionAssignments.FirstOrDefault();
+
+                        string year = string.Format("{0}/{1}", olderYearRange[0], olderYearRange[1]);
+
+                        //current year salary
+                        Salary salary = Db.Salaries
+                            .Where(s => s.Year == year && s.PositionAssignmentId == pa.Id)
+                            .FirstOrDefault();
+                        if (salary == null)
+                        {
+                            salary = new Salary()
+                            {
+                                Year = year,
+                                Value = empl.Salary.CurrentSalary,
+                                StartDate = fiscalYearStartDate,
+                                EndDate = fiscalYearEndDate,
+                                YearEndMeritDecision = (empl.Salary as FacultySalaryViewModel).MeritDecision,
+                                YearEndMeritReason = (empl.Salary as FacultySalaryViewModel).MeritReason,
+                                YearEndMerit = (empl.Salary as FacultySalaryViewModel).Merit,
+                                YearEndPromotionStatus = (empl.Salary as FacultySalaryViewModel).IsPromoted
+                            };
+                            pa.Compensations.Add(salary);
+                        }
+
+                        //Year end Contract Settlement for the current year
+                        string name = "Year-end Contract Settlement";
+                        Adjustment atb = Db.Adjustments
+                            .Where(a => a.PositionAssignmentId == pa.Id && a.Year == year && a.Name == name)
+                            .FirstOrDefault();
+                        if(atb == null)
+                        {
+                            atb = new Adjustment()
+                            {
+                                Year = year,
+                                EndDate = fiscalYearEndDate,
+                                Name = name,
+                                StartDate = fiscalYearStartDate,
+                                Value = empl.FacultySalary.ContractSettlement
+                            };
+                            pa.Compensations.Add(atb);
+                        }
+                        Db.SaveChanges();
+
+                        //Year-end special adjustment for the current year
+                        if (empl.FacultySalary.SpecialAdjustment > 0)
+                        {
+                            name = "Special Adjustment";
+                            Adjustment sa = Db.Adjustments
+                                .Where(a => a.PositionAssignmentId == pa.Id && a.Year == year && a.Name == name)
+                                .FirstOrDefault();
+
+                            if(sa == null)
+                            {
+                                sa = new Adjustment()
+                                {
+                                    Year = year,
+                                    EndDate = fiscalYearEndDate,
+                                    Name = name,
+                                    StartDate = fiscalYearStartDate,
+                                    Value = empl.FacultySalary.SpecialAdjustment
+                                };
+                                pa.Compensations.Add(sa);
+                            }
+                        }
+                        Db.SaveChanges();
+
+                        //Year-end market supplement for the current year
+                        if (empl.FacultySalary.MarketSupplement > 0)
+                        {
+                            name = "Market Supplement";
+                            Adjustment sa = Db.Adjustments
+                                .Where(a => a.PositionAssignmentId == pa.Id && a.Year == year && a.Name == name)
+                                .FirstOrDefault();
+
+                            if (sa == null)
+                            {
+                                sa = new Adjustment()
+                                {
+                                    Year = year,
+                                    EndDate = fiscalYearEndDate,
+                                    Name = name,
+                                    StartDate = fiscalYearStartDate,
+                                    Value = empl.FacultySalary.MarketSupplement
+                                };
+                                pa.Compensations.Add(sa);
+                            }
+                        }
+                        Db.SaveChanges();
+
+
+                        //next year salary
+                        year = string.Format("{0}/{1}", latterYearRange[0], latterYearRange[1]);
+                        salary = Db.Salaries
+                            .Where(s => s.Year == year && s.PositionAssignmentId == pa.Id)
+                            .FirstOrDefault();
+                        if (salary == null)
+                        {
+                            salary = new Salary()
+                            {
+                                Year = year,
+                                Value = empl.Salary.NextSalary,
+                                StartDate = fiscalYearStartDate.AddDays(1),
+                                EndDate = nextFiscalYearEndDate,
+                                YearEndMeritDecision = null,
+                                YearEndMeritReason = null,
+                                YearEndMerit = null,
+                                YearEndPromotionStatus = false
+                            };
+                            pa.Compensations.Add(salary);
+                        }
+
+
                         //////KR: Oct 24
                         ////var position = Db.Positions.Where(pos => pos.Number == empl.PositionNumber).FirstOrDefault();
                         ////var person = Db.Persons.Where(per => per.EmployeeId == empl.EmployeeId).FirstOrDefault();
                         ////var personPosition = GetPositionAssociations(person.Id, position.Id, sampleDate).FirstOrDefault();
-                        
+
                         ////var currentFiscalYear = fiscalYearStartDate.Year + "/" + fiscalYearEndDate.Year;
                         ////var nextFiscalYear = fiscalYearEndDate.Year + "/" + (fiscalYearEndDate.Year + 1);
 
