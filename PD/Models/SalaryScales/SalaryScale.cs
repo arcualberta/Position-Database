@@ -12,26 +12,20 @@ namespace PD.Models.SalaryScales
         [Key]
         public int Id { get; set; }
 
-        public string Guid { get; set; }
         public string Name { get; set; }
 
-        ////////[Display(Name="Minimum Salary")]
-        ////////public decimal Minimum { get; set; }
+        [Display(Name = "Minimum Salary")]
+        public decimal Minimum { get; set; }
 
-        ////////[Display(Name = "Maximum Salary")]
-        ////////public decimal Maximum { get; set; }
+        [Display(Name = "Maximum Salary")]
+        public decimal Maximum { get; set; }
 
-        ////////[Display(Name = "Salary Step Dollar Value")]
-        ////////public decimal StepValue { get; set; }
+        [Display(Name = "Salary Step Dollar Value")]
+        public decimal StepValue { get; set; }
 
-        /// <summary>
-        /// Gets or sets the ATB (Across the Board) proportion.
-        /// </summary>
-        /// <value>
-        /// The ATB proportion; minimum 0 and maximum 100.
-        /// </value>
+        [Display(Name = "Contract Settlement")]
         [Range(0.0, 100)]
-        public double ATBPercentatge { get; set; }
+        public decimal ContractSettlement { get; set; }
 
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }

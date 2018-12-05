@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace PD.Models.Compensations
 {
-    public class Salary : Compensation
+    public class Merit : Compensation
     {
-        public Salary()
-        {
-        }
+        [Display(Name = "Is Promoted?")]
+        public bool IsPromoted { get; set; }
+
+        public decimal Decision { get; set; }
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PD.Migrations
 {
-    public partial class CreateDataModels : Migration
+    public partial class CreatedDataModels : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -95,11 +95,14 @@ namespace PD.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Guid = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
-                    ATBPercentatge = table.Column<double>(nullable: false),
+                    Minimum = table.Column<decimal>(nullable: false),
+                    Maximum = table.Column<decimal>(nullable: false),
+                    StepValue = table.Column<decimal>(nullable: false),
+                    ContractSettlement = table.Column<decimal>(nullable: false),
                     StartDate = table.Column<DateTime>(nullable: true),
-                    EndDate = table.Column<DateTime>(nullable: true)
+                    EndDate = table.Column<DateTime>(nullable: true),
+                    Discriminator = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -353,17 +356,16 @@ namespace PD.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Year = table.Column<string>(nullable: true),
                     Value = table.Column<decimal>(nullable: false),
                     StartDate = table.Column<DateTime>(nullable: true),
                     EndDate = table.Column<DateTime>(nullable: true),
+                    Notes = table.Column<string>(nullable: true),
                     PositionAssignmentId = table.Column<int>(nullable: false),
                     Discriminator = table.Column<string>(nullable: false),
                     Name = table.Column<string>(nullable: true),
-                    YearEndMeritDecision = table.Column<decimal>(nullable: true),
-                    YearEndMeritReason = table.Column<string>(nullable: true),
-                    YearEndMerit = table.Column<decimal>(nullable: true),
-                    YearEndPromotionStatus = table.Column<bool>(nullable: true)
+                    Percentage = table.Column<decimal>(nullable: true),
+                    IsPromoted = table.Column<bool>(nullable: true),
+                    Decision = table.Column<decimal>(nullable: true)
                 },
                 constraints: table =>
                 {

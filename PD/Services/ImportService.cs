@@ -15,6 +15,7 @@ using PD.Models.Compensations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.DataProtection;
 using PD.Models.Positions;
+using PD.Models.SalaryScales;
 
 namespace PD.Services
 {
@@ -55,9 +56,13 @@ namespace PD.Services
             bargUnitCol
         };
 
-        public void InjestFacultySalaryAdjustmentData(string fileName, string worksheetName, DateTime fiscalYearStartDate, DateTime fiscalYearEndDate, DateTime sampleDate, DateTime nextFiscalYearEndDate)
+        public void InjestFacultySalaryAdjustmentData(string fileName, string worksheetName, DateTime currentYearStartDate, DateTime currentYearEndDate, DateTime nextYearEndDate)
         {
             FileInfo file = new FileInfo(fileName);
+            DateTime currentYearSampleDate = currentYearStartDate.AddDays(1).Date;
+            DateTime nextYearStartDate = currentYearEndDate.AddDays(1).Date;
+            DateTime nextYearSampleDate = nextYearStartDate.AddDays(1).Date;
+
             //try
             {
                 byte[] dataBytes = File.ReadAllBytes(fileName);
@@ -116,11 +121,11 @@ namespace PD.Services
                     //Making sure past and current salaries are in the correct columns
                     int[] olderYearRange = worksheet.Cells[2, (int)ColIndex.pastSalaryCol].Value.ToString().Split("/").Select(x => int.Parse(x)).ToArray();
                     int[] latterYearRange = worksheet.Cells[2, (int)ColIndex.currSalaryCol].Value.ToString().Split("/").Select(x => int.Parse(x)).ToArray();
-                    if (olderYearRange[0] != fiscalYearStartDate.Year || olderYearRange[1] != fiscalYearEndDate.Year)
-                        throw new Exception("Specified fiscal year does not match with the data");
+                    if (olderYearRange[0] != currentYearStartDate.Year || olderYearRange[1] != currentYearEndDate.Year)
+                        throw new Exception("Specified salary year does not match with the data");
 
                     if (olderYearRange[1] != latterYearRange[0])
-                        throw new Exception("The ending year of the older fiscal year must be as same as the begining year of the latter fiscal year.");
+                        throw new Exception("The ending year of the older salary year must be as same as the begining year of the latter salary year.");
 
                     for (int row = 3; row <= rowCount; ++row)
                     {
@@ -274,8 +279,8 @@ namespace PD.Services
                         //Retrieve the active position record with the given position number from the database
                         Position position = Db.Positions
                             .Where(p => p.Number == empl.PositionNumber
-                                && (p.StartDate.HasValue == false || p.StartDate <= DateTime.Today)
-                                && (p.EndDate.HasValue == false || p.EndDate > DateTime.Today)
+                                && (p.StartDate.HasValue == false || p.StartDate <= currentYearSampleDate)
+                                && (p.EndDate.HasValue == false || p.EndDate > currentYearSampleDate)
                                 )
                             .FirstOrDefault();
 
@@ -283,8 +288,8 @@ namespace PD.Services
                         {
                             //Create a new position record
                             position = new Faculty();
-                            position.StartDate = fiscalYearStartDate;
-                            position.EndDate = null;
+                            position.StartDate = currentYearStartDate;
+                            position.EndDate = null; //No end date for employees imported throgh the spreadsheet
                             position.Number = empl.PositionNumber;
                             position.Title = empl.Rank;
                             position.Workload = empl.FtPtStatus;
@@ -316,10 +321,10 @@ namespace PD.Services
                     //Adding position assignments to positions
                     foreach (var empl in employees)
                     {
-                        IQueryable<PositionAssignment> positionAssignments = GetPositionAssignments(null, empl.PositionNumber, sampleDate);
+                        IQueryable<PositionAssignment> positionAssignments = GetPositionAssignments(null, empl.PositionNumber, currentYearSampleDate);
 
                         if (positionAssignments.Count() > 1)
-                            throw new Exception("Data Error: Same position has multiple assign,emys at the time period containig " + sampleDate.Date);
+                            throw new Exception("Data Error: Same position has multiple assign,emys at the time period containig " + currentYearSampleDate.Date);
 
                         if (positionAssignments.Count() == 0)
                         {
@@ -333,8 +338,8 @@ namespace PD.Services
 
                             PositionAssignment pa = new PositionAssignment();
                             pa.Status = PositionAssignment.eStatus.Active;
-                            pa.StartDate = fiscalYearStartDate;
-                            pa.EndDate = null;
+                            pa.StartDate = currentYearStartDate;
+                            pa.EndDate = null; //No end date for position assignments imported through the spreadsheet
 
                             position.PositionAssignments.Add(pa);
 
@@ -350,8 +355,8 @@ namespace PD.Services
                         IQueryable<PositionAssignment> positionAssignments = Db.PositionAssignments
                             .Include(a => a.Compensations)
                             .Where(a => a.Position.Number == empl.PositionNumber
-                                && (!a.StartDate.HasValue || a.StartDate <= sampleDate)
-                                && (!a.EndDate.HasValue || a.EndDate >= sampleDate)
+                                && (!a.StartDate.HasValue || a.StartDate <= currentYearSampleDate)
+                                && (!a.EndDate.HasValue || a.EndDate >= currentYearSampleDate)
                             );
 
                         if (positionAssignments.Count() != 1)
@@ -359,165 +364,151 @@ namespace PD.Services
 
                         PositionAssignment pa = positionAssignments.FirstOrDefault();
 
-                        string year = string.Format("{0}/{1}", olderYearRange[0], olderYearRange[1]);
-
-                        //current year salary
+                        //Salary for the CURRENT year
                         Salary salary = Db.Salaries
-                            .Where(s => s.Year == year && s.PositionAssignmentId == pa.Id)
+                            .Where(s => s.StartDate == currentYearStartDate && s.EndDate == currentYearEndDate && s.PositionAssignmentId == pa.Id)
                             .FirstOrDefault();
                         if (salary == null)
                         {
                             salary = new Salary()
                             {
-                                Year = year,
                                 Value = empl.Salary.CurrentSalary,
-                                StartDate = fiscalYearStartDate,
-                                EndDate = fiscalYearEndDate,
-                                YearEndMeritDecision = (empl.Salary as FacultySalaryViewModel).MeritDecision,
-                                YearEndMeritReason = (empl.Salary as FacultySalaryViewModel).MeritReason,
-                                YearEndMerit = (empl.Salary as FacultySalaryViewModel).Merit,
-                                YearEndPromotionStatus = (empl.Salary as FacultySalaryViewModel).IsPromoted
+                                StartDate = currentYearStartDate,
+                                EndDate = currentYearEndDate,
                             };
                             pa.Compensations.Add(salary);
+                            Db.SaveChanges();
                         }
 
-                        //Year end Contract Settlement for the current year
-                        string name = "Year-end Contract Settlement";
-                        Adjustment atb = Db.Adjustments
-                            .Where(a => a.PositionAssignmentId == pa.Id && a.Year == year && a.Name == name)
+                        //Merit for the NEXT year
+                        Merit merit = Db.Merits
+                            .Where(a => a.PositionAssignmentId == pa.Id && a.StartDate == nextYearStartDate && a.EndDate == nextYearEndDate)
+                            .FirstOrDefault();
+                        if (merit == null)
+                        {
+                            merit = new Merit()
+                            {
+                                StartDate = nextYearStartDate,
+                                EndDate = nextYearEndDate,
+                                Value = (empl.Salary as FacultySalaryViewModel).MeritDecision,
+                                Notes = (empl.Salary as FacultySalaryViewModel).MeritReason,
+                                IsPromoted = (empl.Salary as FacultySalaryViewModel).IsPromoted
+                            };
+                            pa.Compensations.Add(merit);
+                            Db.SaveChanges();
+                        }
+                        //Contract Settlement for the NEXT year
+                        ContractSettlement atb = Db.ContractSettlements
+                            .Where(a => a.PositionAssignmentId == pa.Id && a.StartDate == nextYearStartDate && a.EndDate == nextYearEndDate)
                             .FirstOrDefault();
                         if(atb == null)
                         {
-                            atb = new Adjustment()
+                            atb = new ContractSettlement()
                             {
-                                Year = year,
-                                EndDate = fiscalYearEndDate,
-                                Name = name,
-                                StartDate = fiscalYearStartDate,
+                                StartDate = nextYearStartDate,
+                                EndDate = nextYearEndDate,
                                 Value = empl.FacultySalary.ContractSettlement
                             };
                             pa.Compensations.Add(atb);
+                            Db.SaveChanges();
                         }
-                        Db.SaveChanges();
 
-                        //Year-end special adjustment for the current year
+                        //Special adjustment for the NEXT year
+                        string name = "Special Adjustment";
                         if (empl.FacultySalary.SpecialAdjustment > 0)
                         {
-                            name = "Special Adjustment";
                             Adjustment sa = Db.Adjustments
-                                .Where(a => a.PositionAssignmentId == pa.Id && a.Year == year && a.Name == name)
-                                .FirstOrDefault();
-
-                            if(sa == null)
-                            {
-                                sa = new Adjustment()
-                                {
-                                    Year = year,
-                                    EndDate = fiscalYearEndDate,
-                                    Name = name,
-                                    StartDate = fiscalYearStartDate,
-                                    Value = empl.FacultySalary.SpecialAdjustment
-                                };
-                                pa.Compensations.Add(sa);
-                            }
-                        }
-                        Db.SaveChanges();
-
-                        //Year-end market supplement for the current year
-                        if (empl.FacultySalary.MarketSupplement > 0)
-                        {
-                            name = "Market Supplement";
-                            Adjustment sa = Db.Adjustments
-                                .Where(a => a.PositionAssignmentId == pa.Id && a.Year == year && a.Name == name)
+                            .Where(a => a.PositionAssignmentId == pa.Id && a.StartDate == nextYearStartDate && a.EndDate == nextYearEndDate && a.Name == name)
                                 .FirstOrDefault();
 
                             if (sa == null)
                             {
                                 sa = new Adjustment()
                                 {
-                                    Year = year,
-                                    EndDate = fiscalYearEndDate,
-                                    Name = name,
-                                    StartDate = fiscalYearStartDate,
-                                    Value = empl.FacultySalary.MarketSupplement
+                                    StartDate = nextYearStartDate,
+                                    EndDate = nextYearEndDate,
+                                    Value = empl.FacultySalary.SpecialAdjustment,
+                                    Name = name
                                 };
                                 pa.Compensations.Add(sa);
+                                Db.SaveChanges();
                             }
                         }
-                        Db.SaveChanges();
 
-
-                        //next year salary
-                        year = string.Format("{0}/{1}", latterYearRange[0], latterYearRange[1]);
-                        salary = Db.Salaries
-                            .Where(s => s.Year == year && s.PositionAssignmentId == pa.Id)
-                            .FirstOrDefault();
-                        if (salary == null)
+                        //Market supplement for the NEXT year
+                        name = "Market Supplement";
+                        if (empl.FacultySalary.MarketSupplement > 0)
                         {
-                            salary = new Salary()
+                            Adjustment sa = Db.Adjustments
+                                .Where(a => a.PositionAssignmentId == pa.Id && a.StartDate == nextYearStartDate && a.EndDate == nextYearEndDate && a.Name == name)
+                                .FirstOrDefault();
+
+                            if (sa == null)
                             {
-                                Year = year,
-                                Value = empl.Salary.NextSalary,
-                                StartDate = fiscalYearStartDate.AddDays(1),
-                                EndDate = nextFiscalYearEndDate,
-                                YearEndMeritDecision = null,
-                                YearEndMeritReason = null,
-                                YearEndMerit = null,
-                                YearEndPromotionStatus = false
-                            };
-                            pa.Compensations.Add(salary);
+                                sa = new Adjustment()
+                                {
+                                    StartDate = nextYearStartDate,
+                                    EndDate = nextYearEndDate,
+                                    Value = empl.FacultySalary.MarketSupplement,
+                                    Name = name
+                                };
+                                pa.Compensations.Add(sa);
+                                Db.SaveChanges();
+                            }
                         }
-
-
-                        //////KR: Oct 24
-                        ////var position = Db.Positions.Where(pos => pos.Number == empl.PositionNumber).FirstOrDefault();
-                        ////var person = Db.Persons.Where(per => per.EmployeeId == empl.EmployeeId).FirstOrDefault();
-                        ////var personPosition = GetPositionAssociations(person.Id, position.Id, sampleDate).FirstOrDefault();
-
-                        ////var currentFiscalYear = fiscalYearStartDate.Year + "/" + fiscalYearEndDate.Year;
-                        ////var nextFiscalYear = fiscalYearEndDate.Year + "/" + (fiscalYearEndDate.Year + 1);
-
-                        //////Add current year's compensation records if it does not exist in the database
-                        ////if(!personPosition.Compensations.Where(c => c.Year == currentFiscalYear).Any())
-                        ////{
-                        ////    FacultyCompensation c = new FacultyCompensation();
-                        ////    c.Year = currentFiscalYear;
-                        ////    c.Salary = empl.Salary.CurrentSalary;
-                        ////    c.StartDate = fiscalYearStartDate.Date;
-                        ////    c.EndDate = fiscalYearEndDate.Date;
-                        ////    personPosition.Compensations.Add(c);
-                        ////}
-
-                        //////Add next year's compensation if 
-                        ////FacultySalaryViewModel salary = empl.Salary as FacultySalaryViewModel;
-                        ////if (!personPosition.Compensations.Where(c => c.Year == nextFiscalYear).Any())
-                        ////{
-                        ////    FacultyCompensation c = new FacultyCompensation();
-                        ////    c.Year = nextFiscalYear;
-                        ////    c.StartDate = fiscalYearEndDate.Date.AddDays(1);
-                        ////    c.EndDate = nextFiscalYearEndDate;
-                        ////    c.Salary = salary.NextSalary;
-                        ////    c.MeritDecision = salary.MeritDecision;
-                        ////    c.MeritReason = salary.MeritReason;
-                        ////    c.Merit = salary.Merit;
-                        ////    c.ContractSuppliment = salary.ContractSettlement;
-                        ////    c.SpecialAdjustment = salary.SpecialAdjustment;
-                        ////    c.MarketSupplement = salary.MarketSupplement;
-
-                        ////    personPosition.Compensations.Add(c);
-                        ////}
-
-                        ////Db.SaveChanges();
                     }
 
-                    //Updating 
+                    //Salary Scales
+                    //=============
+                    bool newDataAdded = AddFacultySalaryScale("Assistant Professor", new DateTime(2015, 07, 01), 76534, 106402, 2489, 1);
+                    newDataAdded |= AddFacultySalaryScale("Assistant Professor", new DateTime(2016, 07, 01), 77299, 107467, 2514, 1);
+                    newDataAdded |= AddFacultySalaryScale("Assistant Professor", new DateTime(2017, 07, 01), 78458, 109082, 2552, 1);
 
+                    newDataAdded |= AddFacultySalaryScale("Associate Professor", new DateTime(2015, 07, 01), 88971, 133645, 3191, 1);
+                    newDataAdded |= AddFacultySalaryScale("Associate Professor", new DateTime(2016, 07, 01), 89861, 134983, 3223, 1);
+                    newDataAdded |= AddFacultySalaryScale("Associate Professor", new DateTime(2017, 07, 01), 91209, 137003, 3271, 1);
+
+                    newDataAdded |= AddFacultySalaryScale("Professor 1", new DateTime(2015, 07, 01), 110715, 133227, 3752, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor 1", new DateTime(2016, 07, 01), 111822, 134562, 3790, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor 1", new DateTime(2017, 07, 01), 113499, 136581, 3847, 1);
+
+                    newDataAdded |= AddFacultySalaryScale("Professor 2", new DateTime(2015, 07, 01), 133227, 145991, 3191, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor 2", new DateTime(2016, 07, 01), 134562, 147454, 3223, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor 2", new DateTime(2017, 07, 01), 136581, 149665, 3271, 1);
+
+                    newDataAdded |= AddFacultySalaryScale("Professor 3", new DateTime(2015, 07, 01), 145991, 389913, 2489, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor 3", new DateTime(2016, 07, 01), 147454, 393826, 2514, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor 2", new DateTime(2017, 07, 01), 149665, 399761, 2552, 1);
+
+                    if (newDataAdded)
+                        Db.SaveChanges();
                 }
             }
             //catch (Exception ex)
             //{
             //    throw ex;
             //}
+        }
+
+        protected bool AddFacultySalaryScale(string name, DateTime startDate, decimal minSalary, decimal maxSalary, decimal salaryStep, decimal contractSettlement)
+        {
+            if (Db.FacultySalaryScales.Where(sc => sc.StartDate == startDate && sc.Name == name).Any())
+                return false;
+            else
+            {
+                FacultySalaryScale scale = new FacultySalaryScale()
+                {
+                    Name = name,
+                    StartDate = startDate,
+                    EndDate = startDate.AddYears(1).AddDays(-1),
+                    ContractSettlement = contractSettlement,
+                    Minimum = minSalary,
+                    Maximum = maxSalary,
+                    StepValue = salaryStep
+                };
+                Db.SalaryScales.Add(scale);
+                return true;
+            }
         }
 
         protected IEnumerable<int> GetChartStringIds(int deptIdId, int fundId, int programId, int accountId)

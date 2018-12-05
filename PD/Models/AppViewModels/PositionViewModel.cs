@@ -42,7 +42,7 @@ namespace PD.Models.AppViewModels
 
         }
 
-        public PositionViewModel(PositionAssignment pa, string fiscalYear, DataProtector dp)
+        public PositionViewModel(PositionAssignment pa, DateTime sampleDate, DataProtector dp)
         {
             Department = "";
             PositionNumber = pa.Position.Number;
@@ -52,7 +52,7 @@ namespace PD.Models.AppViewModels
             WorkLoad = pa.Position.Workload;
             Status = pa.Status;
             ContractType = pa.Position.ContractType;
-            Compensation = pa.Compensations.Where(c => c.Year == fiscalYear).FirstOrDefault();
+            Compensation = pa.Compensations.Where(c => c.StartDate <= sampleDate && sampleDate <= c.EndDate).FirstOrDefault();
 
         }
     }

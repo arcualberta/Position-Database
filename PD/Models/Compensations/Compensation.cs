@@ -10,7 +10,7 @@ namespace PD.Models.Compensations
     {
         [Key]
         public int Id { get; set; }
-        public string Year { get; set; }
+//        public string Year { get; set; }
         public decimal Value { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }

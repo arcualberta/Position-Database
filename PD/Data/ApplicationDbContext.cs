@@ -31,13 +31,23 @@ namespace PD.Data
         public DbSet<PositionAccount> PositionAccounts { get; set; }
         public DbSet<Position> Positions { get; set; }
         public DbSet<PositionAssignment> PositionAssignments { get; set; }
-        public DbSet<SalaryScale> SalaryScales { get; set; }
         public DbSet<Person> Persons { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Speedcode> Speedcodes { get; set; }
         public DbSet<ChartField2ChartStringJoin> ChartField2ChartStringJoins { get; set; }
+
+        //Salary Scales
+        public DbSet<SalaryScale> SalaryScales { get; set; }
+        public DbSet<APOSalaryScale> APOSalaryScales { get; set; }
+        public DbSet<FacultySalaryScale> FacultySalaryScales { get; set; }
+        public DbSet<NASASalaryScale> NASASalaryScales { get; set; }
+
+
+        //Compensation Types
         public DbSet<Compensation> Compensations { get; set; }
         public DbSet<Salary> Salaries { get; set; }
+        public DbSet<ContractSettlement> ContractSettlements { get; set; }
+        public DbSet<Merit> Merits { get; set; }
         public DbSet<Adjustment> Adjustments { get; set; }
 
 

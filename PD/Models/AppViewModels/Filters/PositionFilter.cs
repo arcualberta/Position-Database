@@ -28,13 +28,5 @@ namespace PD.Models.AppViewModels.Filters
         ////[Display(Name = "Active Positions")]
         ////public bool IsActive { get; set; } = true;
 
-        public string GetFiscalYear()
-        {
-            if (Date.Month < 4)
-                return (Date.Year - 1) + "/" + Date.Year;
-            else
-                return (Date.Year) + "/" + (Date.Year + 1);
-        }
-
     }
 }

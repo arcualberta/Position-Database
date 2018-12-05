@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace PD.Models.Compensations
 {
-    public class Salary : Compensation
+    [Display(Name = "Contract Settlement")]
+    public class ContractSettlement : Compensation
     {
-        public Salary()
-        {
-        }
+        public decimal Percentage { get; set; }
     }
 }

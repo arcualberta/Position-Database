@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace PD.Models.SalaryScales
 {
-    public class NASA : SalaryScale
+    public class NASASalaryScale : SalaryScale
     {
     }
 }

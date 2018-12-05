@@ -249,8 +249,6 @@ namespace PD.Migrations
 
                     b.Property<decimal>("Value");
 
-                    b.Property<string>("Year");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PositionAssignmentId");
@@ -372,19 +370,28 @@ namespace PD.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<double>("ATBPercentatge");
+                    b.Property<decimal>("ContractSettlement");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired();
 
                     b.Property<DateTime?>("EndDate");
 
-                    b.Property<string>("Guid");
+                    b.Property<decimal>("Maximum");
+
+                    b.Property<decimal>("Minimum");
 
                     b.Property<string>("Name");
 
                     b.Property<DateTime?>("StartDate");
 
+                    b.Property<decimal>("StepValue");
+
                     b.HasKey("Id");
 
                     b.ToTable("SalaryScales");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("SalaryScale");
                 });
 
             modelBuilder.Entity("PD.Models.Speedcode", b =>
@@ -494,21 +501,68 @@ namespace PD.Migrations
                     b.HasDiscriminator().HasValue("Adjustment");
                 });
 
+            modelBuilder.Entity("PD.Models.Compensations.ContractSettlement", b =>
+                {
+                    b.HasBaseType("PD.Models.Compensations.Compensation");
+
+                    b.Property<decimal>("Percentage");
+
+                    b.ToTable("ContractSettlement");
+
+                    b.HasDiscriminator().HasValue("ContractSettlement");
+                });
+
+            modelBuilder.Entity("PD.Models.Compensations.Merit", b =>
+                {
+                    b.HasBaseType("PD.Models.Compensations.Compensation");
+
+                    b.Property<decimal>("Decision");
+
+                    b.Property<bool>("IsPromoted");
+
+                    b.ToTable("Merit");
+
+                    b.HasDiscriminator().HasValue("Merit");
+                });
+
             modelBuilder.Entity("PD.Models.Compensations.Salary", b =>
                 {
                     b.HasBaseType("PD.Models.Compensations.Compensation");
 
-                    b.Property<decimal?>("YearEndMerit");
-
-                    b.Property<decimal?>("YearEndMeritDecision");
-
-                    b.Property<string>("YearEndMeritReason");
-
-                    b.Property<bool>("YearEndPromotionStatus");
 
                     b.ToTable("Salary");
 
                     b.HasDiscriminator().HasValue("Salary");
+                });
+
+            modelBuilder.Entity("PD.Models.SalaryScales.APOSalaryScale", b =>
+                {
+                    b.HasBaseType("PD.Models.SalaryScales.SalaryScale");
+
+
+                    b.ToTable("APOSalaryScale");
+
+                    b.HasDiscriminator().HasValue("APOSalaryScale");
+                });
+
+            modelBuilder.Entity("PD.Models.SalaryScales.FacultySalaryScale", b =>
+                {
+                    b.HasBaseType("PD.Models.SalaryScales.SalaryScale");
+
+
+                    b.ToTable("FacultySalaryScale");
+
+                    b.HasDiscriminator().HasValue("FacultySalaryScale");
+                });
+
+            modelBuilder.Entity("PD.Models.SalaryScales.NASASalaryScale", b =>
+                {
+                    b.HasBaseType("PD.Models.SalaryScales.SalaryScale");
+
+
+                    b.ToTable("NASASalaryScale");
+
+                    b.HasDiscriminator().HasValue("NASASalaryScale");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
