@@ -35,6 +35,7 @@ namespace PD.Data
         public DbSet<Department> Departments { get; set; }
         public DbSet<Speedcode> Speedcodes { get; set; }
         public DbSet<ChartField2ChartStringJoin> ChartField2ChartStringJoins { get; set; }
+        public DbSet<ChangeLog> ChangeLog { get; set; }
 
         //Salary Scales
         public DbSet<SalaryScale> SalaryScales { get; set; }
