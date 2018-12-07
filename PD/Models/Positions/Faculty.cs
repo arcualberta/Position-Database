@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -38,6 +39,7 @@ namespace PD.Models.Positions
             ATS
         }
 
-        public eRank Rank { get; set; }
+        [NotMapped]
+        public eRank Rank { get { return Enum.Parse<eRank>(Title); } set { Title = value.ToString(); } }
     }
 }

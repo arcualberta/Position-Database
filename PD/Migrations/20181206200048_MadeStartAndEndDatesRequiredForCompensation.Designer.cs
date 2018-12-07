@@ -10,8 +10,8 @@ using PD.Data;
 namespace PD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20181205202343_CreatedDataModels")]
-    partial class CreatedDataModels
+    [Migration("20181206200048_MadeStartAndEndDatesRequiredForCompensation")]
+    partial class MadeStartAndEndDatesRequiredForCompensation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -186,6 +186,27 @@ namespace PD.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("PD.Models.ChangeLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Change");
+
+                    b.Property<int?>("PositionAssignmentId");
+
+                    b.Property<DateTime>("Timestamp");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PositionAssignmentId");
+
+                    b.ToTable("ChangeLog");
+                });
+
             modelBuilder.Entity("PD.Models.ChartField", b =>
                 {
                     b.Property<int>("Id")
@@ -241,13 +262,15 @@ namespace PD.Migrations
                     b.Property<string>("Discriminator")
                         .IsRequired();
 
-                    b.Property<DateTime?>("EndDate");
+                    b.Property<DateTime>("EndDate");
+
+                    b.Property<bool>("IsProjection");
 
                     b.Property<string>("Notes");
 
                     b.Property<int>("PositionAssignmentId");
 
-                    b.Property<DateTime?>("StartDate");
+                    b.Property<DateTime>("StartDate");
 
                     b.Property<decimal>("Value");
 
@@ -324,6 +347,8 @@ namespace PD.Migrations
 
                     b.Property<DateTime?>("EndDate");
 
+                    b.Property<int?>("PersonId");
+
                     b.Property<int?>("PositionId");
 
                     b.Property<DateTime?>("StartDate");
@@ -331,6 +356,8 @@ namespace PD.Migrations
                     b.Property<int>("Status");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
 
                     b.HasIndex("PositionId");
 
@@ -351,8 +378,6 @@ namespace PD.Migrations
 
                     b.Property<string>("Number");
 
-                    b.Property<int?>("PersonId");
-
                     b.Property<DateTime?>("StartDate");
 
                     b.Property<string>("Title");
@@ -360,8 +385,6 @@ namespace PD.Migrations
                     b.Property<int>("Workload");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PersonId");
 
                     b.ToTable("Positions");
                 });
@@ -612,6 +635,13 @@ namespace PD.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("PD.Models.ChangeLog", b =>
+                {
+                    b.HasOne("PD.Models.PositionAssignment")
+                        .WithMany("ChangeLog")
+                        .HasForeignKey("PositionAssignmentId");
+                });
+
             modelBuilder.Entity("PD.Models.ChartField2ChartStringJoin", b =>
                 {
                     b.HasOne("PD.Models.ChartField", "ChartField")
@@ -648,16 +678,13 @@ namespace PD.Migrations
 
             modelBuilder.Entity("PD.Models.PositionAssignment", b =>
                 {
+                    b.HasOne("PD.Models.Person", "Person")
+                        .WithMany("PositionAssignments")
+                        .HasForeignKey("PersonId");
+
                     b.HasOne("PD.Models.Positions.Position", "Position")
                         .WithMany("PositionAssignments")
                         .HasForeignKey("PositionId");
-                });
-
-            modelBuilder.Entity("PD.Models.Positions.Position", b =>
-                {
-                    b.HasOne("PD.Models.Person", "Person")
-                        .WithMany("Positions")
-                        .HasForeignKey("PersonId");
                 });
 
             modelBuilder.Entity("PD.Models.ChartFields.DeptID", b =>

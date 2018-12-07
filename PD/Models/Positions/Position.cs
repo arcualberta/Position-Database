@@ -61,9 +61,6 @@ namespace PD.Models.Positions
         /// </value>
         public DateTime? EndDate { get; set; }
 
-        public int? PersonId { get; set; }
-        public Person Person { get; set; }
-
         public virtual ICollection<PositionAccount> PositionAccounts { get; set; } = new List<PositionAccount>();
 
         public virtual ICollection<PositionAssignment> PositionAssignments { get; set; } = new List<PositionAssignment>();

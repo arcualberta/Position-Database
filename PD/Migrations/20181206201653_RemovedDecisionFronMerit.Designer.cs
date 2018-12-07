@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PD.Data;
 
 namespace PD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181206201653_RemovedDecisionFronMerit")]
+    partial class RemovedDecisionFronMerit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -372,9 +374,6 @@ namespace PD.Migrations
 
                     b.Property<string>("Description");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired();
-
                     b.Property<DateTime?>("EndDate");
 
                     b.Property<string>("Number");
@@ -388,23 +387,6 @@ namespace PD.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Positions");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Position");
-                });
-
-            modelBuilder.Entity("PD.Models.PromotionScheme", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("CurrentTitle");
-
-                    b.Property<string>("PromotedTitle");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PromotionSchemes");
                 });
 
             modelBuilder.Entity("PD.Models.SalaryScales.SalaryScale", b =>
@@ -537,8 +519,6 @@ namespace PD.Migrations
                 {
                     b.HasBaseType("PD.Models.Compensations.Compensation");
 
-                    b.Property<bool>("IsBaseSalaryComponent");
-
                     b.Property<string>("Name");
 
                     b.ToTable("Adjustment");
@@ -576,36 +556,6 @@ namespace PD.Migrations
                     b.ToTable("Salary");
 
                     b.HasDiscriminator().HasValue("Salary");
-                });
-
-            modelBuilder.Entity("PD.Models.Positions.Apo", b =>
-                {
-                    b.HasBaseType("PD.Models.Positions.Position");
-
-
-                    b.ToTable("Apo");
-
-                    b.HasDiscriminator().HasValue("Apo");
-                });
-
-            modelBuilder.Entity("PD.Models.Positions.Faculty", b =>
-                {
-                    b.HasBaseType("PD.Models.Positions.Position");
-
-
-                    b.ToTable("Faculty");
-
-                    b.HasDiscriminator().HasValue("Faculty");
-                });
-
-            modelBuilder.Entity("PD.Models.Positions.Nasa", b =>
-                {
-                    b.HasBaseType("PD.Models.Positions.Position");
-
-
-                    b.ToTable("Nasa");
-
-                    b.HasDiscriminator().HasValue("Nasa");
                 });
 
             modelBuilder.Entity("PD.Models.SalaryScales.APOSalaryScale", b =>

@@ -29,7 +29,7 @@ namespace PD.Services
             var positionAssignment = Db.PositionAssignments
                 .Include(p => p.Compensations)
                 .Include(p => p.Position)
-                .Include(p => p.Position.Person)
+                .Include(p => p.Person)
                 .Where(p => p.Id == positionAssignmentId)
                 .FirstOrDefault();
 

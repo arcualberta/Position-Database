@@ -20,6 +20,12 @@ namespace PD.Services
         public ApplicationDbContext Db { get; }
 
         private DataProtector _DataProtector;
+        /// <summary>
+        /// Gets the data protector. Used for encryption and decryption of data fields.
+        /// </summary>
+        /// <value>
+        /// The data protector.
+        /// </value>
         public DataProtector DataProtector
         {
             get
@@ -42,6 +48,29 @@ namespace PD.Services
             Db = db;
         }
 
+        public PositionAssignment GetPositionAssignment(
+            int id, DateTime sampleDate,
+            bool includeCompensations = false,
+            bool includeChangeLog = false,
+            bool includePosition = false,
+            bool includePerson = false)
+        {
+            IQueryable<PositionAssignment> matches = Db.PositionAssignments;
+
+            if (includeCompensations)
+                matches = matches.Include(x => x.Compensations);
+
+            if (includeChangeLog)
+                matches = matches.Include(x => x.ChangeLog);
+
+            if (includePosition)
+                matches = matches.Include(x => x.Position);
+
+            matches = matches.Where(x => x.StartDate <= sampleDate && (!x.EndDate.HasValue || x.EndDate >= sampleDate));
+
+            return matches.FirstOrDefault();
+        }
+
         public IQueryable<PositionAssignment> GetPositionAssignments(
             int? positionId = null,
             string positionNumber = null,
@@ -57,7 +86,7 @@ namespace PD.Services
             if (includePersinInfo)
                 positionAssignments = Db.PositionAssignments
                     .Include(a => a.Position)
-                    .Include(a => a.Position.Person);
+                    .Include(a => a.Person);
             else if (includePositionInfo)
                 positionAssignments = Db.PositionAssignments.Include(a => a.Position);
             else
@@ -79,33 +108,14 @@ namespace PD.Services
        public IQueryable<PositionAssignment> GetPositionAssignments(PositionFilter filter)
         {
             IQueryable<PositionAssignment> associations = Db.PositionAssignments
-                .Include(pp => pp.Position)
-                .Include(pp => pp.Position.Person)
-                .Where(pp =>
-                    (!pp.StartDate.HasValue || pp.StartDate.Value <= filter.Date)
-                    && (!pp.EndDate.HasValue || pp.EndDate.Value > filter.Date)
+                .Include(pa => pa.Position)
+                .Include(pa => pa.Person)
+                .Where(pa =>
+                    (!pa.StartDate.HasValue || pa.StartDate.Value <= filter.Date)
+                    && (!pa.EndDate.HasValue || pa.EndDate.Value > filter.Date)
                     );
 
             return associations;
         }
-
-        //public Position GetPosition(string positionId, )
-
-        ////public IQueryable<Position> GetPositions(Position.ePositionType positionType, DateTime? date = null, bool isActive = true)
-        ////{
-        ////    if (!date.HasValue)
-        ////        date = DateTime.Now.Date;
-
-        ////    IQueryable<Position> positions = Db.Positions
-        ////        .Where(pos =>
-        ////            pos.PositionType == positionType
-        ////            && pos.IsActive == isActive
-        ////            && (!pos.StartDate.HasValue || pos.StartDate.Value <= date)
-        ////            && (!pos.EndDate.HasValue || pos.EndDate.Value > date)
-        ////            );
-
-        ////    return positions;
-        ////}
-
     }
 }

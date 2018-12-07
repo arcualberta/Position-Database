@@ -10,7 +10,5 @@ namespace PD.Models.Compensations
     {
         [Display(Name = "Is Promoted?")]
         public bool IsPromoted { get; set; }
-
-        public decimal Decision { get; set; }
     }
 }

@@ -277,7 +277,7 @@ namespace PD.Services
                         Person person = Db.Persons.Where(p => p.EmployeeId == empl.EmployeeId).FirstOrDefault();
 
                         //Retrieve the active position record with the given position number from the database
-                        Position position = Db.Positions
+                        Faculty position = Db.Faculty
                             .Where(p => p.Number == empl.PositionNumber
                                 && (p.StartDate.HasValue == false || p.StartDate <= currentYearSampleDate)
                                 && (p.EndDate.HasValue == false || p.EndDate > currentYearSampleDate)
@@ -291,16 +291,46 @@ namespace PD.Services
                             position.StartDate = currentYearStartDate;
                             position.EndDate = null; //No end date for employees imported throgh the spreadsheet
                             position.Number = empl.PositionNumber;
-                            position.Title = empl.Rank;
+                            position.Rank = Enum.Parse<Faculty.eRank>(empl.Rank);
                             position.Workload = empl.FtPtStatus;
                             position.ContractType = empl.ContractStatus;
 
                             Db.Positions.Add(position);
-                            person.Positions.Add(position);
                             Db.SaveChanges();
                         }
                     }
-                    
+
+
+                    //Adding position assignments to positions
+                    foreach (var empl in employees)
+                    {
+                        IQueryable<PositionAssignment> positionAssignments = GetPositionAssignments(null, empl.PositionNumber, currentYearSampleDate);
+                        if (positionAssignments.Count() > 1)
+                            throw new Exception("Data Error: Same position has multiple assignments at the time period containig " + currentYearSampleDate.Date);
+
+                        IQueryable<Position> positions = Db.Positions
+                            .Where(p => p.Number == empl.PositionNumber && p.StartDate <= currentYearSampleDate && (!p.EndDate.HasValue || currentYearSampleDate <= p.EndDate));
+                        if (positions.Count() != 1)
+                            throw new Exception("Data Error: Exactly 1 position with position number " + empl.PositionNumber +" is requred for the time period " + currentYearSampleDate.Date);
+                        Position position = positions.First();
+
+                        if (positionAssignments.Count() == 0)
+                        {
+                            Person person = Db.Persons.Where(p => p.EmployeeId == empl.EmployeeId).FirstOrDefault();
+
+                            PositionAssignment pa = new PositionAssignment();
+                            pa.Status = PositionAssignment.eStatus.Active;
+                            pa.StartDate = currentYearStartDate;
+                            pa.EndDate = null; //No end date for position assignments imported through the spreadsheet
+                            pa.PositionId = position.Id;
+                            pa.Status = PositionAssignment.eStatus.Active;
+
+                            person.PositionAssignments.Add(pa);
+
+                            Db.SaveChanges();
+                        }
+                    }
+
                     //Creating Position Accounts
                     foreach (var empl in employees)
                     {
@@ -318,34 +348,34 @@ namespace PD.Services
                         }
                     }
 
-                    //Adding position assignments to positions
-                    foreach (var empl in employees)
-                    {
-                        IQueryable<PositionAssignment> positionAssignments = GetPositionAssignments(null, empl.PositionNumber, currentYearSampleDate);
+                    //////////////////Adding position assignments to positions
+                    ////////////////foreach (var empl in employees)
+                    ////////////////{
+                    ////////////////    IQueryable<PositionAssignment> positionAssignments = GetPositionAssignments(null, empl.PositionNumber, currentYearSampleDate);
 
-                        if (positionAssignments.Count() > 1)
-                            throw new Exception("Data Error: Same position has multiple assign,emys at the time period containig " + currentYearSampleDate.Date);
+                    ////////////////    if (positionAssignments.Count() > 1)
+                    ////////////////        throw new Exception("Data Error: Same position has multiple assign,emys at the time period containig " + currentYearSampleDate.Date);
 
-                        if (positionAssignments.Count() == 0)
-                        {
-                            Position position = Db.Positions
-                                .Include(pos => pos.PositionAssignments)
-                                .Where(pos => pos.Number == empl.PositionNumber)
-                                .FirstOrDefault();
+                    ////////////////    if (positionAssignments.Count() == 0)
+                    ////////////////    {
+                    ////////////////        Position position = Db.Positions
+                    ////////////////            .Include(pos => pos.PositionAssignments)
+                    ////////////////            .Where(pos => pos.Number == empl.PositionNumber)
+                    ////////////////            .FirstOrDefault();
 
-                            if (position == null)
-                                throw new Exception(string.Format("Data Error: Position with position number {0} does not exist", empl.PositionNumber));
+                    ////////////////        if (position == null)
+                    ////////////////            throw new Exception(string.Format("Data Error: Position with position number {0} does not exist", empl.PositionNumber));
 
-                            PositionAssignment pa = new PositionAssignment();
-                            pa.Status = PositionAssignment.eStatus.Active;
-                            pa.StartDate = currentYearStartDate;
-                            pa.EndDate = null; //No end date for position assignments imported through the spreadsheet
+                    ////////////////        PositionAssignment pa = new PositionAssignment();
+                    ////////////////        pa.Status = PositionAssignment.eStatus.Active;
+                    ////////////////        pa.StartDate = currentYearStartDate;
+                    ////////////////        pa.EndDate = null; //No end date for position assignments imported through the spreadsheet
 
-                            position.PositionAssignments.Add(pa);
+                    ////////////////        position.PositionAssignments.Add(pa);
 
-                            Db.SaveChanges();
-                        }
-                    }
+                    ////////////////        Db.SaveChanges();
+                    ////////////////    }
+                    ////////////////}
 
 
                     //Updating employee salary information
@@ -366,7 +396,7 @@ namespace PD.Services
 
                         //Salary for the CURRENT year
                         Salary salary = Db.Salaries
-                            .Where(s => s.StartDate == currentYearStartDate && s.EndDate == currentYearEndDate && s.PositionAssignmentId == pa.Id)
+                            .Where(s => s.StartDate == currentYearStartDate && s.EndDate == currentYearEndDate && s.PositionAssignmentId == pa.Id && s.IsProjection == false)
                             .FirstOrDefault();
                         if (salary == null)
                         {
@@ -375,6 +405,7 @@ namespace PD.Services
                                 Value = empl.Salary.CurrentSalary,
                                 StartDate = currentYearStartDate,
                                 EndDate = currentYearEndDate,
+                                IsProjection = false
                             };
                             pa.Compensations.Add(salary);
                             Db.SaveChanges();
@@ -382,7 +413,7 @@ namespace PD.Services
 
                         //Merit for the NEXT year
                         Merit merit = Db.Merits
-                            .Where(a => a.PositionAssignmentId == pa.Id && a.StartDate == nextYearStartDate && a.EndDate == nextYearEndDate)
+                            .Where(a => a.PositionAssignmentId == pa.Id && a.StartDate == nextYearStartDate && a.EndDate == nextYearEndDate && a.IsProjection == false)
                             .FirstOrDefault();
                         if (merit == null)
                         {
@@ -392,14 +423,15 @@ namespace PD.Services
                                 EndDate = nextYearEndDate,
                                 Value = (empl.Salary as FacultySalaryViewModel).MeritDecision,
                                 Notes = (empl.Salary as FacultySalaryViewModel).MeritReason,
-                                IsPromoted = (empl.Salary as FacultySalaryViewModel).IsPromoted
+                                IsPromoted = (empl.Salary as FacultySalaryViewModel).IsPromoted,
+                                IsProjection = false
                             };
                             pa.Compensations.Add(merit);
                             Db.SaveChanges();
                         }
                         //Contract Settlement for the NEXT year
                         ContractSettlement atb = Db.ContractSettlements
-                            .Where(a => a.PositionAssignmentId == pa.Id && a.StartDate == nextYearStartDate && a.EndDate == nextYearEndDate)
+                            .Where(a => a.PositionAssignmentId == pa.Id && a.StartDate == nextYearStartDate && a.EndDate == nextYearEndDate && a.IsProjection == false)
                             .FirstOrDefault();
                         if(atb == null)
                         {
@@ -407,7 +439,8 @@ namespace PD.Services
                             {
                                 StartDate = nextYearStartDate,
                                 EndDate = nextYearEndDate,
-                                Value = empl.FacultySalary.ContractSettlement
+                                Value = empl.FacultySalary.ContractSettlement,
+                                IsProjection = false
                             };
                             pa.Compensations.Add(atb);
                             Db.SaveChanges();
@@ -418,7 +451,7 @@ namespace PD.Services
                         if (empl.FacultySalary.SpecialAdjustment > 0)
                         {
                             Adjustment sa = Db.Adjustments
-                            .Where(a => a.PositionAssignmentId == pa.Id && a.StartDate == nextYearStartDate && a.EndDate == nextYearEndDate && a.Name == name)
+                            .Where(a => a.PositionAssignmentId == pa.Id && a.StartDate == nextYearStartDate && a.EndDate == nextYearEndDate && a.Name == name && a.IsProjection == false)
                                 .FirstOrDefault();
 
                             if (sa == null)
@@ -428,7 +461,9 @@ namespace PD.Services
                                     StartDate = nextYearStartDate,
                                     EndDate = nextYearEndDate,
                                     Value = empl.FacultySalary.SpecialAdjustment,
-                                    Name = name
+                                    Name = name,
+                                    IsProjection = false,
+                                    IsBaseSalaryComponent = true
                                 };
                                 pa.Compensations.Add(sa);
                                 Db.SaveChanges();
@@ -440,7 +475,7 @@ namespace PD.Services
                         if (empl.FacultySalary.MarketSupplement > 0)
                         {
                             Adjustment sa = Db.Adjustments
-                                .Where(a => a.PositionAssignmentId == pa.Id && a.StartDate == nextYearStartDate && a.EndDate == nextYearEndDate && a.Name == name)
+                                .Where(a => a.PositionAssignmentId == pa.Id && a.StartDate == nextYearStartDate && a.EndDate == nextYearEndDate && a.Name == name && a.IsProjection == false)
                                 .FirstOrDefault();
 
                             if (sa == null)
@@ -450,13 +485,34 @@ namespace PD.Services
                                     StartDate = nextYearStartDate,
                                     EndDate = nextYearEndDate,
                                     Value = empl.FacultySalary.MarketSupplement,
-                                    Name = name
+                                    Name = name,
+                                    IsProjection = false,
+                                    IsBaseSalaryComponent = false
                                 };
                                 pa.Compensations.Add(sa);
                                 Db.SaveChanges();
                             }
                         }
-                    }
+
+                        //Actual salary for the NEXT year
+                        salary = Db.Salaries
+                            .Where(s => s.StartDate == nextYearStartDate && s.EndDate == nextYearEndDate && s.PositionAssignmentId == pa.Id && s.IsProjection == false)
+                            .FirstOrDefault();
+                        if (salary == null)
+                        {
+                            salary = new Salary()
+                            {
+                                Value = empl.Salary.NextSalary,
+                                StartDate = nextYearStartDate,
+                                EndDate = nextYearEndDate,
+                                IsProjection = false
+                            };
+                            pa.Compensations.Add(salary);
+                            Db.SaveChanges();
+                        }
+
+
+                    }//End: foreach(var empl in employees)
 
                     //Salary Scales
                     //=============
@@ -482,6 +538,21 @@ namespace PD.Services
 
                     if (newDataAdded)
                         Db.SaveChanges();
+
+                    //Adding promotion schemes
+                    if (!Db.PromotionSchemes.Where(s => s.CurrentTitle == Faculty.eRank.AssistantProfessor.ToString()).Any())
+                        Db.PromotionSchemes.Add(new PromotionScheme() { CurrentTitle = Faculty.eRank.AssistantProfessor.ToString(), PromotedTitle = Faculty.eRank.AssociateProfessor.ToString() });
+                    if (!Db.PromotionSchemes.Where(s => s.CurrentTitle == Faculty.eRank.AssociateProfessor.ToString()).Any())
+                        Db.PromotionSchemes.Add(new PromotionScheme() { CurrentTitle = Faculty.eRank.AssociateProfessor.ToString(), PromotedTitle = Faculty.eRank.Professor1.ToString() });
+                    if (!Db.PromotionSchemes.Where(s => s.CurrentTitle == Faculty.eRank.Professor1.ToString()).Any())
+                        Db.PromotionSchemes.Add(new PromotionScheme() { CurrentTitle = Faculty.eRank.Professor1.ToString(), PromotedTitle = Faculty.eRank.Professor2.ToString() });
+                    if (!Db.PromotionSchemes.Where(s => s.CurrentTitle == Faculty.eRank.Professor2.ToString()).Any())
+                        Db.PromotionSchemes.Add(new PromotionScheme() { CurrentTitle = Faculty.eRank.Professor2.ToString(), PromotedTitle = Faculty.eRank.Professor3.ToString() });
+                    if (!Db.PromotionSchemes.Where(s => s.CurrentTitle == Faculty.eRank.FSO1.ToString()).Any())
+                        Db.PromotionSchemes.Add(new PromotionScheme() { CurrentTitle = Faculty.eRank.FSO1.ToString(), PromotedTitle = Faculty.eRank.FSO2.ToString() });
+                    if (!Db.PromotionSchemes.Where(s => s.CurrentTitle == Faculty.eRank.FSO2.ToString()).Any())
+                        Db.PromotionSchemes.Add(new PromotionScheme() { CurrentTitle = Faculty.eRank.FSO2.ToString(), PromotedTitle = Faculty.eRank.FSO3.ToString() });
+                    Db.SaveChanges();
                 }
             }
             //catch (Exception ex)

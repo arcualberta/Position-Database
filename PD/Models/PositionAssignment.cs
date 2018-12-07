@@ -37,6 +37,27 @@ namespace PD.Models
         public int? PositionId { get; set; }
         public virtual Position Position {get;set;}
 
+        public int? PersonId { get; set; }
+        public Person Person { get; set; }
+
         public virtual ICollection<Compensation> Compensations { get; set; } = new List<Compensation>();
+
+        public virtual ICollection<ChangeLog> ChangeLog { get; set; } = new LinkedList<ChangeLog>();
+
+
+        /// <summary>
+        /// Returns the projected or confirmed compensation of the give type T for the target date
+        /// from the compensations already loaded into memory.        
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="targetDate">The target date.</param>
+        /// <param name="isProjection">if set to <c>true</c> [is projection].</param>
+        /// <returns></returns>
+        public T GetCompensation<T>(DateTime targetDate, bool isProjection) where T : Compensation
+        {
+            return Compensations
+                .Where(c => c is T && c.StartDate <= targetDate && c.EndDate >= targetDate && c.IsProjection == isProjection)
+                .FirstOrDefault() as T;
+        }
     }
 }

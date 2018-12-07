@@ -90,6 +90,25 @@ namespace PD.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Positions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Number = table.Column<string>(nullable: true),
+                    Title = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
+                    Workload = table.Column<int>(nullable: false),
+                    ContractType = table.Column<int>(nullable: false),
+                    StartDate = table.Column<DateTime>(nullable: true),
+                    EndDate = table.Column<DateTime>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Positions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SalaryScales",
                 columns: table => new
                 {
@@ -250,56 +269,6 @@ namespace PD.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Positions",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Number = table.Column<string>(nullable: true),
-                    Title = table.Column<string>(nullable: true),
-                    Description = table.Column<string>(nullable: true),
-                    Workload = table.Column<int>(nullable: false),
-                    ContractType = table.Column<int>(nullable: false),
-                    StartDate = table.Column<DateTime>(nullable: true),
-                    EndDate = table.Column<DateTime>(nullable: true),
-                    PersonId = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Positions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Positions_Persons_PersonId",
-                        column: x => x.PersonId,
-                        principalTable: "Persons",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ChartField2ChartStringJoins",
-                columns: table => new
-                {
-                    ChartStringId = table.Column<int>(nullable: false),
-                    ChartFieldId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ChartField2ChartStringJoins", x => new { x.ChartFieldId, x.ChartStringId });
-                    table.ForeignKey(
-                        name: "FK_ChartField2ChartStringJoins_ChartFields_ChartFieldId",
-                        column: x => x.ChartFieldId,
-                        principalTable: "ChartFields",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ChartField2ChartStringJoins_ChartStrings_ChartStringId",
-                        column: x => x.ChartStringId,
-                        principalTable: "ChartStrings",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "PositionAccounts",
                 columns: table => new
                 {
@@ -337,15 +306,68 @@ namespace PD.Migrations
                     Status = table.Column<int>(nullable: false),
                     StartDate = table.Column<DateTime>(nullable: true),
                     EndDate = table.Column<DateTime>(nullable: true),
-                    PositionId = table.Column<int>(nullable: true)
+                    PositionId = table.Column<int>(nullable: true),
+                    PersonId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PositionAssignments", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_PositionAssignments_Persons_PersonId",
+                        column: x => x.PersonId,
+                        principalTable: "Persons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_PositionAssignments_Positions_PositionId",
                         column: x => x.PositionId,
                         principalTable: "Positions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ChartField2ChartStringJoins",
+                columns: table => new
+                {
+                    ChartStringId = table.Column<int>(nullable: false),
+                    ChartFieldId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChartField2ChartStringJoins", x => new { x.ChartFieldId, x.ChartStringId });
+                    table.ForeignKey(
+                        name: "FK_ChartField2ChartStringJoins_ChartFields_ChartFieldId",
+                        column: x => x.ChartFieldId,
+                        principalTable: "ChartFields",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ChartField2ChartStringJoins_ChartStrings_ChartStringId",
+                        column: x => x.ChartStringId,
+                        principalTable: "ChartStrings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ChangeLog",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    UserId = table.Column<string>(nullable: true),
+                    Timestamp = table.Column<DateTime>(nullable: false),
+                    Change = table.Column<string>(nullable: true),
+                    PositionAssignmentId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChangeLog", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ChangeLog_PositionAssignments_PositionAssignmentId",
+                        column: x => x.PositionAssignmentId,
+                        principalTable: "PositionAssignments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -359,6 +381,7 @@ namespace PD.Migrations
                     Value = table.Column<decimal>(nullable: false),
                     StartDate = table.Column<DateTime>(nullable: true),
                     EndDate = table.Column<DateTime>(nullable: true),
+                    IsProjection = table.Column<bool>(nullable: false),
                     Notes = table.Column<string>(nullable: true),
                     PositionAssignmentId = table.Column<int>(nullable: false),
                     Discriminator = table.Column<string>(nullable: false),
@@ -418,6 +441,11 @@ namespace PD.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ChangeLog_PositionAssignmentId",
+                table: "ChangeLog",
+                column: "PositionAssignmentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ChartField2ChartStringJoins_ChartStringId",
                 table: "ChartField2ChartStringJoins",
                 column: "ChartStringId");
@@ -443,14 +471,14 @@ namespace PD.Migrations
                 column: "PositionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PositionAssignments_PersonId",
+                table: "PositionAssignments",
+                column: "PersonId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PositionAssignments_PositionId",
                 table: "PositionAssignments",
                 column: "PositionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Positions_PersonId",
-                table: "Positions",
-                column: "PersonId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -469,6 +497,9 @@ namespace PD.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "ChangeLog");
 
             migrationBuilder.DropTable(
                 name: "ChartField2ChartStringJoins");
@@ -504,10 +535,10 @@ namespace PD.Migrations
                 name: "Departments");
 
             migrationBuilder.DropTable(
-                name: "Positions");
+                name: "Persons");
 
             migrationBuilder.DropTable(
-                name: "Persons");
+                name: "Positions");
         }
     }
 }

@@ -10,8 +10,8 @@ using PD.Data;
 namespace PD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20181205210308_AddedChangeLog")]
-    partial class AddedChangeLog
+    [Migration("20181206185210_CreatedDataModels")]
+    partial class CreatedDataModels
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -194,11 +194,15 @@ namespace PD.Migrations
 
                     b.Property<string>("Change");
 
+                    b.Property<int?>("PositionAssignmentId");
+
                     b.Property<DateTime>("Timestamp");
 
                     b.Property<string>("UserId");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PositionAssignmentId");
 
                     b.ToTable("ChangeLog");
                 });
@@ -259,6 +263,8 @@ namespace PD.Migrations
                         .IsRequired();
 
                     b.Property<DateTime?>("EndDate");
+
+                    b.Property<bool>("IsProjection");
 
                     b.Property<string>("Notes");
 
@@ -341,6 +347,8 @@ namespace PD.Migrations
 
                     b.Property<DateTime?>("EndDate");
 
+                    b.Property<int?>("PersonId");
+
                     b.Property<int?>("PositionId");
 
                     b.Property<DateTime?>("StartDate");
@@ -348,6 +356,8 @@ namespace PD.Migrations
                     b.Property<int>("Status");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
 
                     b.HasIndex("PositionId");
 
@@ -368,8 +378,6 @@ namespace PD.Migrations
 
                     b.Property<string>("Number");
 
-                    b.Property<int?>("PersonId");
-
                     b.Property<DateTime?>("StartDate");
 
                     b.Property<string>("Title");
@@ -377,8 +385,6 @@ namespace PD.Migrations
                     b.Property<int>("Workload");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PersonId");
 
                     b.ToTable("Positions");
                 });
@@ -629,6 +635,13 @@ namespace PD.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("PD.Models.ChangeLog", b =>
+                {
+                    b.HasOne("PD.Models.PositionAssignment")
+                        .WithMany("ChangeLog")
+                        .HasForeignKey("PositionAssignmentId");
+                });
+
             modelBuilder.Entity("PD.Models.ChartField2ChartStringJoin", b =>
                 {
                     b.HasOne("PD.Models.ChartField", "ChartField")
@@ -665,16 +678,13 @@ namespace PD.Migrations
 
             modelBuilder.Entity("PD.Models.PositionAssignment", b =>
                 {
+                    b.HasOne("PD.Models.Person", "Person")
+                        .WithMany("PositionAssignments")
+                        .HasForeignKey("PersonId");
+
                     b.HasOne("PD.Models.Positions.Position", "Position")
                         .WithMany("PositionAssignments")
                         .HasForeignKey("PositionId");
-                });
-
-            modelBuilder.Entity("PD.Models.Positions.Position", b =>
-                {
-                    b.HasOne("PD.Models.Person", "Person")
-                        .WithMany("Positions")
-                        .HasForeignKey("PersonId");
                 });
 
             modelBuilder.Entity("PD.Models.ChartFields.DeptID", b =>

@@ -29,13 +29,20 @@ namespace PD.Data
         #endregion
 
         public DbSet<PositionAccount> PositionAccounts { get; set; }
-        public DbSet<Position> Positions { get; set; }
         public DbSet<PositionAssignment> PositionAssignments { get; set; }
         public DbSet<Person> Persons { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Speedcode> Speedcodes { get; set; }
         public DbSet<ChartField2ChartStringJoin> ChartField2ChartStringJoins { get; set; }
         public DbSet<ChangeLog> ChangeLog { get; set; }
+        public DbSet<PromotionScheme> PromotionSchemes { get; set; }
+
+        //Positions
+        public DbSet<Position> Positions { get; set; }
+        public DbSet<Faculty> Faculty { get; set; }
+        public DbSet<Nasa> Nasa { get; set; }
+        public DbSet<Apo> Apo { get; set; }
+
 
         //Salary Scales
         public DbSet<SalaryScale> SalaryScales { get; set; }

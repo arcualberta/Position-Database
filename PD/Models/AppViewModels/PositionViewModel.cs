@@ -47,8 +47,8 @@ namespace PD.Models.AppViewModels
             Department = "";
             PositionNumber = pa.Position.Number;
             PositionTitle = pa.Position.Title;
-            EmployeeName = dp.Decrypt(pa.Position.Person.Name);
-            EmployeeId = pa.Position.Person.EmployeeId;
+            EmployeeName = dp.Decrypt(pa.Person.Name);
+            EmployeeId = pa.Person.EmployeeId;
             WorkLoad = pa.Position.Workload;
             Status = pa.Status;
             ContractType = pa.Position.ContractType;
