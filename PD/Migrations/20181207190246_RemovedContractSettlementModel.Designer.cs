@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PD.Data;
 
 namespace PD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181207190246_RemovedContractSettlementModel")]
+    partial class RemovedContractSettlementModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -549,8 +551,6 @@ namespace PD.Migrations
             modelBuilder.Entity("PD.Models.Compensations.Merit", b =>
                 {
                     b.HasBaseType("PD.Models.Compensations.Compensation");
-
-                    b.Property<decimal>("Increment");
 
                     b.Property<bool>("IsPromoted");
 

@@ -54,7 +54,6 @@ namespace PD.Data
         //Compensation Types
         public DbSet<Compensation> Compensations { get; set; }
         public DbSet<Salary> Salaries { get; set; }
-        public DbSet<ContractSettlement> ContractSettlements { get; set; }
         public DbSet<Merit> Merits { get; set; }
         public DbSet<Adjustment> Adjustments { get; set; }
 

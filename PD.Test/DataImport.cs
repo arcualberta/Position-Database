@@ -12,6 +12,7 @@ using System.Linq;
 using PD.Test.Db;
 using System.IO;
 using Microsoft.AspNetCore.DataProtection;
+using PD.Services.Projections;
 
 namespace PD.Test
 {
@@ -29,6 +30,16 @@ namespace PD.Test
             Assert.True(File.Exists(dataFile));
             ds.InjestFacultySalaryAdjustmentData(dataFile, worksheet2015_16, new DateTime(2015, 7, 1).Date,
                         new DateTime(2016, 06, 30).Date, new DateTime(2017, 06, 30).Date);
+        }
+
+        [Fact]
+        public void ProjectFacultySalaries()
+        {
+            SqlServerDb server = new SqlServerDb();
+            ApplicationDbContext db = server.Db;
+
+            FacultyProjectionService srv = new FacultyProjectionService(db);
+            srv.ProjectSalaries(new DateTime(2016, 7, 1).Date, new DateTime(2017, 06, 30).Date);
         }
     }
 }

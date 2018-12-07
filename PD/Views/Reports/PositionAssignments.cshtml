@@ -24,6 +24,27 @@
                 @Html.DisplayNameFor(model => model.Position.Title)
             </th>
             <th>
+                @Html.DisplayName("Previous Salary")
+            </th>
+            <th>
+                @Html.DisplayName("ATB")
+            </th>
+            <th>
+                @Html.DisplayName("Merit")
+            </th>
+            <th>
+                @Html.DisplayName("Special Adjustment")
+            </th>
+            <th>
+                @Html.DisplayName("Projected Salary")
+            </th>
+            <th>
+                @Html.DisplayName("Actual Salary")
+            </th>
+            <th>
+                @Html.DisplayName("Promoted")
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Status)
             </th>
             <th>
@@ -31,12 +52,6 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.EndDate)
-            </th>
-            <th>
-                @Html.DisplayName("Projected Base Salary")
-            </th>
-            <th>
-                @Html.DisplayName("Actual Base Salary")
             </th>
         </tr>
     </thead>
@@ -47,14 +62,42 @@
             string startDate = item.Position.StartDate.HasValue ? item.Position.StartDate.Value.ToString("yyyy-MM-dd") : "";
             string endDate = item.Position.EndDate.HasValue ? item.Position.EndDate.Value.ToString("yyyy-MM-dd") : "";
 
+            var previousSalary = item.GetCompensation<Salary>(filter.Date.AddYears(-1), false);
+            string previousSalaryVal = previousSalary != null ? previousSalary.Value.ToString() : "";
+
+            string atb = previousSalary != null ? Math.Round(previousSalary.Value * 0.01m).ToString() : "";
+
             var projectedBaseSalary = item.GetCompensation<Salary>(filter.Date, true);
             string projectedBaseSalaryVal = projectedBaseSalary != null ? projectedBaseSalary.Value.ToString() : "";
 
             var actualBaseSalary = item.GetCompensation<Salary>(filter.Date, false);
             string actualBaseSalaryVal = actualBaseSalary != null ? actualBaseSalary.Value.ToString() : "";
 
+            var merit = item.GetCompensation<Merit>(filter.Date, false);
+            string meritIncrement = merit != null ? merit.Increment.ToString() : "";
+            string promoted = merit != null && merit.IsPromoted ? "promoted" : "";
 
-            <tr>
+            var specialAdjustments = item.GetAdjustments(filter.Date, true).Select(adj => adj.Value.ToString());
+            string specialAdjustmentsVal = string.Join(", ", specialAdjustments);
+
+            string alertClass = "";
+            if (string.IsNullOrEmpty(projectedBaseSalaryVal) || string.IsNullOrEmpty(actualBaseSalaryVal))
+            {
+                alertClass = "alert alert-info";
+            }
+            else if (projectedBaseSalaryVal != actualBaseSalaryVal)
+            {
+                if(Math.Abs(projectedBaseSalary.Value - actualBaseSalary.Value) <= 2)
+                {
+                    alertClass = "alert alert-warning";
+                }
+                else
+                {
+                    alertClass = "alert alert-danger";
+                }
+            }
+
+            <tr class="@alertClass">
                 <td>
                     @Html.DisplayFor(modelItem => name)
                 </td>
@@ -65,6 +108,27 @@
                     @Html.DisplayFor(modelItem => item.Position.Title)
                 </td>
                 <td>
+                    @Html.DisplayFor(modelItem => previousSalaryVal)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => atb)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => meritIncrement)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => specialAdjustmentsVal)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => projectedBaseSalaryVal)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => actualBaseSalaryVal)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => promoted)
+                </td>
+                <td>
                     @Html.DisplayFor(modelItem => item.Status)
                 </td>
                 <td>
@@ -72,12 +136,6 @@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => endDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(model => projectedBaseSalaryVal)
-                </td>
-                <td>
-                    @Html.DisplayFor(model => actualBaseSalaryVal)
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

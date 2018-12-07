@@ -429,22 +429,6 @@ namespace PD.Services
                             pa.Compensations.Add(merit);
                             Db.SaveChanges();
                         }
-                        //Contract Settlement for the NEXT year
-                        ContractSettlement atb = Db.ContractSettlements
-                            .Where(a => a.PositionAssignmentId == pa.Id && a.StartDate == nextYearStartDate && a.EndDate == nextYearEndDate && a.IsProjection == false)
-                            .FirstOrDefault();
-                        if(atb == null)
-                        {
-                            atb = new ContractSettlement()
-                            {
-                                StartDate = nextYearStartDate,
-                                EndDate = nextYearEndDate,
-                                Value = empl.FacultySalary.ContractSettlement,
-                                IsProjection = false
-                            };
-                            pa.Compensations.Add(atb);
-                            Db.SaveChanges();
-                        }
 
                         //Special adjustment for the NEXT year
                         string name = "Special Adjustment";
@@ -516,25 +500,25 @@ namespace PD.Services
 
                     //Salary Scales
                     //=============
-                    bool newDataAdded = AddFacultySalaryScale("Assistant Professor", new DateTime(2015, 07, 01), 76534, 106402, 2489, 1);
-                    newDataAdded |= AddFacultySalaryScale("Assistant Professor", new DateTime(2016, 07, 01), 77299, 107467, 2514, 1);
-                    newDataAdded |= AddFacultySalaryScale("Assistant Professor", new DateTime(2017, 07, 01), 78458, 109082, 2552, 1);
+                    bool newDataAdded = AddFacultySalaryScale("AssistantProfessor", new DateTime(2015, 07, 01), 76534, 106402, 2489, 1);
+                    newDataAdded |= AddFacultySalaryScale("AssistantProfessor", new DateTime(2016, 07, 01), 77299, 107467, 2514, 1);
+                    newDataAdded |= AddFacultySalaryScale("AssistantProfessor", new DateTime(2017, 07, 01), 78458, 109082, 2552, 1);
 
-                    newDataAdded |= AddFacultySalaryScale("Associate Professor", new DateTime(2015, 07, 01), 88971, 133645, 3191, 1);
-                    newDataAdded |= AddFacultySalaryScale("Associate Professor", new DateTime(2016, 07, 01), 89861, 134983, 3223, 1);
-                    newDataAdded |= AddFacultySalaryScale("Associate Professor", new DateTime(2017, 07, 01), 91209, 137003, 3271, 1);
+                    newDataAdded |= AddFacultySalaryScale("AssociateProfessor", new DateTime(2015, 07, 01), 88971, 133645, 3191, 1);
+                    newDataAdded |= AddFacultySalaryScale("AssociateProfessor", new DateTime(2016, 07, 01), 89861, 134983, 3223, 1);
+                    newDataAdded |= AddFacultySalaryScale("AssociateProfessor", new DateTime(2017, 07, 01), 91209, 137003, 3271, 1);
 
-                    newDataAdded |= AddFacultySalaryScale("Professor 1", new DateTime(2015, 07, 01), 110715, 133227, 3752, 1);
-                    newDataAdded |= AddFacultySalaryScale("Professor 1", new DateTime(2016, 07, 01), 111822, 134562, 3790, 1);
-                    newDataAdded |= AddFacultySalaryScale("Professor 1", new DateTime(2017, 07, 01), 113499, 136581, 3847, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2015, 07, 01), 110715, 133227, 3752, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2016, 07, 01), 111822, 134562, 3790, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2017, 07, 01), 113499, 136581, 3847, 1);
 
-                    newDataAdded |= AddFacultySalaryScale("Professor 2", new DateTime(2015, 07, 01), 133227, 145991, 3191, 1);
-                    newDataAdded |= AddFacultySalaryScale("Professor 2", new DateTime(2016, 07, 01), 134562, 147454, 3223, 1);
-                    newDataAdded |= AddFacultySalaryScale("Professor 2", new DateTime(2017, 07, 01), 136581, 149665, 3271, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2015, 07, 01), 133227, 145991, 3191, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2016, 07, 01), 134562, 147454, 3223, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2017, 07, 01), 136581, 149665, 3271, 1);
 
-                    newDataAdded |= AddFacultySalaryScale("Professor 3", new DateTime(2015, 07, 01), 145991, 389913, 2489, 1);
-                    newDataAdded |= AddFacultySalaryScale("Professor 3", new DateTime(2016, 07, 01), 147454, 393826, 2514, 1);
-                    newDataAdded |= AddFacultySalaryScale("Professor 2", new DateTime(2017, 07, 01), 149665, 399761, 2552, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor3", new DateTime(2015, 07, 01), 145991, 389913, 2489, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor3", new DateTime(2016, 07, 01), 147454, 393826, 2514, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2017, 07, 01), 149665, 399761, 2552, 1);
 
                     if (newDataAdded)
                         Db.SaveChanges();

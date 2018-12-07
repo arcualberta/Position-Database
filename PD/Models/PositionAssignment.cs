@@ -51,13 +51,49 @@ namespace PD.Models
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="targetDate">The target date.</param>
-        /// <param name="isProjection">if set to <c>true</c> [is projection].</param>
+        /// <param name="isProjection">if set to <c>true</c> then returns the projected compensation. Otherwise, retutns the confirmed compensation.</param>
         /// <returns></returns>
         public T GetCompensation<T>(DateTime targetDate, bool isProjection) where T : Compensation
         {
             return Compensations
                 .Where(c => c is T && c.StartDate <= targetDate && c.EndDate >= targetDate && c.IsProjection == isProjection)
                 .FirstOrDefault() as T;
+        }
+
+        /// <summary>
+        /// Returns the confirmed compensation of the give type T for the target date
+        /// from the compensations already loaded into memory. If it's not available but a projected one available that matches the criteria, then 
+        /// returns that projected one.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="targetDate">The target date.</param>
+        /// <returns></returns>
+        public T GetCompensation<T>(DateTime targetDate) where T : Compensation
+        {
+            T compensation = GetCompensation<T>(targetDate, false);
+            if(compensation == null)
+                compensation = GetCompensation<T>(targetDate, true);
+            return compensation;
+        }
+
+
+        /// <summary>
+        /// Returns all adjustment instances which are part of the base salary for the period covering the target date.
+        /// </summary>
+        /// <param name="targetDate">The target date.</param>
+        /// <param name="isBaseSalaryComponents">if set to <c>true</c> then returns adjustments that are part of the base salary. 
+        /// Otherwise, returns adjustments that are NOT part of the base salary.
+        /// </param>
+        /// <returns></returns>
+        public IEnumerable<Adjustment> GetAdjustments(DateTime targetDate, bool isBaseSalaryComponents)
+        {
+            IEnumerable<Adjustment> adjustments = Compensations
+                .Where(c => c is Adjustment && c.StartDate <= targetDate && c.EndDate >= targetDate && (c as Adjustment).IsBaseSalaryComponent == isBaseSalaryComponents)
+                .ToList()
+                .Select(c => c as Adjustment)
+                .ToList();
+
+            return adjustments;
         }
     }
 }
