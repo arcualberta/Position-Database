@@ -29,7 +29,10 @@ namespace PD.Controllers
             IQueryable<PositionAssignment> positionAssignments = srv.GetPositionAssignments(filter);
 
             ViewBag.Filter = filter;
-            return View(positionAssignments.ToList().Select(pp => new PositionViewModel(pp, filter.Date, srv.DataProtector)));
+            ViewBag.DataProtector = srv.DataProtector;
+
+            return View("PositionAssignments", positionAssignments);
+            //return View(positionAssignments.ToList().Select(pp => new PositionViewModel(pp, filter.Date, srv.DataProtector)));
         }
     }
 }

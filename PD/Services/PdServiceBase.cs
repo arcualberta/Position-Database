@@ -110,6 +110,8 @@ namespace PD.Services
             IQueryable<PositionAssignment> associations = Db.PositionAssignments
                 .Include(pa => pa.Position)
                 .Include(pa => pa.Person)
+                .Include(pa => pa.Compensations)
+                .Include(pa => pa.ChangeLog)
                 .Where(pa =>
                     (!pa.StartDate.HasValue || pa.StartDate.Value <= filter.Date)
                     && (!pa.EndDate.HasValue || pa.EndDate.Value > filter.Date)
