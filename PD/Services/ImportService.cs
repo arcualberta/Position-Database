@@ -324,6 +324,8 @@ namespace PD.Services
                             pa.EndDate = null; //No end date for position assignments imported through the spreadsheet
                             pa.PositionId = position.Id;
                             pa.Status = PositionAssignment.eStatus.Active;
+                            pa.SalaryCycleStartMonth = 7;
+                            pa.SalaryCycleStartDay = 1;
 
                             person.PositionAssignments.Add(pa);
 

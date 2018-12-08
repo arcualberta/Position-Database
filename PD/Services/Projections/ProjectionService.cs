@@ -31,19 +31,18 @@ namespace PD.Services
             if (pa == null)
                 return null;
 
-            return ProjectSalary(pa, targetDate, cycleStartDate, cycleEndDate, defaultMeritDecision, updateDatabase);
+            return ProjectSalary(pa, targetDate, defaultMeritDecision, updateDatabase);
         }
 
         public virtual PositionAssignment ProjectSalary(
             PositionAssignment pa,
             DateTime targetDate,
-            DateTime cycleStartDate,
-            DateTime cycleEndDate,
             decimal defaultMeritDecision,
             bool updateDatabase = false)
         {
             //Creating data structures to be able to calculate the projection
-            if (!InitializeProjection(pa, targetDate, cycleStartDate, cycleEndDate, defaultMeritDecision))
+            DateTime cycleStartDate = pa.GetCycleStartDate(targetDate);
+            if (!InitializeProjection(pa, targetDate, cycleStartDate, cycleStartDate.AddYears(1).AddDays(-1), defaultMeritDecision))
                 return null; ;
 
             // STEP 2: Updating the salary parameters

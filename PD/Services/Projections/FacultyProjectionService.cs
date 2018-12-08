@@ -78,7 +78,7 @@ namespace PD.Services.Projections
             {
                 try
                 {
-                    PositionAssignment updated = ProjectSalary(pa, targetDate, cycleStartDate, cycleEndDate, defaultMeritDecision, updateDatabase);
+                    PositionAssignment updated = ProjectSalary(pa, targetDate, defaultMeritDecision, updateDatabase);
                 }
                 catch(Exception ex)
                 {

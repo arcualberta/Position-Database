@@ -34,6 +34,13 @@ namespace PD.Models
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
+        [Display(Name = "Month in which a new salary year begins")]
+        [Range(1, 12)]
+        public int SalaryCycleStartMonth { get; set; }
+        [Display(Name = "Date in which a new salary year begins")]
+        [Range(1, 31)]
+        public int SalaryCycleStartDay { get; set; }
+
         public int? PositionId { get; set; }
         public virtual Position Position {get;set;}
 
@@ -94,6 +101,17 @@ namespace PD.Models
                 .ToList();
 
             return adjustments;
+        }
+
+        public DateTime GetCycleStartDate(DateTime targetDate)
+        {
+            DateTime cycleStartDate = new DateTime(targetDate.Year, SalaryCycleStartMonth, SalaryCycleStartDay);
+
+            if (cycleStartDate > targetDate)
+                cycleStartDate = cycleStartDate.AddYears(-1);
+
+            return cycleStartDate;
+
         }
     }
 }

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PD.Data;
 
 namespace PD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181208194809_AddedCycleStartMonthAndDateToPositionAssignment")]
+    partial class AddedCycleStartMonthAndDateToPositionAssignment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -343,15 +345,15 @@ namespace PD.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("CycleStartDate");
+
+                    b.Property<int>("CycleStartMonth");
+
                     b.Property<DateTime?>("EndDate");
 
                     b.Property<int?>("PersonId");
 
                     b.Property<int?>("PositionId");
-
-                    b.Property<int>("SalaryCycleStartDay");
-
-                    b.Property<int>("SalaryCycleStartMonth");
 
                     b.Property<DateTime?>("StartDate");
 
