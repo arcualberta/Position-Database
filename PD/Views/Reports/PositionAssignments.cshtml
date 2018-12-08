@@ -10,8 +10,7 @@
 }
 
 @Html.EditorFor(model => filter, new { controller = "reports", action = "positions" })
-
-<table class="table">
+<table class="table table-bordered">
     <thead>
         <tr>
             <th>
@@ -53,6 +52,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.EndDate)
             </th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -89,7 +89,7 @@
             }
             else if (projectedBaseSalaryVal != actualBaseSalaryVal)
             {
-                if(Math.Abs(projectedBaseSalary.Value - actualBaseSalary.Value) <= 2)
+                if (Math.Abs(projectedBaseSalary.Value - actualBaseSalary.Value) <= 2)
                 {
                     alertClass = "alert alert-warning";
                 }
@@ -103,28 +103,28 @@
                 <td>
                     @Html.DisplayFor(modelItem => name)
                 </td>
-                <td>
+                <td title="@Html.DisplayNameFor(model => item.Person.EmployeeId)">
                     @Html.DisplayFor(modelItem => item.Person.EmployeeId)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Position.Title)
                 </td>
-                <td>
+                <td title="Old salary">
                     @Html.DisplayFor(modelItem => previousSalaryVal)
                 </td>
-                <td>
+                <td title="ATB">
                     @Html.DisplayFor(modelItem => atb)
                 </td>
-                <td>
+                <td title="Merit">
                     @Html.DisplayFor(modelItem => meritIncrement)
                 </td>
-                <td>
+                <td title="Special adjustment">
                     @Html.DisplayFor(modelItem => specialAdjustmentsVal)
                 </td>
-                <td>
+                <td title="Projected new salary">
                     @Html.DisplayFor(model => projectedBaseSalaryVal)
                 </td>
-                <td>
+                <td title="Actual new salary">
                     @Html.DisplayFor(model => actualBaseSalaryVal)
                 </td>
                 <td>
@@ -147,3 +147,5 @@
         }
     </tbody>
 </table>
+
+
