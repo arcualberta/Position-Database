@@ -68,7 +68,7 @@
             string atb = previousSalary != null ? Math.Round(previousSalary.Value * 0.01m).ToString() : "";
 
             var projectedBaseSalary = item.GetCompensation<Salary>(filter.Date, true);
-            string projectedBaseSalaryVal = projectedBaseSalary != null ? projectedBaseSalary.Value.ToString() : "";
+            string projectedBaseSalaryVal = projectedBaseSalary != null && projectedBaseSalary.Value > 0 ? projectedBaseSalary.Value.ToString() : "";
 
             var actualBaseSalary = item.GetCompensation<Salary>(filter.Date, false);
             string actualBaseSalaryVal = actualBaseSalary != null ? actualBaseSalary.Value.ToString() : "";
@@ -81,6 +81,8 @@
             string specialAdjustmentsVal = string.Join(", ", specialAdjustments);
 
             string alertClass = "";
+            string specialStyles = projectedBaseSalary != null && projectedBaseSalary.IsMaxed ? "color:green !important;font-weight:bold;" : "";
+
             if (string.IsNullOrEmpty(projectedBaseSalaryVal) || string.IsNullOrEmpty(actualBaseSalaryVal))
             {
                 alertClass = "alert alert-info";
@@ -97,7 +99,7 @@
                 }
             }
 
-            <tr class="@alertClass">
+            <tr class="@alertClass" style="@specialStyles">
                 <td>
                     @Html.DisplayFor(modelItem => name)
                 </td>

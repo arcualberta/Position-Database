@@ -8,8 +8,7 @@ namespace PD.Models.Compensations
 {
     public class Salary : Compensation
     {
-        public Salary()
-        {
-        }
+        [Display(Name = "Is Maxed")]
+        public bool IsMaxed { get; set; }
     }
 }

@@ -56,6 +56,7 @@ namespace PD.Data
         public DbSet<Salary> Salaries { get; set; }
         public DbSet<Merit> Merits { get; set; }
         public DbSet<Adjustment> Adjustments { get; set; }
+        public DbSet<ContractSettlement> ContractSettlements { get; set; }
 
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
