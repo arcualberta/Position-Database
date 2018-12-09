@@ -49,7 +49,7 @@ namespace PD.Models
 
         public virtual ICollection<Compensation> Compensations { get; set; } = new List<Compensation>();
 
-        public virtual ICollection<ChangeLog> ChangeLog { get; set; } = new LinkedList<ChangeLog>();
+        public virtual ICollection<AuditRecord> AuditTrail { get; set; } = new LinkedList<AuditRecord>();
 
 
         /// <summary>
@@ -112,6 +112,15 @@ namespace PD.Models
 
             return cycleStartDate;
 
+        }
+
+        public void LogError(string message)
+        {
+            AuditRecord record = new AuditRecord(AuditRecord.eAuditRecordType.Error)
+            {
+                Message = message             
+            };
+            AuditTrail.Add(record);
         }
     }
 }

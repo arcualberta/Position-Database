@@ -6,12 +6,20 @@ using System.Threading.Tasks;
 
 namespace PD.Models
 {
-    public class ChangeLog
+    public class AuditRecord
     {
+        public enum eAuditRecordType { Info, Warning, Error }
+
         public int Id { get; set; }
         public string UserId { get; set; }
-        public DateTime Timestamp { get; set; }
-        public string Change { get; set; }
+        public DateTime Timestamp { get; set; } = DateTime.Now;
+        public string Message { get; set; }
+        public eAuditRecordType AuditType { get; set; }
+
+        public AuditRecord(eAuditRecordType type)
+        {
+            AuditType = type;
+        }
 
         public bool TrackChange(string userId, Object oldObject, Object newObject)
         {
@@ -27,8 +35,9 @@ namespace PD.Models
                 if (oldVal != newVal)
                     changes.Add(string.Format("{0}: {1} => {2}", prp.Name, oldVal, newVal));
             }
-            Change = string.Join("<br />", changes);
+            Message += string.Join("<br />", changes);
             return changes.Count > 0;
         }
+
     }
 }

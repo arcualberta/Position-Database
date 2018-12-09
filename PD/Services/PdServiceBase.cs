@@ -61,7 +61,7 @@ namespace PD.Services
                 matches = matches.Include(x => x.Compensations);
 
             if (includeChangeLog)
-                matches = matches.Include(x => x.ChangeLog);
+                matches = matches.Include(x => x.AuditTrail);
 
             if (includePosition)
                 matches = matches.Include(x => x.Position);
@@ -111,7 +111,7 @@ namespace PD.Services
                 .Include(pa => pa.Position)
                 .Include(pa => pa.Person)
                 .Include(pa => pa.Compensations)
-                .Include(pa => pa.ChangeLog)
+                .Include(pa => pa.AuditTrail)
                 .Where(pa =>
                     (!pa.StartDate.HasValue || pa.StartDate.Value <= filter.Date)
                     && (!pa.EndDate.HasValue || pa.EndDate.Value > filter.Date)
