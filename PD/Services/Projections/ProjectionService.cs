@@ -112,8 +112,8 @@ namespace PD.Services
                     IsProjection = true,
                     PositionAssignmentId = pa.Id,
                     Notes = "Projected on " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    Value = defaultMeritDecision,
-                    Increment = 0m,
+                    MeritDecision = defaultMeritDecision,
+                    Value = 0m,
                     IsPromoted = false
                 };
                 pa.Compensations.Add(merit);
@@ -211,17 +211,17 @@ namespace PD.Services
                 decimal salary_before_merit = previousSalary.Value + atb.Value;
 
                 //Now calculate the merit increment based on the given merit decision and the step value
-                merit.Increment = Math.Round(merit.Value * scale.StepValue);
+                merit.Value = Math.Round(merit.MeritDecision * scale.StepValue);
 
                 //If the new salary exceeds the max for the scale when the increment is added, OR
                 //if the new salary becomes very close to the max salary but smaller (say, within $10) when the increment is added
                 //THEN we adjust the increment such that the resultant salary becomes the max salary when the increment is applied.
-                decimal tentative_new_salary = salary_before_merit + merit.Increment;
+                decimal tentative_new_salary = salary_before_merit + merit.Value;
                 if (tentative_new_salary > scale.Maximum || (scale.Maximum - tentative_new_salary) < 10m)
-                    merit.Increment = scale.Maximum - salary_before_merit;
+                    merit.Value = scale.Maximum - salary_before_merit;
 
                 //Now we finally add the increment to the final salary.
-                newSalary.Value = salary_before_merit + merit.Increment;
+                newSalary.Value = salary_before_merit + merit.Value;
             }
 
 

@@ -65,7 +65,8 @@
             var previousSalary = item.GetCompensation<Salary>(filter.Date.AddYears(-1), false);
             string previousSalaryVal = previousSalary != null ? previousSalary.Value.ToString() : "";
 
-            string atb = previousSalary != null ? Math.Round(previousSalary.Value * 0.01m).ToString() : "";
+            var atbVal = item.GetCompensation<ContractSettlement>(filter.Date, true);
+            string atb = atbVal != null ? atbVal.Value.ToString() : "";
 
             var projectedBaseSalary = item.GetCompensation<Salary>(filter.Date, true);
             string projectedBaseSalaryVal = projectedBaseSalary != null && projectedBaseSalary.Value > 0 ? projectedBaseSalary.Value.ToString() : "";
@@ -74,7 +75,7 @@
             string actualBaseSalaryVal = actualBaseSalary != null ? actualBaseSalary.Value.ToString() : "";
 
             var merit = item.GetCompensation<Merit>(filter.Date, false);
-            string meritIncrement = merit != null ? merit.Increment.ToString() : "";
+            string meritIncrement = merit != null ? merit.Value.ToString() : "";
             string promoted = merit != null && merit.IsPromoted ? "promoted" : "";
 
             var specialAdjustments = item.GetAdjustments(filter.Date, true).Select(adj => adj.Value.ToString());

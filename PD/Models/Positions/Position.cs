@@ -39,7 +39,8 @@ namespace PD.Models.Positions
 
         public string Description { get; set; }
 
-        public eWorkload Workload { get; set; }
+        [Range(0, 1)]
+        public decimal Workload { get; set; }
 
         public eContractType ContractType { get; set; }
 

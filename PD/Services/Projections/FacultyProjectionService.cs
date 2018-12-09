@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using PD.Services.Projections.Rules;
 
 namespace PD.Services.Projections
 {
@@ -61,12 +62,35 @@ namespace PD.Services.Projections
         }
 
 
-        public void ProjectSalaries(DateTime cycleStartDate, DateTime cycleEndDate)
-        {
-            DateTime targetDate = cycleStartDate.AddDays(1);
-            decimal defaultMeritDecision = 1;
-            bool updateDatabase = true;
+        //////public void ProjectSalaries(DateTime targetDate)
+        //////{
+        //////    decimal defaultMeritDecision = 1;
+        //////    bool updateDatabase = true;
 
+        //////    List<PositionAssignment> facultyPositions = Db.PositionAssignments
+        //////        .Include(pa => pa.Position)
+        //////        .Include(pa => pa.Person)
+        //////        .Include(pa => pa.Compensations)
+        //////        .Where(pa => pa.Position is Faculty && pa.StartDate <= targetDate && (pa.EndDate.HasValue == false || pa.EndDate >= targetDate))
+        //////        .ToList();
+
+        //////    foreach (PositionAssignment pa in facultyPositions)
+        //////    {
+        //////        try
+        //////        {
+        //////            PositionAssignment updated = ProjectSalary(pa, targetDate, defaultMeritDecision, updateDatabase);
+        //////        }
+        //////        catch (Exception ex)
+        //////        {
+
+        //////        }
+        //////    }
+
+        //////}
+
+
+        public void ProjectSalaries(DateTime targetDate)
+        {
             List<PositionAssignment> facultyPositions = Db.PositionAssignments
                 .Include(pa => pa.Position)
                 .Include(pa=>pa.Person)
@@ -74,11 +98,19 @@ namespace PD.Services.Projections
                 .Where(pa => pa.Position is Faculty && pa.StartDate <= targetDate && (pa.EndDate.HasValue == false || pa.EndDate >= targetDate))
                 .ToList();
 
+            AbstractProjectionRule
+                atbRule = new ComputeContractSettlement(Db),
+                meritRule = new ComputeMerit(Db);
+            
+
             foreach(PositionAssignment pa in facultyPositions)
             {
                 try
                 {
-                    PositionAssignment updated = ProjectSalary(pa, targetDate, defaultMeritDecision, updateDatabase);
+                    atbRule.Execute(pa, targetDate);
+                    meritRule.Execute(pa, targetDate);
+
+                    Db.SaveChanges();
                 }
                 catch(Exception ex)
                 {

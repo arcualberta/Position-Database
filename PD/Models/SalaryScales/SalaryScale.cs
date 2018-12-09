@@ -27,6 +27,9 @@ namespace PD.Models.SalaryScales
         [Range(0.0, 100)]
         public decimal ContractSettlement { get; set; }
 
+        [Display(Name = "Default Merit Decision")]
+        public decimal DefaultMeritDecision { get; set; }
+
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
     }

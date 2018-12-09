@@ -25,7 +25,7 @@ namespace PD.Models.AppViewModels
         public string EmployeeId { get; set; }
 
         [Display(Name = "FT/PT")]
-        public Position.eWorkload WorkLoad { get; set; }
+        public decimal WorkLoad { get; set; }
 
         [Display(Name = "Status")]
         public PositionAssignment.eStatus Status { get; set; }

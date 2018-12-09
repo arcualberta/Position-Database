@@ -11,7 +11,7 @@ namespace PD.Models.Compensations
         [Display(Name = "Is Promoted?")]
         public bool IsPromoted { get; set; }
 
-        [Display(Name = "Increment")]
-        public decimal Increment { get; set; }
+        [Display(Name = "Merit Decision")]
+        public decimal MeritDecision { get; set; }
     }
 }

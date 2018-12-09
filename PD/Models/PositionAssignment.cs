@@ -122,5 +122,25 @@ namespace PD.Models
             };
             AuditTrail.Add(record);
         }
+
+        public void LogWarning(string message)
+        {
+            AuditRecord record = new AuditRecord(AuditRecord.eAuditRecordType.Warning)
+            {
+                Message = message
+            };
+            AuditTrail.Add(record);
+        }
+
+        public void LogInfo(string message)
+        {
+            AuditRecord record = new AuditRecord(AuditRecord.eAuditRecordType.Info)
+            {
+                Message = message
+            };
+            AuditTrail.Add(record);
+        }
+
+
     }
 }

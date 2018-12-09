@@ -16,6 +16,10 @@ namespace PD.Models
         public string Message { get; set; }
         public eAuditRecordType AuditType { get; set; }
 
+        public AuditRecord()
+        {
+
+        }
         public AuditRecord(eAuditRecordType type)
         {
             AuditType = type;

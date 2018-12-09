@@ -35,6 +35,7 @@ namespace PD.Services
             posNumCol,
             recordNumCol,
             ftPtStatusCol,
+            workloadCol,
             statusCol,
             fundSrcCol,
             meritDecCol,
@@ -89,6 +90,7 @@ namespace PD.Services
                         "Position Number",
                         "Record #",
                         "FT/PT",
+                        "Workload",
                         "Status",
                         "Fund Source",
                         "Merit Decision",
@@ -129,7 +131,7 @@ namespace PD.Services
 
                     for (int row = 3; row <= rowCount; ++row)
                     {
-                        Position.eWorkload ftptStatus = Enum.Parse<Position.eWorkload>(worksheet.Cells[row, (int)ColIndex.ftPtStatusCol].Value.ToString());
+                        decimal workload = decimal.Parse(worksheet.Cells[row, (int)ColIndex.workloadCol].Value.ToString());
                         eFundingSource fundingSource = Enum.Parse<eFundingSource>(worksheet.Cells[row, (int)ColIndex.fundSrcCol].Value.ToString());
 
                         FacultyEmployeeViewModel empl = new FacultyEmployeeViewModel()
@@ -139,7 +141,7 @@ namespace PD.Services
                             EmployeeId = worksheet.Cells[row, (int)ColIndex.employeeIdCol].Value.ToString().Trim(),
                             EmployeeName = worksheet.Cells[row, (int)ColIndex.employeeNameCol].Value.ToString().Trim(),
                             PositionNumber = worksheet.Cells[row, (int)ColIndex.posNumCol].Value.ToString().Trim(),
-                            FtPtStatus = ftptStatus,
+                            Workload = workload,
                             FundingSource = fundingSource,
                             RecordNumber = Int32.Parse(worksheet.Cells[row, (int)ColIndex.recordNumCol].Value.ToString().Trim()),
                         };
@@ -292,7 +294,7 @@ namespace PD.Services
                             position.EndDate = null; //No end date for employees imported throgh the spreadsheet
                             position.Number = empl.PositionNumber;
                             position.Rank = Enum.Parse<Faculty.eRank>(empl.Rank);
-                            position.Workload = empl.FtPtStatus;
+                            position.Workload = empl.Workload;
                             position.ContractType = empl.ContractStatus;
 
                             Db.Positions.Add(position);
@@ -423,7 +425,7 @@ namespace PD.Services
                             {
                                 StartDate = nextYearStartDate,
                                 EndDate = nextYearEndDate,
-                                Value = (empl.Salary as FacultySalaryViewModel).MeritDecision,
+                                MeritDecision = (empl.Salary as FacultySalaryViewModel).MeritDecision,
                                 Notes = (empl.Salary as FacultySalaryViewModel).MeritReason,
                                 IsPromoted = (empl.Salary as FacultySalaryViewModel).IsPromoted,
                                 IsProjection = false
@@ -502,25 +504,25 @@ namespace PD.Services
 
                     //Salary Scales
                     //=============
-                    bool newDataAdded = AddFacultySalaryScale("AssistantProfessor", new DateTime(2015, 07, 01), 76534, 106402, 2489, 1);
-                    newDataAdded |= AddFacultySalaryScale("AssistantProfessor", new DateTime(2016, 07, 01), 77299, 107467, 2514, 1);
-                    newDataAdded |= AddFacultySalaryScale("AssistantProfessor", new DateTime(2017, 07, 01), 78458, 109082, 2552, 1);
+                    bool newDataAdded = AddFacultySalaryScale("AssistantProfessor", new DateTime(2015, 07, 01), 76534, 106402, 2489, 1, 1);
+                    newDataAdded |= AddFacultySalaryScale("AssistantProfessor", new DateTime(2016, 07, 01), 77299, 107467, 2514, 1, 1);
+                    newDataAdded |= AddFacultySalaryScale("AssistantProfessor", new DateTime(2017, 07, 01), 78458, 109082, 2552, 1, 1);
 
-                    newDataAdded |= AddFacultySalaryScale("AssociateProfessor", new DateTime(2015, 07, 01), 88971, 133645, 3191, 1);
-                    newDataAdded |= AddFacultySalaryScale("AssociateProfessor", new DateTime(2016, 07, 01), 89861, 134983, 3223, 1);
-                    newDataAdded |= AddFacultySalaryScale("AssociateProfessor", new DateTime(2017, 07, 01), 91209, 137003, 3271, 1);
+                    newDataAdded |= AddFacultySalaryScale("AssociateProfessor", new DateTime(2015, 07, 01), 88971, 133645, 3191, 1, 1);
+                    newDataAdded |= AddFacultySalaryScale("AssociateProfessor", new DateTime(2016, 07, 01), 89861, 134983, 3223, 1, 1);
+                    newDataAdded |= AddFacultySalaryScale("AssociateProfessor", new DateTime(2017, 07, 01), 91209, 137003, 3271, 1, 1);
 
-                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2015, 07, 01), 110715, 133227, 3752, 1);
-                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2016, 07, 01), 111822, 134562, 3790, 1);
-                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2017, 07, 01), 113499, 136581, 3847, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2015, 07, 01), 110715, 133227, 3752, 1, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2016, 07, 01), 111822, 134562, 3790, 1, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2017, 07, 01), 113499, 136581, 3847, 1, 1);
 
-                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2015, 07, 01), 133227, 145991, 3191, 1);
-                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2016, 07, 01), 134562, 147454, 3223, 1);
-                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2017, 07, 01), 136581, 149665, 3271, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2015, 07, 01), 133227, 145991, 3191, 1, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2016, 07, 01), 134562, 147454, 3223, 1, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2017, 07, 01), 136581, 149665, 3271, 1, 1);
 
-                    newDataAdded |= AddFacultySalaryScale("Professor3", new DateTime(2015, 07, 01), 145991, 389913, 2489, 1);
-                    newDataAdded |= AddFacultySalaryScale("Professor3", new DateTime(2016, 07, 01), 147454, 393826, 2514, 1);
-                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2017, 07, 01), 149665, 399761, 2552, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor3", new DateTime(2015, 07, 01), 145991, 389913, 2489, 1, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor3", new DateTime(2016, 07, 01), 147454, 393826, 2514, 1, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2017, 07, 01), 149665, 399761, 2552, 1, 1);
 
                     if (newDataAdded)
                         Db.SaveChanges();
@@ -547,7 +549,7 @@ namespace PD.Services
             //}
         }
 
-        protected bool AddFacultySalaryScale(string name, DateTime startDate, decimal minSalary, decimal maxSalary, decimal salaryStep, decimal contractSettlement)
+        protected bool AddFacultySalaryScale(string name, DateTime startDate, decimal minSalary, decimal maxSalary, decimal salaryStep, decimal contractSettlement, decimal defaultMeritDecision)
         {
             if (Db.FacultySalaryScales.Where(sc => sc.StartDate == startDate && sc.Name == name).Any())
                 return false;
@@ -561,7 +563,8 @@ namespace PD.Services
                     ContractSettlement = contractSettlement,
                     Minimum = minSalary,
                     Maximum = maxSalary,
-                    StepValue = salaryStep
+                    StepValue = salaryStep,
+                    DefaultMeritDecision = defaultMeritDecision
                 };
                 Db.SalaryScales.Add(scale);
                 return true;

@@ -1,0 +1,96 @@
+﻿using PD.Data;
+using PD.Models;
+using PD.Models.Compensations;
+using PD.Models.Positions;
+using PD.Models.SalaryScales;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace PD.Services.Projections.Rules
+{
+    public class HandleUpperSalaryLimits : AbstractProjectionRule
+    {
+        public HandleUpperSalaryLimits(ApplicationDbContext db)
+            : base(db, "Handle upper salary limits", "")
+        {
+        }
+
+        public override bool Execute(PositionAssignment pa, DateTime targetDate)
+        {
+            try
+            {
+                if (!(pa.Position.Title == Faculty.eRank.Professor1.ToString() || pa.Position.Title == Faculty.eRank.Professor2.ToString() || pa.Position.Title == Faculty.eRank.Professor3.ToString()))
+                    return false;
+
+                Salary salary = pa.GetCompensation<Salary>(targetDate);
+                if (salary == null)
+                    throw new Exception(string.Format("Salary not found for the year of {0}", targetDate));
+
+                SalaryScale scale = GetSalaryScale(pa.Position.Title, targetDate);
+                if (scale == null)
+                    throw new Exception(string.Format("Salary scale not found for the year of {0}", targetDate));
+
+                if (salary.Value <= scale.Maximum)
+                    return false;
+
+                //You are here because the salary is higher than the maximum limit for the scale.
+
+                pa.LogInfo("Enforcing upper salary limit");
+
+                decimal excess = salary.Value - scale.Maximum;
+
+                //Rule 1: reduce the merit if, if applicable
+                Merit merit = pa.GetCompensation<Merit>(targetDate);
+                if (merit!= null && merit.Value > 0.01m)
+                {
+                    pa.LogInfo("Adjusting merits to handle upper salary limit.");
+                    if (merit.Value >= excess)
+                    {
+                        merit.Value = merit.Value - excess;
+                        excess = 0;
+                    }
+                    else
+                    {
+                        excess = excess - merit.Value;
+                        merit.Value = 0;
+                    }
+                }
+
+                //Rule 2: if excess is still positive, try to reduce it by bringing down atb
+                if (excess > 0m)
+                {
+                    ContractSettlement atb = pa.GetCompensation<ContractSettlement>(targetDate);
+                    if (atb != null && atb.Value > 0.01m)
+                    {
+                        pa.LogInfo("Adjusting contract settlement to handle upper salary limit.");
+
+                        if (atb.Value >= excess)
+                        {
+                            atb.Value = atb.Value - excess;
+                            excess = 0;
+                        }
+                        else
+                        {
+                            excess = excess - atb.Value;
+                            atb.Value = 0;
+                        }
+                    }
+                }
+
+                //If we still have excess, then we will report it as a warning.
+                if (excess > 0m)
+                    pa.LogWarning("Overpaid beyond the max salary limit for the scale!");
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                pa.LogError(ex.Message);
+                return false;
+            }
+        }
+    }
+}
