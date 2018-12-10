@@ -20,7 +20,6 @@ namespace PD.Services.Projections.Rules
             try
             {
                 //Past year's salary
-                bool flag = pa.Person.EmployeeId == "0352118";
                 Salary pastSalary = pa.GetCompensation<Salary>(targetDate.AddYears(-1));
                 if (pastSalary == null)
                     throw new Exception(string.Format("Past year's salary not found for the target date of {0}", targetDate));

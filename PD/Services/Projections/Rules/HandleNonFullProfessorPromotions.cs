@@ -32,6 +32,51 @@ namespace PD.Services.Projections.Rules
                 if (!merit.IsPromoted)
                     return false;
 
+                //We are here because the individual received a promotion
+                PromotionScheme scheme = Db.PromotionSchemes.Where(sc => sc.CurrentTitle == pa.Position.Title).FirstOrDefault();
+                if (scheme == null)
+                    throw new Exception(string.Format("Promotion scheme for {0} not found", pa.Position.Title));
+
+                //Putting an end date for the current position assignment and it's associated position
+                PositionAssignment oldPositionAssignment = pa;
+                oldPositionAssignment.EndDate = pa.GetCycleStartDate(targetDate).AddYears(1).AddDays(-1);
+                oldPositionAssignment.Position.EndDate = oldPositionAssignment.EndDate;
+
+                //Creating a new position assignment
+                pa = new PositionAssignment()
+                {
+                    StartDate = oldPositionAssignment.EndDate.Value.AddDays(1),
+                    PersonId = oldPositionAssignment.PersonId,
+                    SalaryCycleStartDay = oldPositionAssignment.SalaryCycleStartDay,
+                    SalaryCycleStartMonth = oldPositionAssignment.SalaryCycleStartMonth,
+                    PositionId = oldPositionAssignment.PositionId,
+                    Status = oldPositionAssignment.Status,
+                };
+
+                Position position = new Faculty()
+                {
+                    ContractType = oldPositionAssignment.Position.ContractType,
+                    Number = oldPositionAssignment.Position.Number,
+                    Rank = Enum.Parse<Faculty.eRank>(scheme.PromotedTitle),
+                    StartDate = pa.StartDate,
+                    Title = scheme.PromotedTitle,
+                    Workload = oldPositionAssignment.Position.Workload,
+                };
+                position.PositionAssignments.Add(pa);
+                pa.Position = position;
+
+                //Carrying over the same position accounts
+                List<PositionAccount> accounts = Db.PositionAccounts.Where(pacc => pacc.PositionId == oldPositionAssignment.PositionId).ToList();
+                foreach (var acc in accounts)
+                    position.PositionAccounts.Add(acc);
+
+                //TODO: 
+                // Get the previous salary from the old account
+                // Get the merit from the previous position and recompute it based on the scale of the new position
+                // Get the ATB from the past position
+                // Get all adjustments for the target year from the past position 
+                // Recalculate the new aggregated salary
+
                 pa.LogInfo("Handling none-full professor promotion");
 
 
