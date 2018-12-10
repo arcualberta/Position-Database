@@ -17,7 +17,7 @@ namespace PD.Services.Projections.Rules
 
         public ApplicationDbContext Db { get; set; }
 
-        public abstract bool Execute(PositionAssignment pa, DateTime targetDate);
+        public abstract bool Execute(ref PositionAssignment pa, DateTime targetDate);
 
         public AbstractProjectionRule(ApplicationDbContext db, string name, string description)
         {

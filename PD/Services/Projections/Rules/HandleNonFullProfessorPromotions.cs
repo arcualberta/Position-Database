@@ -18,7 +18,7 @@ namespace PD.Services.Projections.Rules
 
         }
 
-        public override bool Execute(PositionAssignment pa, DateTime targetDate)
+        public override bool Execute(ref PositionAssignment pa, DateTime targetDate)
         {
             try
             {
@@ -33,7 +33,8 @@ namespace PD.Services.Projections.Rules
                     return false;
 
                 //We are here because the individual received a promotion
-                PromotionScheme scheme = Db.PromotionSchemes.Where(sc => sc.CurrentTitle == pa.Position.Title).FirstOrDefault();
+                string title = pa.Position.Title;
+                PromotionScheme scheme = Db.PromotionSchemes.Where(sc => sc.CurrentTitle == title).FirstOrDefault();
                 if (scheme == null)
                     throw new Exception(string.Format("Promotion scheme for {0} not found", pa.Position.Title));
 

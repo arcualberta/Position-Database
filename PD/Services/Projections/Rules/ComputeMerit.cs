@@ -17,7 +17,7 @@ namespace PD.Services.Projections.Rules
 
         }
 
-        public override bool Execute(PositionAssignment pa, DateTime targetDate)
+        public override bool Execute(ref PositionAssignment pa, DateTime targetDate)
         {
             try
             {

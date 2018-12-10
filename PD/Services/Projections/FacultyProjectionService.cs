@@ -110,8 +110,9 @@ namespace PD.Services.Projections
             };
 
 
-            foreach(PositionAssignment pa in facultyPositions)
+            foreach(PositionAssignment posAssignment in facultyPositions)
             {
+                PositionAssignment pa = posAssignment;
                 try
                 {
                     //Removing non-log type messges from the audit trail
@@ -124,7 +125,7 @@ namespace PD.Services.Projections
                         pa.AuditTrail.Remove(message);
 
                     foreach (AbstractProjectionRule rule in rules)
-                        rule.Execute(pa, targetDate);
+                        rule.Execute(ref pa, targetDate);
 
                     Db.SaveChanges();
                 }
