@@ -25,9 +25,9 @@ namespace PD.Services.Projections.Rules
                 if (!(pa.Position.Title == Faculty.eRank.Professor1.ToString() || pa.Position.Title == Faculty.eRank.Professor2.ToString() || pa.Position.Title == Faculty.eRank.Professor3.ToString()))
                     return false;
 
-                Salary salary = pa.GetCompensation<Salary>(targetDate);
+                Salary salary = pa.GetCompensation<Salary>(targetDate, true);
                 if (salary == null)
-                    throw new Exception(string.Format("Salary not found for the year of {0}", targetDate));
+                    throw new Exception(string.Format("Projected salary not found for the year of {0}", targetDate));
 
                 if (salary.Value <= 0.01m)
                     throw new Exception(string.Format("Handle full prof promotion: salary is not computed for the year of {0}", targetDate));

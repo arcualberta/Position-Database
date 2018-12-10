@@ -21,12 +21,12 @@ namespace PD.Services.Projections.Rules
         {
             try
             {
-                if (!(pa.Position.Title == Faculty.eRank.Professor1.ToString() || pa.Position.Title == Faculty.eRank.Professor2.ToString() || pa.Position.Title == Faculty.eRank.Professor3.ToString()))
-                    return false;
+                if (pa.Position.Title == Faculty.eRank.Professor3.ToString())
+                    return false; //No upper limit for full professor 3
 
-                Salary salary = pa.GetCompensation<Salary>(targetDate);
+                Salary salary = pa.GetCompensation<Salary>(targetDate, true);
                 if (salary == null)
-                    throw new Exception(string.Format("Salary not found for the year of {0}", targetDate));
+                    throw new Exception(string.Format("Projected salary not found for the year of {0}", targetDate));
 
                 SalaryScale scale = GetSalaryScale(pa.Position.Title, targetDate);
                 if (scale == null)
@@ -35,9 +35,10 @@ namespace PD.Services.Projections.Rules
                 if (salary.Value <= scale.Maximum)
                     return false;
 
-                //You are here because the salary is higher than the maximum limit for the scale.
+                //You are here because the salary is higher than or equal the maximum limit for the scale.
 
                 pa.LogInfo("Enforcing upper salary limit");
+                salary.IsMaxed = true;
 
                 decimal excess = salary.Value - scale.Maximum;
 

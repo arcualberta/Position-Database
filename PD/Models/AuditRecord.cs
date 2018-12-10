@@ -8,7 +8,7 @@ namespace PD.Models
 {
     public class AuditRecord
     {
-        public enum eAuditRecordType { Info, Warning, Error }
+        public enum eAuditRecordType { Log, Info, Warning, Error }
 
         public int Id { get; set; }
         public string UserId { get; set; }

@@ -20,6 +20,7 @@ namespace PD.Services.Projections.Rules
             try
             {
                 //Past year's salary
+                bool flag = pa.Person.EmployeeId == "0352118";
                 Salary pastSalary = pa.GetCompensation<Salary>(targetDate.AddYears(-1));
                 if (pastSalary == null)
                     throw new Exception(string.Format("Past year's salary not found for the target date of {0}", targetDate));
@@ -34,13 +35,24 @@ namespace PD.Services.Projections.Rules
 
                 List<Adjustment> adjustments = pa.GetAdjustments(targetDate, true).ToList();
 
-                Salary salary = pa.GetCompensation<Salary>(targetDate);
+                Salary salary = pa.GetCompensation<Salary>(targetDate, true);
                 if (salary == null)
-                    throw new Exception(string.Format("Salary not found for the year of {0}", targetDate));
+                {
+                    DateTime startDate = pa.GetCycleStartDate(targetDate);
+                    salary = new Salary()
+                    {
+                        StartDate = startDate,
+                        EndDate = startDate.AddYears(1).AddDays(-1),
+                        IsProjection = true,
+                        Notes = string.Format("Projected on {0}", DateTime.Now.ToString())
+                    };
+                    pa.Compensations.Add(salary);
+                }
 
-                salary.Value = 
+                salary.Value = pastSalary.Value + merit.Value + atb.Value;
 
-
+                foreach (Adjustment adj in adjustments)
+                    salary.Value += adj.Value;
 
                 return true;
 

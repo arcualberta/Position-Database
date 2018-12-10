@@ -25,25 +25,15 @@ namespace PD.Services.Projections.Rules
                 if (!(pa.Position.Title == Faculty.eRank.AssistantProfessor.ToString() || pa.Position.Title == Faculty.eRank.AssociateProfessor.ToString()))
                     return false;
 
-                Salary salary = pa.GetCompensation<Salary>(targetDate);
-                if (salary == null)
-                    throw new Exception(string.Format("Salary not found for the year of {0}", targetDate));
+                Merit merit = pa.GetCompensation<Merit>(targetDate);
+                if (merit == null)
+                    throw new Exception(string.Format("Merit not found for the year of {0}", targetDate));
 
-                if (salary.Value <= 0.01m)
-                    throw new Exception(string.Format("Handle non-full prof promotion: salary is not computed for the year of {0}", targetDate));
-
-                SalaryScale scale = GetSalaryScale(pa.Position.Title, targetDate);
-                if (scale == null)
-                    throw new Exception(string.Format("Salary scale not found for the year of {0}", targetDate));
-
-                if (salary.Value <= scale.Maximum)
+                if (!merit.IsPromoted)
                     return false;
 
                 pa.LogInfo("Handling none-full professor promotion");
 
-                Merit merit = pa.GetCompensation<Merit>(targetDate);
-                if (merit == null)
-                    throw new Exception(string.Format("Merit not found for the year of {0}", targetDate));
 
                 throw new Exception("None-full prof promotion handling not yet implemented");
 

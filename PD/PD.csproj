@@ -12,6 +12,8 @@
     <Compile Remove="Data\Migrations\20180817065838_CreatedAppDataModels.Designer.cs" />
     <Compile Remove="Data\Migrations\20180817070704_AddedChartField2ChartStringJoinModel.cs" />
     <Compile Remove="Data\Migrations\20180817070704_AddedChartField2ChartStringJoinModel.Designer.cs" />
+    <Compile Remove="Migrations\20181210040308_AuditTrail.cs" />
+    <Compile Remove="Migrations\20181210040308_AuditTrail.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

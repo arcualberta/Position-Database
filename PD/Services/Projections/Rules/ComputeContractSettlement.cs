@@ -35,7 +35,6 @@ namespace PD.Services.Projections.Rules
                     DateTime startDate = pa.GetCycleStartDate(targetDate);
                     atb = new ContractSettlement()
                     {
-                        Value = (scale.ContractSettlement * pastSalary.Value) / 100m,
                         StartDate = startDate,
                         EndDate = startDate.AddYears(1).AddDays(-1),
                         IsProjection = true,
@@ -43,6 +42,7 @@ namespace PD.Services.Projections.Rules
                     };
                     pa.Compensations.Add(atb);
                 }
+                atb.Value = Math.Round((scale.ContractSettlement * pastSalary.Value) / 100m);
                 return true;
             }
             catch (Exception ex)

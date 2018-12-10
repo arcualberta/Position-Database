@@ -95,20 +95,36 @@ namespace PD.Services.Projections
                 .Include(pa => pa.Position)
                 .Include(pa=>pa.Person)
                 .Include(pa => pa.Compensations)
+                .Include(pa => pa.AuditTrail)
                 .Where(pa => pa.Position is Faculty && pa.StartDate <= targetDate && (pa.EndDate.HasValue == false || pa.EndDate >= targetDate))
                 .ToList();
 
-            AbstractProjectionRule
-                atbRule = new ComputeContractSettlement(Db),
-                meritRule = new ComputeMerit(Db);
-            
+            List<AbstractProjectionRule> rules = new List<AbstractProjectionRule>()
+            {
+                new ComputeContractSettlement(Db),
+                new ComputeMerit(Db),
+                new AggregateBaseSalaryComponents(Db),
+                new HandleFullProfessorPromotions(Db),
+                new HandleNonFullProfessorPromotions(Db),
+                new HandleUpperSalaryLimits(Db)
+            };
+
 
             foreach(PositionAssignment pa in facultyPositions)
             {
                 try
                 {
-                    atbRule.Execute(pa, targetDate);
-                    meritRule.Execute(pa, targetDate);
+                    //Removing non-log type messges from the audit trail
+                    var oldMessages = pa.AuditTrail.Where(au =>
+                        au.AuditType == AuditRecord.eAuditRecordType.Info ||
+                        au.AuditType == AuditRecord.eAuditRecordType.Warning ||
+                        au.AuditType == AuditRecord.eAuditRecordType.Error)
+                    .ToList();
+                    foreach (var message in oldMessages)
+                        pa.AuditTrail.Remove(message);
+
+                    foreach (AbstractProjectionRule rule in rules)
+                        rule.Execute(pa, targetDate);
 
                     Db.SaveChanges();
                 }

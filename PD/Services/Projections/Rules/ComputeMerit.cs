@@ -39,7 +39,7 @@ namespace PD.Services.Projections.Rules
                     };
                     pa.Compensations.Add(merit);
                 }
-                merit.Value = merit.MeritDecision * scale.StepValue * pa.Position.Workload;
+                merit.Value = Math.Round(merit.MeritDecision * scale.StepValue * pa.Position.Workload);
                 return true;
             }
             catch (Exception ex)
