@@ -21,7 +21,7 @@ namespace PD.Services.Projections.Rules
             try
             {
                 //Past year's salary
-                Salary pastSalary = pa.GetCompensation<Salary>(targetDate.AddYears(-1));
+                Salary pastSalary = pa.GetCompensation<Salary>(targetDate.AddYears(-1), PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
                 if (pastSalary == null)
                     throw new Exception(string.Format("Past year's salary not found for the target date of {0}", targetDate));
 
@@ -29,7 +29,7 @@ namespace PD.Services.Projections.Rules
                 if (scale == null)
                     throw new Exception(string.Format("Salary scale not found for the year of {0}", targetDate));
 
-                ContractSettlement atb = pa.GetCompensation<ContractSettlement>(targetDate);
+                ContractSettlement atb = pa.GetCompensation<ContractSettlement>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
                 if (atb == null)
                 {
                     DateTime startDate = pa.GetCycleStartDate(targetDate);

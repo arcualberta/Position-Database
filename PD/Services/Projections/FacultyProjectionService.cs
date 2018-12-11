@@ -34,8 +34,8 @@ namespace PD.Services.Projections
             if (position == null)
                 throw new Exception("Error: a faculty position is expected.");
 
-            //Target year's merit
-            Merit merit = pa.GetCompensation<Merit>(targetDate);
+            //Target year's merit. Give priority for confirmed merits.
+            Merit merit = pa.GetCompensation<Merit>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
 
             if (position.Rank == Faculty.eRank.Professor1 || position.Rank == Faculty.eRank.Professor2 || position.Rank == Faculty.eRank.Professor3)
             {
@@ -103,8 +103,8 @@ namespace PD.Services.Projections
             {
                 new ComputeContractSettlement(Db),
                 new ComputeMerit(Db),
+                new ComputeMeritFullProfessor(Db),
                 new AggregateBaseSalaryComponents(Db),
-                new HandleFullProfessorPromotions(Db),
                 new HandleNonFullProfessorPromotions(Db),
                 new HandleUpperSalaryLimits(Db)
             };
@@ -113,26 +113,29 @@ namespace PD.Services.Projections
             foreach(PositionAssignment posAssignment in facultyPositions)
             {
                 PositionAssignment pa = posAssignment;
-                try
-                {
-                    //Removing non-log type messges from the audit trail
-                    var oldMessages = pa.AuditTrail.Where(au =>
-                        au.AuditType == AuditRecord.eAuditRecordType.Info ||
-                        au.AuditType == AuditRecord.eAuditRecordType.Warning ||
-                        au.AuditType == AuditRecord.eAuditRecordType.Error)
-                    .ToList();
-                    foreach (var message in oldMessages)
-                        pa.AuditTrail.Remove(message);
 
-                    foreach (AbstractProjectionRule rule in rules)
+                //Removing non-log type messges from the audit trail
+                var oldMessages = pa.AuditTrail.Where(au =>
+                    au.AuditType == AuditRecord.eAuditRecordType.Info ||
+                    au.AuditType == AuditRecord.eAuditRecordType.Warning ||
+                    au.AuditType == AuditRecord.eAuditRecordType.Error)
+                .ToList();
+                foreach (var message in oldMessages)
+                    pa.AuditTrail.Remove(message);
+
+                foreach (AbstractProjectionRule rule in rules)
+                {
+                    try
+                    {
                         rule.Execute(ref pa, targetDate);
-
-                    Db.SaveChanges();
+                    }
+                    catch (Exception ex)
+                    {
+                    }
                 }
-                catch(Exception ex)
-                {
 
-                }
+                Db.SaveChanges();
+
             }
 
         }

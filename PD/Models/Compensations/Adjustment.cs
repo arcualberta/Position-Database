@@ -12,5 +12,15 @@ namespace PD.Models.Compensations
 
         [Display(Name = "Is this a component of the base salary?")]
         public bool IsBaseSalaryComponent { get; set; }
+
+        public override Compensation Clone()
+        {
+            Adjustment child = Clone<Adjustment>();
+            child.Name = Name;
+            child.IsBaseSalaryComponent = IsBaseSalaryComponent;
+
+            return child;
+        }
+
     }
 }

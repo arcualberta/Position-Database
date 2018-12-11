@@ -26,6 +26,8 @@ namespace PD.Models
             LeaveWithoutPay
         }
 
+        public enum eCompensationRetrievalPriority { ProjectionFirst, ConfirmedFirst }
+
         [Key]
         public int Id { get; set; }
 
@@ -51,6 +53,8 @@ namespace PD.Models
 
         public virtual ICollection<AuditRecord> AuditTrail { get; set; } = new LinkedList<AuditRecord>();
 
+        public int? PredecessorId { get; set; }
+        public PositionAssignment Predecessor { get; set; }
 
         /// <summary>
         /// Returns the projected or confirmed compensation of the give type T for the target date
@@ -75,11 +79,24 @@ namespace PD.Models
         /// <typeparam name="T"></typeparam>
         /// <param name="targetDate">The target date.</param>
         /// <returns></returns>
-        public T GetCompensation<T>(DateTime targetDate) where T : Compensation
+        public T GetCompensation<T>(DateTime targetDate, eCompensationRetrievalPriority priority) where T : Compensation
         {
-            T compensation = GetCompensation<T>(targetDate, false);
+            //Set the flag to true if we should give a pririty for retrieving projections, and set false otherwise.
+            bool flag = priority == eCompensationRetrievalPriority.ProjectionFirst;
+
+            //Get the projected compensation
+            T compensation = GetCompensation<T>(targetDate, flag); 
+
+            //If the projected compensation does not exist then get the actual/confirmed compensation
             if(compensation == null)
-                compensation = GetCompensation<T>(targetDate, true);
+                compensation = GetCompensation<T>(targetDate, !flag);
+
+            //If the requested compensation is not found in the current position assignment BUT if a 
+            //pedecessor position assignment exists, then obtain the requested compensation from that 
+            //predecessor.
+            if (compensation == null && Predecessor != null)
+                compensation = Predecessor.GetCompensation<T>(targetDate, priority);
+
             return compensation;
         }
 

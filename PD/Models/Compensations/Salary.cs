@@ -10,5 +10,13 @@ namespace PD.Models.Compensations
     {
         [Display(Name = "Is Maxed")]
         public bool IsMaxed { get; set; }
+
+        public override Compensation Clone()
+        {
+            Salary child = Clone<Salary>();
+            child.IsMaxed = IsMaxed;
+
+            return child;
+        }
     }
 }

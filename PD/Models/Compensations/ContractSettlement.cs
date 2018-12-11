@@ -7,5 +7,9 @@ namespace PD.Models.Compensations
 {
     public class ContractSettlement : Compensation
     {
+        public override Compensation Clone()
+        {
+            return Clone<ContractSettlement>();
+        }
     }
 }

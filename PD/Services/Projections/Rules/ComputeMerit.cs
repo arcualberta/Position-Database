@@ -1,6 +1,7 @@
 ﻿using PD.Data;
 using PD.Models;
 using PD.Models.Compensations;
+using PD.Models.Positions;
 using PD.Models.SalaryScales;
 using System;
 using System.Collections.Generic;
@@ -21,11 +22,15 @@ namespace PD.Services.Projections.Rules
         {
             try
             {
+                //This method of merit calculation does not apply to full professors
+                if (pa.Position.Title == Faculty.eRank.Professor1.ToString() || pa.Position.Title == Faculty.eRank.Professor2.ToString() || pa.Position.Title == Faculty.eRank.Professor3.ToString())
+                    return false;
+
                 SalaryScale scale = GetSalaryScale(pa.Position.Title, targetDate);
                 if (scale == null)
                     throw new Exception(string.Format("Salary scale not found for the year of {0}", targetDate));
 
-                Merit merit = pa.GetCompensation<Merit>(targetDate);
+                Merit merit = pa.GetCompensation<Merit>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
                 if (merit == null)
                 {
                     DateTime startDate = pa.GetCycleStartDate(targetDate);

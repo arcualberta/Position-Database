@@ -13,5 +13,14 @@ namespace PD.Models.Compensations
 
         [Display(Name = "Merit Decision")]
         public decimal MeritDecision { get; set; }
+
+        public override Compensation Clone()
+        {
+            Merit child = Clone<Merit>();
+            child.IsPromoted = IsPromoted;
+            child.MeritDecision = MeritDecision;
+
+            return child;
+        }
     }
 }

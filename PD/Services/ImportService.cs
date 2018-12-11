@@ -512,13 +512,13 @@ namespace PD.Services
                     newDataAdded |= AddFacultySalaryScale("AssociateProfessor", new DateTime(2016, 07, 01), 89861, 134983, 3223, 1, 1);
                     newDataAdded |= AddFacultySalaryScale("AssociateProfessor", new DateTime(2017, 07, 01), 91209, 137003, 3271, 1, 1);
 
-                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2015, 07, 01), 110715, 133227, 3752, 1, 1);
-                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2016, 07, 01), 111822, 134562, 3790, 1, 1);
-                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2017, 07, 01), 113499, 136581, 3847, 1, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2015, 07, 01), 110715, 133226, 3752, 1, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2016, 07, 01), 111822, 134561, 3790, 1, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2017, 07, 01), 113499, 136580, 3847, 1, 1);
 
-                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2015, 07, 01), 133227, 145991, 3191, 1, 1);
-                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2016, 07, 01), 134562, 147454, 3223, 1, 1);
-                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2017, 07, 01), 136581, 149665, 3271, 1, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2015, 07, 01), 133227, 145990, 3191, 1, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2016, 07, 01), 134562, 147453, 3223, 1, 1);
+                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2017, 07, 01), 136581, 149664, 3271, 1, 1);
 
                     newDataAdded |= AddFacultySalaryScale("Professor3", new DateTime(2015, 07, 01), 145991, 389913, 2489, 1, 1);
                     newDataAdded |= AddFacultySalaryScale("Professor3", new DateTime(2016, 07, 01), 147454, 393826, 2514, 1, 1);

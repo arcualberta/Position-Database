@@ -102,7 +102,7 @@ namespace PD.Services
             //Retrieve the confirmed merit for the period covering the target date.
             //If one does not exist, then try to retrieve projected one. 
             //If it doesn't exist either, then create a projected one.
-            Merit merit = pa.GetCompensation<Merit>(targetDate);
+            Merit merit = pa.GetCompensation<Merit>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
             if (merit == null)
             {
                 merit = new Merit()
@@ -122,7 +122,7 @@ namespace PD.Services
             //Retrieve the confirmed ContractSettlement for the period covering the target date.
             //If one does not exist, then try to retrieve projected one. 
             //If it doesn't exist either, then create a projected one.
-            ContractSettlement atb = pa.GetCompensation<ContractSettlement>(targetDate);
+            ContractSettlement atb = pa.GetCompensation<ContractSettlement>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
             if (atb == null)
             {
                 atb = new ContractSettlement()
@@ -146,8 +146,8 @@ namespace PD.Services
             //values do not exist.
             //============================================================================================================
 
-            //Previous yeaar's salary
-            Salary previousSalary = pa.GetCompensation<Salary>(targetDate.AddYears(-1));
+            //Previous yeaar's salary. Give priority for the confirmed salary, if it exists.
+            Salary previousSalary = pa.GetCompensation<Salary>(targetDate.AddYears(-1), PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
             if (previousSalary == null)
                 throw new Exception("Previous year's salary not found.");
 
@@ -164,12 +164,12 @@ namespace PD.Services
             if (newSalary == null)
                 throw new Exception("Required salary object to be updated not loaded.");
 
-            //Target year's merit
-            Merit merit = pa.GetCompensation<Merit>(targetDate);
+            //Target year's merit. Give priority to confirmed merit first.
+            Merit merit = pa.GetCompensation<Merit>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
             if (merit == null)
                 throw new Exception("Merit details not found for the target interval of " + targetDate);
 
-            ContractSettlement atb = pa.GetCompensation<ContractSettlement>(targetDate);
+            ContractSettlement atb = pa.GetCompensation<ContractSettlement>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
             if (atb == null)
                 throw new Exception("Contract Settlement details not found for the target interval of " + targetDate);
 

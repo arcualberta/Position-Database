@@ -43,7 +43,7 @@ namespace PD.Services.Projections.Rules
                 decimal excess = salary.Value - scale.Maximum;
 
                 //Rule 1: reduce the merit if, if applicable
-                Merit merit = pa.GetCompensation<Merit>(targetDate);
+                Merit merit = pa.GetCompensation<Merit>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
                 if (merit!= null && merit.Value > 0.01m)
                 {
                     pa.LogInfo("Adjusting merits to handle upper salary limit.");
@@ -62,7 +62,7 @@ namespace PD.Services.Projections.Rules
                 //Rule 2: if excess is still positive, try to reduce it by bringing down atb
                 if (excess > 0m)
                 {
-                    ContractSettlement atb = pa.GetCompensation<ContractSettlement>(targetDate);
+                    ContractSettlement atb = pa.GetCompensation<ContractSettlement>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
                     if (atb != null && atb.Value > 0.01m)
                     {
                         pa.LogInfo("Adjusting contract settlement to handle upper salary limit.");

@@ -25,12 +25,14 @@ namespace PD.Services.Projections.Rules
                 if (!(pa.Position.Title == Faculty.eRank.AssistantProfessor.ToString() || pa.Position.Title == Faculty.eRank.AssociateProfessor.ToString()))
                     return false;
 
-                Merit merit = pa.GetCompensation<Merit>(targetDate);
+                Merit merit = pa.GetCompensation<Merit>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
                 if (merit == null)
                     throw new Exception(string.Format("Merit not found for the year of {0}", targetDate));
 
                 if (!merit.IsPromoted)
                     return false;
+
+                pa.LogInfo("Handling none-full professor promotion");
 
                 //We are here because the individual received a promotion
                 string title = pa.Position.Title;
@@ -54,6 +56,9 @@ namespace PD.Services.Projections.Rules
                     Status = oldPositionAssignment.Status,
                 };
 
+                //Linking the previous position assignment as the predecessor for this position assignment
+                pa.Predecessor = oldPositionAssignment.Predecessor;
+
                 Position position = new Faculty()
                 {
                     ContractType = oldPositionAssignment.Position.ContractType,
@@ -71,19 +76,37 @@ namespace PD.Services.Projections.Rules
                 foreach (var acc in accounts)
                     position.PositionAccounts.Add(acc);
 
-                //TODO: 
-                // Get the previous salary from the old account
-                // Get the merit from the previous position and recompute it based on the scale of the new position
-                // Get the ATB from the past position
-                // Get all adjustments for the target year from the past position 
-                // Recalculate the new aggregated salary
+                //Transferring all compensations recorded for the target year in the old position account 
+                //into the new one
+                List<Compensation> compensations = oldPositionAssignment.Compensations
+                    .Where(c => c.StartDate <= targetDate && c.EndDate >= targetDate)
+                    .ToList();
+                foreach(Compensation c in compensations)
+                {
+                    //If the compensation start date is earlier than the start date of the new position assignment
+                    //then we split the compensation into two and set the end date of the first half to be a day prior
+                    //to the start date of the new position assignment and then we leave this first half with the 
+                    //old position assigment, and then we carry over the second half to the new position assignment.
+                    //If the start date of this compensation is as same as the start date of the new position assignment,
+                    //then we simply carry it over to the new position assignment as a whole
 
-                pa.LogInfo("Handling none-full professor promotion");
+                    if (c.StartDate < pa.StartDate)
+                    {
+                        c.EndDate = pa.StartDate.Value.AddDays(-1);
+                        Compensation clone = c.Clone();
+                        clone.StartDate = pa.StartDate.Value;
+                        pa.Compensations.Add(clone);
+                    }
+                    else
+                        pa.Compensations.Add(c);
+                }
 
+                pa.LogInfo("New position created");
 
-                throw new Exception("None-full prof promotion handling not yet implemented");
-
-
+                //Recalculating the merit, atb and the aggregated base salary
+                new ComputeMerit(Db).Execute(ref pa, targetDate);
+                new ComputeContractSettlement(Db).Execute(ref pa, targetDate);
+                new AggregateBaseSalaryComponents(Db).Execute(ref pa, targetDate);
 
                 return true;
 
