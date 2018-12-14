@@ -32,7 +32,7 @@ namespace PD.Services.Projections.Rules
                 if (!merit.IsPromoted)
                     return false;
 
-                pa.LogInfo("Handling none-full professor promotion");
+                pa.LogInfo("Handling promotions for none-full professors");
 
                 //We are here because the individual received a promotion
                 string title = pa.Position.Title;

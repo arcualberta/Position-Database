@@ -34,6 +34,8 @@ namespace PD.Services.Projections.Rules
 
                 List<Adjustment> adjustments = pa.GetAdjustments(targetDate, true).ToList();
 
+                pa.LogInfo("Aggregating base salary components.");
+
                 Salary salary = pa.GetCompensation<Salary>(targetDate, true);
                 if (salary == null)
                 {
@@ -53,6 +55,8 @@ namespace PD.Services.Projections.Rules
                 foreach (Adjustment adj in adjustments)
                     salary.Value += adj.Value;
 
+                salary.Value = Math.Round(salary.Value);
+                pa.LogInfo("Aggregated salary: $" + salary.Value);
                 return true;
 
             }

@@ -30,6 +30,8 @@ namespace PD.Services.Projections.Rules
                 if (scale == null)
                     throw new Exception(string.Format("Salary scale not found for the year of {0}", targetDate));
 
+                pa.LogInfo("Computing merit for none-full professors");
+
                 Merit merit = pa.GetCompensation<Merit>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
                 if (merit == null)
                 {
@@ -45,6 +47,8 @@ namespace PD.Services.Projections.Rules
                     pa.Compensations.Add(merit);
                 }
                 merit.Value = Math.Round(merit.MeritDecision * scale.StepValue * pa.Position.Workload);
+                //merit.Value = merit.MeritDecision * scale.StepValue * pa.Position.Workload;
+                pa.LogInfo("Merit: $" + merit.Value);
                 return true;
             }
             catch (Exception ex)

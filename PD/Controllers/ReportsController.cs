@@ -34,6 +34,17 @@ namespace PD.Controllers
             return View("PositionAssignments", positionAssignments);
             //return View(positionAssignments.ToList().Select(pp => new PositionViewModel(pp, filter.Date, srv.DataProtector)));
         }
+
+        public IActionResult Details(int id, DateTime targetDate)
+        {
+            ReportService srv = new ReportService(_context);
+            PositionAssignment pa = srv.GetPositionAssignment(id, targetDate, true, true, true, true);
+
+            ViewBag.Filter = new PositionFilter() { Date = targetDate };
+            ViewBag.DataProtector = srv.DataProtector;
+
+            return View(pa);
+        }
     }
 }
 

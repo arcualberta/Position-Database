@@ -49,24 +49,32 @@ namespace PD.Services
         }
 
         public PositionAssignment GetPositionAssignment(
-            int id, DateTime sampleDate,
+            int id, 
+            DateTime sampleDate,
             bool includeCompensations = false,
-            bool includeChangeLog = false,
+            bool includeAuditTrail = false,
             bool includePosition = false,
-            bool includePerson = false)
+            bool includePerson = false, 
+            bool includePredecessorPositionAssignment = false)
         {
             IQueryable<PositionAssignment> matches = Db.PositionAssignments;
 
             if (includeCompensations)
                 matches = matches.Include(x => x.Compensations);
 
-            if (includeChangeLog)
+            if (includeAuditTrail)
                 matches = matches.Include(x => x.AuditTrail);
 
             if (includePosition)
                 matches = matches.Include(x => x.Position);
 
-            matches = matches.Where(x => x.StartDate <= sampleDate && (!x.EndDate.HasValue || x.EndDate >= sampleDate));
+            if (includePerson)
+                matches = matches.Include(x => x.Person);
+
+            if(includePredecessorPositionAssignment)
+                matches = matches.Include(x => x.Predecessor);
+
+            matches = matches.Where(x => x.Id == id && x.StartDate <= sampleDate && (!x.EndDate.HasValue || x.EndDate >= sampleDate));
 
             return matches.FirstOrDefault();
         }

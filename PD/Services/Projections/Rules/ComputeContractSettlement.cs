@@ -29,6 +29,7 @@ namespace PD.Services.Projections.Rules
                 if (scale == null)
                     throw new Exception(string.Format("Salary scale not found for the year of {0}", targetDate));
 
+                pa.LogInfo("Computing contract settlement.");
                 ContractSettlement atb = pa.GetCompensation<ContractSettlement>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
                 if (atb == null)
                 {
@@ -43,6 +44,8 @@ namespace PD.Services.Projections.Rules
                     pa.Compensations.Add(atb);
                 }
                 atb.Value = Math.Round((scale.ContractSettlement * pastSalary.Value) / 100m);
+                //atb.Value = (scale.ContractSettlement * pastSalary.Value) / 100m;
+                pa.LogInfo("Contract Settlement: $" + atb.Value);
                 return true;
             }
             catch (Exception ex)

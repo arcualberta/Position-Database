@@ -22,7 +22,7 @@ namespace PD.Services.Projections.Rules
         {
             try
             {
-                bool debug = pa.Person.EmployeeId == "1211608";
+                bool debug = pa.Person.EmployeeId == "0016166";
 
                 //This merit calculation only applies to full professors.
                 if (!(pa.Position.Title == Faculty.eRank.Professor1.ToString() || pa.Position.Title == Faculty.eRank.Professor2.ToString() || pa.Position.Title == Faculty.eRank.Professor3.ToString()))
@@ -45,6 +45,7 @@ namespace PD.Services.Projections.Rules
                 if (scale == null)
                     throw new Exception(string.Format("Salary scale not found for the past year of {0}", targetDate));
 
+                pa.LogInfo("Computing merit for full professprs.");
                 //Merit for the target year
                 Merit merit = pa.GetCompensation<Merit>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
                 if (merit == null)
@@ -128,7 +129,8 @@ namespace PD.Services.Projections.Rules
 
                 //Adjusting the merit value according to the workload
                 merit.Value = Math.Round(merit.Value * pa.Position.Workload);
-
+                //merit.Value = merit.Value * pa.Position.Workload;
+                pa.LogInfo("Merit: $" + merit.Value);
                 return true;
             }
             catch (Exception ex)

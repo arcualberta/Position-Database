@@ -13,9 +13,9 @@
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>
+            @*<th>
                 @Html.DisplayNameFor(model => model.Person.Name)
-            </th>
+            </th>*@
             <th>
                 @Html.DisplayNameFor(model => model.Person.EmployeeId)
             </th>
@@ -95,7 +95,7 @@
             }
             else if (projectedBaseSalaryVal != actualBaseSalaryVal)
             {
-                if (Math.Abs(projectedBaseSalary.Value - actualBaseSalary.Value) <= 2)
+                if (Math.Abs(projectedBaseSalary.Value - actualBaseSalary.Value) <= 5)
                 {
                     alertClass = "alert alert-warning";
                 }
@@ -105,51 +105,55 @@
                 }
             }
 
-            <tr class="@alertClass" style="@specialStyles">
-                <td>
-                    @Html.DisplayFor(modelItem => name)
-                </td>
-                <td title="@Html.DisplayNameFor(model => item.Person.EmployeeId)">
-                    @Html.DisplayFor(modelItem => item.Person.EmployeeId)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Position.Title)
-                </td>
-                <td title="Old salary">
-                    @Html.DisplayFor(modelItem => previousSalaryVal)
-                </td>
-                <td title="ATB">
-                    @Html.DisplayFor(modelItem => atb)
-                </td>
-                <td title="Merit">
-                    @Html.DisplayFor(modelItem => meritIncrement)
-                </td>
-                <td title="Special adjustment">
-                    @Html.DisplayFor(modelItem => specialAdjustmentsVal)
-                </td>
-                <td title="Projected new salary @issueSummary" style="@issueIndicatorStyles">
-                    @Html.DisplayFor(model => projectedBaseSalaryVal)
-                </td>
-                <td title="Actual new salary">
-                    @Html.DisplayFor(model => actualBaseSalaryVal)
-                </td>
-                <td title="Is promoted?">
-                    @Html.DisplayFor(model => promoted)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Status)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => startDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => endDate)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-                </td>
-            </tr>
+        <tr class="@alertClass" style="@specialStyles" title="@name">
+            @*<td>
+                @Html.DisplayFor(modelItem => name)
+
+            </td>*@
+            <td title="@name">
+                @Html.DisplayFor(modelItem => item.Person.EmployeeId)
+            </td>
+            @*<td title="@Html.DisplayNameFor(model => item.Person.EmployeeId)">
+            @Html.DisplayFor(modelItem => item.Person.EmployeeId)
+        </td>*@
+            <td>
+                @Html.DisplayFor(modelItem => item.Position.Title)
+            </td>
+            <td title="Old salary">
+                @Html.DisplayFor(modelItem => previousSalaryVal)
+            </td>
+            <td title="ATB">
+                @Html.DisplayFor(modelItem => atb)
+            </td>
+            <td title="Merit">
+                @Html.DisplayFor(modelItem => meritIncrement)
+            </td>
+            <td title="Special adjustment">
+                @Html.DisplayFor(modelItem => specialAdjustmentsVal)
+            </td>
+            <td title="Projected new salary @issueSummary" style="@issueIndicatorStyles">
+                @Html.DisplayFor(model => projectedBaseSalaryVal)
+            </td>
+            <td title="Actual new salary">
+                @Html.DisplayFor(model => actualBaseSalaryVal)
+            </td>
+            <td title="Is promoted?">
+                @Html.DisplayFor(model => promoted)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => startDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => endDate)
+            </td>
+            <td>
+                @*                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |*@
+                <a asp-action="Details" asp-route-id="@item.Id" asp-all-route-data="@{new Dictionary<string, string>() { { "targetDate", filter.Date.ToShortDateString() }, { "id", item.Id.ToString() } }}">Details</a>
+            </td>
+        </tr>
         }
     </tbody>
 </table>
