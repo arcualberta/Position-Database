@@ -30,7 +30,7 @@ namespace PD.Services.Projections.Rules
                 if (scale == null)
                     throw new Exception(string.Format("Salary scale not found for the year of {0}", targetDate));
 
-                pa.LogInfo("Computing merit for none-full professors");
+                pa.LogInfo("Computing merit for none-full professors", pa.GetCycleYearRange(targetDate), true);
 
                 Merit merit = pa.GetCompensation<Merit>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
                 if (merit == null)
@@ -48,12 +48,12 @@ namespace PD.Services.Projections.Rules
                 }
                 merit.Value = Math.Round(merit.MeritDecision * scale.StepValue * pa.Position.Workload);
                 //merit.Value = merit.MeritDecision * scale.StepValue * pa.Position.Workload;
-                pa.LogInfo("Merit: $" + merit.Value);
+                pa.LogInfo("Merit: $" + merit.Value, pa.GetCycleYearRange(targetDate), true);
                 return true;
             }
             catch (Exception ex)
             {
-                pa.LogError(ex.Message);
+                pa.LogError(ex.Message, pa.GetCycleYearRange(targetDate), true);
                 return false;
             }
         }

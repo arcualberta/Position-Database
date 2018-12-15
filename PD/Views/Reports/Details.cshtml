@@ -54,15 +54,24 @@
         </dd>
     </dl>
 
-    <h5>Audit Trail</h5>
-    @foreach(var log in Model.AuditTrail)
-    {
-        <div>
-            <div>@*@log.Timestamp.ToLongDateString()*@</div>
-            <div>@Html.Raw(log.Message)</div>
-        </div>
-    }
+    <div class="audit-summary">
+        <h4>Audit Trail</h4>
+        @{
+            string cycle = Model.GetCycleYearRange(filter.Date);
+            foreach (var log in Model.AuditTrail)
+            {
+                if (log.SalaryCycle == cycle)
+                {
+                    <div>
+                        <div>@*@log.Timestamp.ToLongDateString()*@</div>
+                        <div>@Html.Raw(log.Message)</div>
+                    </div>
+                }
+            }
+        }
+    </div>
 </div>
+<br />
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="positions" asp-all-route-data="@{new Dictionary<string, string>() { { "filter.Date", filter.Date.ToShortDateString() } }}">Back to List</a>

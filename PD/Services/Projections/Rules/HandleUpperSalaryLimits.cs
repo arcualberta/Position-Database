@@ -37,7 +37,7 @@ namespace PD.Services.Projections.Rules
 
                 //You are here because the salary is higher than or equal the maximum limit for the scale.
 
-                pa.LogInfo("Handling upper salary limit");
+                pa.LogInfo("Handling upper salary limit", pa.GetCycleYearRange(targetDate), true);
                 salary.IsMaxed = true;
 
                 decimal excess = salary.Value - scale.Maximum;
@@ -46,8 +46,8 @@ namespace PD.Services.Projections.Rules
                 Merit merit = pa.GetCompensation<Merit>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
                 if (merit!= null && merit.Value > 0.01m)
                 {
-                    pa.LogInfo("Adjusting merits to handle upper salary limit.");
-                    pa.LogInfo("Original merit: $" + merit.Value);
+                    pa.LogInfo("Adjusting merits to handle upper salary limit.", pa.GetCycleYearRange(targetDate), true);
+                    pa.LogInfo("Original merit: $" + merit.Value, pa.GetCycleYearRange(targetDate), true);
                     if (merit.Value >= excess)
                     {
                         merit.Value = merit.Value - excess;
@@ -58,19 +58,19 @@ namespace PD.Services.Projections.Rules
                         excess = excess - merit.Value;
                         merit.Value = 0;
                     }
-                    pa.LogInfo("Adjusted merit: $" + merit.Value);
+                    pa.LogInfo("Adjusted merit: $" + merit.Value, pa.GetCycleYearRange(targetDate), true);
                 }
 
                 //Rule 2: if excess is still positive, try to reduce it by bringing down atb
                 if (excess > 0m)
                 {
-                    pa.LogInfo("Salary exceeds the upper limit by $" + excess);
+                    pa.LogInfo("Salary exceeds the upper limit by $" + excess, pa.GetCycleYearRange(targetDate), true);
 
                     ContractSettlement atb = pa.GetCompensation<ContractSettlement>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
                     if (atb != null && atb.Value > 0.01m)
                     {
-                        pa.LogInfo("Adjusting contract settlement to handle upper salary limit.");
-                        pa.LogInfo("Original contract settlement: $" + atb.Value);
+                        pa.LogInfo("Adjusting contract settlement to handle upper salary limit.", pa.GetCycleYearRange(targetDate), true);
+                        pa.LogInfo("Original contract settlement: $" + atb.Value, pa.GetCycleYearRange(targetDate), true);
 
                         if (atb.Value >= excess)
                         {
@@ -82,20 +82,20 @@ namespace PD.Services.Projections.Rules
                             excess = excess - atb.Value;
                             atb.Value = 0;
                         }
-                        pa.LogInfo("Adjusted contract settlement: $" + atb.Value);
+                        pa.LogInfo("Adjusted contract settlement: $" + atb.Value, pa.GetCycleYearRange(targetDate), true);
                     }
                 }
 
                 //If we still have excess, then we will report it as a warning.
                 if (excess > 0m)
-                    pa.LogWarning("Overpaid beyond the max salary limit for the scale!");
+                    pa.LogWarning("Overpaid beyond the max salary limit for the scale!", pa.GetCycleYearRange(targetDate), true);
 
                 return true;
 
             }
             catch (Exception ex)
             {
-                pa.LogError(ex.Message);
+                pa.LogError(ex.Message, pa.GetCycleYearRange(targetDate), true);
                 return false;
             }
         }

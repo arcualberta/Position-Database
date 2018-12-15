@@ -131,29 +131,43 @@ namespace PD.Models
 
         }
 
-        public void LogError(string message)
+        public string GetCycleYearRange(DateTime targetDate)
+        {
+            DateTime cycleStartDate = GetCycleStartDate(targetDate);
+            return cycleStartDate.Month == 1 
+                ? cycleStartDate.Year.ToString() 
+                : string.Format("{0}-{1}", cycleStartDate.Year.ToString(), (cycleStartDate.Year + 1).ToString());
+        }
+
+        public void LogError(string message, string salaryCycle, bool isProjectionLog)
         {
             AuditRecord record = new AuditRecord(AuditRecord.eAuditRecordType.Error)
             {
-                Message = message             
+                Message = message,
+                SalaryCycle = salaryCycle,
+                IsProjectionLog = isProjectionLog
             };
             AuditTrail.Add(record);
         }
 
-        public void LogWarning(string message)
+        public void LogWarning(string message, string salaryCycle, bool isProjectionLog)
         {
             AuditRecord record = new AuditRecord(AuditRecord.eAuditRecordType.Warning)
             {
-                Message = message
+                Message = message,
+                SalaryCycle = salaryCycle,
+                IsProjectionLog = isProjectionLog
             };
             AuditTrail.Add(record);
         }
 
-        public void LogInfo(string message)
+        public void LogInfo(string message, string salaryCycle, bool isProjectionLog)
         {
             AuditRecord record = new AuditRecord(AuditRecord.eAuditRecordType.Info)
             {
-                Message = message
+                Message = message,
+                SalaryCycle = salaryCycle,
+                IsProjectionLog = isProjectionLog
             };
             AuditTrail.Add(record);
         }

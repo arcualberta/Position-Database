@@ -32,7 +32,7 @@ namespace PD.Services.Projections.Rules
                 if (!merit.IsPromoted)
                     return false;
 
-                pa.LogInfo("Handling promotions for none-full professors");
+                pa.LogInfo("Handling promotions for none-full professors", pa.GetCycleYearRange(targetDate), true);
 
                 //We are here because the individual received a promotion
                 string title = pa.Position.Title;
@@ -101,7 +101,7 @@ namespace PD.Services.Projections.Rules
                         pa.Compensations.Add(c);
                 }
 
-                pa.LogInfo("New position created");
+                pa.LogInfo("New position created", pa.GetCycleYearRange(targetDate), true);
 
                 //Recalculating the merit, atb and the aggregated base salary
                 new ComputeMerit(Db).Execute(ref pa, targetDate);
@@ -113,7 +113,7 @@ namespace PD.Services.Projections.Rules
             }
             catch (Exception ex)
             {
-                pa.LogError(ex.Message);
+                pa.LogError(ex.Message, pa.GetCycleYearRange(targetDate), true);
                 return false;
             }
         }
