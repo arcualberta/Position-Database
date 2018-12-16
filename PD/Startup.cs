@@ -13,8 +13,6 @@ using PD.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace PD
 {
@@ -44,38 +42,14 @@ namespace PD
 
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultUI()
                 .AddDefaultTokenProviders();
-
-            ////services.AddIdentity<IdentityUser, IdentityRole>()
-            ////    .AddEntityFrameworkStores<ApplicationDbContext>()
-            ////    .AddUserStore<UserStore>() //this one provides data storage for user.
-            ////    .AddRoleStore<ApplicationRoleStore>()
-            ////    .AddUserManager<ApplicationUserManager>()
-            ////    .AddRoleManager<ApplicationRoleManager>()
-            ////    .AddDefaultTokenProviders();
-
-
-            //services.AddDefaultIdentity<IdentityUser>()
-            //    .AddEntityFrameworkStores<ApplicationDbContext>();
-
-            //services.AddIdentity<IdentityUser, IdentityRole>()
-            //    .AddEntityFrameworkStores<ApplicationDbContext>();
-
-            ////services.AddIdentity<IdentityUser, IdentityRole>()
-            ////    .AddDefaultUI()
-            ////    .AddRoles<IdentityRole>()
-            ////    .AddRoleManager<RoleManager<IdentityRole>>()
-            ////    .AddDefaultTokenProviders()
-            ////    .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddAuthentication().AddGoogle(googleOptions =>
             {
                 googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
                 googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
             });
-
-            // Add application services.  
-            //services.AddTransient<IEmailSender, IEmailSender>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -88,8 +62,7 @@ namespace PD
             IApplicationBuilder app,
             IHostingEnvironment env,
             UserManager<IdentityUser> userManager,
-            RoleManager<IdentityRole> roleManager,
-            SignInManager<IdentityUser> signInManager)
+            RoleManager<IdentityRole> roleManager)
         {
             if (env.IsDevelopment())
             {
@@ -130,37 +103,48 @@ namespace PD
                 }
             }
 
-            ////var user = new IdentityUser() { UserName = "pdAdmin" };
-            ////var checkAdmins = userManager.GetUsersInRoleAsync("Admin");
-            ////checkAdmins.Wait();
-            ////if (checkAdmins.Result.Count() == 0)
-            ////{
-            ////    //Creating default admin account if an admin account does not exist.
-            ////    string defaultAdminUserName = Configuration["Authentication:SystemAdmin:UserName"];
-            ////    if (string.IsNullOrEmpty(defaultAdminUserName))
-            ////        throw new Exception("Default admin user not defined at Authentication:SystemAdmin:UserName in the applocation configuration.");
+            //Checking admins
+            var checkAdmin = userManager.GetUsersInRoleAsync("Admin");
+            checkAdmin.Wait();
 
-            ////    string defaultAdminPassword = Configuration["Authentication:SystemAdmin:InitialPassword"];
-            ////    if (string.IsNullOrEmpty(defaultAdminPassword))
-            ////        throw new Exception("Default admin password not defined at Authentication:SystemAdmin:InitialPassword in the applocation configuration.");
+            if(checkAdmin.Result.Count() == 0)
+            {
+                //Creating default admin account if an admin account does not exist.
+                string defaultAdminUserName = Configuration["Authentication:SystemAdmin:UserName"];
+                if (string.IsNullOrEmpty(defaultAdminUserName))
+                    throw new Exception("Default admin user not defined at Authentication:SystemAdmin:UserName in the applocation configuration.");
 
-            ////    string defaultAdminEmail= Configuration["Authentication:SystemAdmin:Email"];
-            ////    if (string.IsNullOrEmpty(defaultAdminEmail))
-            ////        throw new Exception("Default admin email not defined at Authentication:SystemAdmin:Email in the applocation configuration.");
+                string defaultAdminEmail = Configuration["Authentication:SystemAdmin:Email"];
+                if (string.IsNullOrEmpty(defaultAdminEmail))
+                    throw new Exception("Default admin email not defined at Authentication:SystemAdmin:Email in the applocation configuration.");
 
-            ////    var defaultAdmin = new IdentityUser() { UserName = defaultAdminUserName, Email = defaultAdminEmail };
-            ////    //defaultAdmin.SecurityStamp = Guid.NewGuid().ToString();
+                string defaultAdminPassword = Configuration["Authentication:SystemAdmin:InitialPassword"];
+                if (string.IsNullOrEmpty(defaultAdminPassword))
+                    throw new Exception("Default admin password not defined at Authentication:SystemAdmin:InitialPassword in the applocation configuration.");
 
-            ////    Task task = userManager.CreateAsync(defaultAdmin, defaultAdminPassword);
-            ////    task.Wait();
-            ////    if (!task.IsCompletedSuccessfully)
-            ////        throw new Exception("Failed to create the default admin user.");
+                var defaultAdmin = new IdentityUser()
+                {
+                    UserName = defaultAdminUserName,
+                    Email = defaultAdminEmail
+                };
 
-            ////    //task = userManager.AddToRoleAsync(defaultAdmin, "Admin");
-            ////    //task.Wait();
-            ////    //if (!task.IsCompletedSuccessfully)
-            ////    //    throw new Exception("Failed to assign the admin role to the default admin user.");
-            ////}
+                var task = userManager.CreateAsync(defaultAdmin, defaultAdminPassword);
+                task.Wait();
+
+                if (!task.Result.Succeeded)
+                {
+                    string error = string.Join(" ", task.Result.Errors.Select(err => err.Description));
+                    throw new Exception("Failed to create default admin user. " + error);
+                }
+
+                task = userManager.AddToRoleAsync(defaultAdmin, "Admin");
+                task.Wait();
+                if (!task.Result.Succeeded)
+                {
+                    string error = string.Join(" ", task.Result.Errors.Select(err => err.Description));
+                    throw new Exception("Failed to assign Admin role to default admin user. " + error);
+                }
+            }
         }
     }
 }
