@@ -109,40 +109,16 @@ namespace PD
 
             if(checkAdmin.Result.Count() == 0)
             {
-                //Creating default admin account if an admin account does not exist.
-                string defaultAdminUserName = Configuration["Authentication:SystemAdmin:UserName"];
-                if (string.IsNullOrEmpty(defaultAdminUserName))
-                    throw new Exception("Default admin user not defined at Authentication:SystemAdmin:UserName in the applocation configuration.");
-
-                string defaultAdminEmail = Configuration["Authentication:SystemAdmin:Email"];
-                if (string.IsNullOrEmpty(defaultAdminEmail))
-                    throw new Exception("Default admin email not defined at Authentication:SystemAdmin:Email in the applocation configuration.");
-
-                string defaultAdminPassword = Configuration["Authentication:SystemAdmin:InitialPassword"];
-                if (string.IsNullOrEmpty(defaultAdminPassword))
-                    throw new Exception("Default admin password not defined at Authentication:SystemAdmin:InitialPassword in the applocation configuration.");
-
-                var defaultAdmin = new IdentityUser()
+                var firstUser = userManager.Users.FirstOrDefault();
+                if(firstUser != null)
                 {
-                    UserName = defaultAdminUserName,
-                    Email = defaultAdminEmail
-                };
+                    Task task = userManager.AddToRoleAsync(firstUser, "Admin");
+                    task.Wait();
 
-                var task = userManager.CreateAsync(defaultAdmin, defaultAdminPassword);
-                task.Wait();
-
-                if (!task.Result.Succeeded)
-                {
-                    string error = string.Join(" ", task.Result.Errors.Select(err => err.Description));
-                    throw new Exception("Failed to create default admin user. " + error);
-                }
-
-                task = userManager.AddToRoleAsync(defaultAdmin, "Admin");
-                task.Wait();
-                if (!task.Result.Succeeded)
-                {
-                    string error = string.Join(" ", task.Result.Errors.Select(err => err.Description));
-                    throw new Exception("Failed to assign Admin role to default admin user. " + error);
+                    if (!task.IsCompletedSuccessfully)
+                    {
+                        throw new Exception("Failed to assign Admin role to default admin user.");
+                    }
                 }
             }
         }
