@@ -7,7 +7,7 @@ using PD.Models;
 using PD.Models.Compensations;
 using PD.Models.SalaryScales;
 
-namespace PD.Services.Projections.Rules
+namespace PD.Services.Projections.Rules.ContractSettlementComputations
 {
     public class ComputeContractSettlement : AbstractProjectionRule
     {

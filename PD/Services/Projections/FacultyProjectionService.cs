@@ -9,6 +9,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PD.Services.Projections.Rules;
+using PD.Services.Projections.Rules.MeritComputations;
+using PD.Services.Projections.Rules.ContractSettlementComputations;
 
 namespace PD.Services.Projections
 {
@@ -103,7 +105,7 @@ namespace PD.Services.Projections
             {
                 new ComputeContractSettlement(Db),
                 new ComputeMerit(Db),
-                new ComputeMeritFullProfessor(Db),
+                new ComputeFullProfessorMerit(Db),
                 new AggregateBaseSalaryComponents(Db),
                 new HandleNonFullProfessorPromotions(Db),
                 new HandleUpperSalaryLimits(Db)

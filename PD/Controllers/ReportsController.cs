@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +14,7 @@ using PD.Services;
 
 namespace PD.Controllers
 {
+    [Authorize(Roles = "Admin,Manager")]
     public class ReportsController : Controller
     {
         private readonly ApplicationDbContext _context;

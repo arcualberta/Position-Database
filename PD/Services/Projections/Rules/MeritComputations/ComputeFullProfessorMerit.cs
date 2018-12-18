@@ -8,12 +8,12 @@ using PD.Models.Compensations;
 using PD.Models.Positions;
 using PD.Models.SalaryScales;
 
-namespace PD.Services.Projections.Rules
+namespace PD.Services.Projections.Rules.MeritComputations
 {
-    public class ComputeMeritFullProfessor : AbstractProjectionRule
+    public class ComputeFullProfessorMerit : AbstractProjectionRule
     {
-        public ComputeMeritFullProfessor(ApplicationDbContext db)
-            : base(db, "Compute Merit", "This rule computes the standard merit based on the merit decision, merit step and the position workload.")
+        public ComputeFullProfessorMerit(ApplicationDbContext db)
+            : base(db, "Compute Full Professor Merit", "This rule computes the standard merit based on the merit decision, merit step and the position workload.")
         {
 
         }
@@ -28,6 +28,9 @@ namespace PD.Services.Projections.Rules
                 if (!(pa.Position.Title == Faculty.eRank.Professor1.ToString() || pa.Position.Title == Faculty.eRank.Professor2.ToString() || pa.Position.Title == Faculty.eRank.Professor3.ToString()))
                     return false;
 
+                if ((pa.Position as Faculty).ContractType == Position.eContractType.S)
+                    throw new Exception("Position contract status was set to \"S\". This individual should hold a pre-retirement or post-retirement rank, not a professor rank.");
+
                 Salary pastSalary = pa.GetCompensation<Salary>(targetDate.AddYears(-1), PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
                 if (pastSalary == null)
                     throw new Exception(string.Format("Past year's salary not found for the target date of {0}", targetDate));
@@ -36,7 +39,7 @@ namespace PD.Services.Projections.Rules
                 SalaryScale scale = Db.SalaryScales
                     .Where(sc => sc.Minimum <= pastSalary.Value && sc.Maximum >= pastSalary.Value
                         && sc.StartDate <= pastSalary.StartDate && sc.EndDate >= pastSalary.EndDate
-                        && (sc.Name == Faculty.eRank.Professor1.ToString() 
+                        && (sc.Name == Faculty.eRank.Professor1.ToString()
                             || sc.Name == Faculty.eRank.Professor2.ToString()
                             || sc.Name == Faculty.eRank.Professor3.ToString())
                           )

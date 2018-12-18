@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PD.Services.Projections.Rules
+namespace PD.Services.Projections.Rules.MeritComputations
 {
     public class ComputeMerit : AbstractProjectionRule
     {
