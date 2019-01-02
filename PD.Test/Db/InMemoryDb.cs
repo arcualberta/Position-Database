@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
 using PD.Data;
-using PD.Models;
 using PD.Models.ChartFields;
 using PD.Services;
 using System.Linq;
