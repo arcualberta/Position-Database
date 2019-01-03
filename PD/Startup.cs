@@ -41,7 +41,7 @@ namespace PD
                 .ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning)) //Disables client evaluation
                 );
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders();
@@ -63,7 +63,7 @@ namespace PD
             IApplicationBuilder app,
             IHostingEnvironment env,
             UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<ApplicationRole> roleManager)
         {
             if (env.IsDevelopment())
             {
@@ -99,7 +99,7 @@ namespace PD
                 if (!roleExist.Result)
                 {
                     //create the roles and seed them to the database: Question 1
-                    var task = roleManager.CreateAsync(new IdentityRole(roleName));
+                    var task = roleManager.CreateAsync(new ApplicationRole(roleName));
                     task.Wait();
                 }
             }
