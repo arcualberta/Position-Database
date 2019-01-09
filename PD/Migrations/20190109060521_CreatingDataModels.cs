@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PD.Migrations
 {
-    public partial class CreateDataModels : Migration
+    public partial class CreatingDataModels : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -98,7 +98,7 @@ namespace PD.Migrations
                     Number = table.Column<string>(nullable: true),
                     Title = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
-                    Workload = table.Column<decimal>(nullable: false),
+                    Workload = table.Column<decimal>(type: "decimal(19, 5)", nullable: false),
                     ContractType = table.Column<int>(nullable: false),
                     StartDate = table.Column<DateTime>(nullable: true),
                     EndDate = table.Column<DateTime>(nullable: true),
@@ -130,11 +130,11 @@ namespace PD.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: true),
-                    Minimum = table.Column<decimal>(nullable: false),
-                    Maximum = table.Column<decimal>(nullable: false),
-                    StepValue = table.Column<decimal>(nullable: false),
-                    ContractSettlement = table.Column<decimal>(nullable: false),
-                    DefaultMeritDecision = table.Column<decimal>(nullable: false),
+                    Minimum = table.Column<decimal>(type: "decimal(19, 5)", nullable: false),
+                    Maximum = table.Column<decimal>(type: "decimal(19, 5)", nullable: false),
+                    StepValue = table.Column<decimal>(type: "decimal(19, 5)", nullable: false),
+                    ContractSettlement = table.Column<decimal>(type: "decimal(19, 5)", nullable: false),
+                    DefaultMeritDecision = table.Column<decimal>(type: "decimal(19, 5)", nullable: false),
                     StartDate = table.Column<DateTime>(nullable: true),
                     EndDate = table.Column<DateTime>(nullable: true),
                     Discriminator = table.Column<string>(nullable: false)
@@ -203,7 +203,7 @@ namespace PD.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(maxLength:128, nullable: false),
                     ProviderKey = table.Column<string>(maxLength: 128, nullable: false),
                     ProviderDisplayName = table.Column<string>(nullable: true),
                     UserId = table.Column<string>(nullable: false)
@@ -247,7 +247,7 @@ namespace PD.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(nullable: false),
+                    UserId = table.Column<string>(maxLength: 128, nullable: false),
                     LoginProvider = table.Column<string>(maxLength: 128, nullable: false),
                     Name = table.Column<string>(maxLength: 128, nullable: false),
                     Value = table.Column<string>(nullable: true)
@@ -292,7 +292,7 @@ namespace PD.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     ChartStringId = table.Column<int>(nullable: false),
                     PositionId = table.Column<int>(nullable: false),
-                    ValuePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ValuePercentage = table.Column<decimal>(type: "decimal(19, 5)", nullable: false),
                     StartDate = table.Column<DateTime>(nullable: true),
                     EndDate = table.Column<DateTime>(nullable: true)
                 },
@@ -406,7 +406,7 @@ namespace PD.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Value = table.Column<decimal>(nullable: false),
+                    Value = table.Column<decimal>(type: "decimal(19, 5)", nullable: false),
                     StartDate = table.Column<DateTime>(nullable: false),
                     EndDate = table.Column<DateTime>(nullable: false),
                     IsProjection = table.Column<bool>(nullable: false),
@@ -416,7 +416,7 @@ namespace PD.Migrations
                     Name = table.Column<string>(nullable: true),
                     IsBaseSalaryComponent = table.Column<bool>(nullable: true),
                     IsPromoted = table.Column<bool>(nullable: true),
-                    MeritDecision = table.Column<decimal>(nullable: true),
+                    MeritDecision = table.Column<decimal>(type: "decimal(19, 5)", nullable: true),
                     IsMaxed = table.Column<bool>(nullable: true)
                 },
                 constraints: table =>

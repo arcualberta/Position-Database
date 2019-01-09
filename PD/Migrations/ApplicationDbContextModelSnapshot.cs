@@ -274,7 +274,8 @@ namespace PD.Migrations
 
                     b.Property<DateTime>("StartDate");
 
-                    b.Property<decimal>("Value");
+                    b.Property<decimal>("Value")
+                        .HasColumnType("decimal(19, 5)");
 
                     b.HasKey("Id");
 
@@ -330,7 +331,7 @@ namespace PD.Migrations
                     b.Property<DateTime?>("StartDate");
 
                     b.Property<decimal>("ValuePercentage")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(19, 5)");
 
                     b.HasKey("Id");
 
@@ -395,7 +396,8 @@ namespace PD.Migrations
 
                     b.Property<string>("Title");
 
-                    b.Property<decimal>("Workload");
+                    b.Property<decimal>("Workload")
+                        .HasColumnType("decimal(19, 5)");
 
                     b.HasKey("Id");
 
@@ -425,24 +427,29 @@ namespace PD.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<decimal>("ContractSettlement");
+                    b.Property<decimal>("ContractSettlement")
+                        .HasColumnType("decimal(19, 5)");
 
-                    b.Property<decimal>("DefaultMeritDecision");
+                    b.Property<decimal>("DefaultMeritDecision")
+                        .HasColumnType("decimal(19, 5)");
 
                     b.Property<string>("Discriminator")
                         .IsRequired();
 
                     b.Property<DateTime?>("EndDate");
 
-                    b.Property<decimal>("Maximum");
+                    b.Property<decimal>("Maximum")
+                        .HasColumnType("decimal(19, 5)");
 
-                    b.Property<decimal>("Minimum");
+                    b.Property<decimal>("Minimum")
+                        .HasColumnType("decimal(19, 5)");
 
                     b.Property<string>("Name");
 
                     b.Property<DateTime?>("StartDate");
 
-                    b.Property<decimal>("StepValue");
+                    b.Property<decimal>("StepValue")
+                        .HasColumnType("decimal(19, 5)");
 
                     b.HasKey("Id");
 
@@ -548,7 +555,8 @@ namespace PD.Migrations
 
                     b.Property<bool>("IsPromoted");
 
-                    b.Property<decimal>("MeritDecision");
+                    b.Property<decimal>("MeritDecision")
+                        .HasColumnType("decimal(19, 5)");
 
                     b.HasDiscriminator().HasValue("Merit");
                 });

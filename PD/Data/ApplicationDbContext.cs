@@ -74,6 +74,18 @@ namespace PD.Data
             builder.Entity<IdentityUser>().Property(x => x.Id).HasMaxLength(128);
             builder.Entity<IdentityRole>().Property(x => x.Id).HasMaxLength(128);
 
+            //Define precision and scale for decimal types
+            foreach (var property in builder.Model.GetEntityTypes()
+                        .SelectMany(t => t.GetProperties())
+                        .Where(p => p.ClrType == typeof(decimal)))
+                {
+                    property.Relational().ColumnType = "decimal(19, 5)";
+                }
+
+            //builder.Entity<Compensation>().Property(x => x.Value).HasColumnType("decimal(16,2)");
+            //builder.Entity<Merit>().Property(x => x.MeritDecision).HasColumnType("decimal(16,2)");
+
+
             // Defininig many-to-many relationship between the ChartField and
             // ChartFieldString models via the ChartFiled2ChartFiledString 
             // join table model
