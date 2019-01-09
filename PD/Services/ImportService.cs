@@ -606,5 +606,26 @@ namespace PD.Services
 
             Db.SaveChanges();
         }
+
+
+        public void UploadFECData(string fileName,
+            int evaluationYear,
+            int dataStartRow, //first row number = 1
+            int emplIdCol, //fitsy col number = 1
+            int nameCol,
+            int rankCol,
+            int rcdCol,
+            int deptCol,
+            int statusCol,
+            int stepOnScaleCol,
+            int currentSalaryCol,
+            int marketSupplementCol,
+            int meritDecisionCol,
+            int meritReasonCol
+            )
+        {
+
+        }
+
     }
 }
