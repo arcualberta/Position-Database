@@ -13,7 +13,6 @@ using PD.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using PD.Models.Users;
 
 namespace PD
 {
@@ -41,7 +40,7 @@ namespace PD
                 .ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning)) //Disables client evaluation
                 );
 
-            services.AddIdentity<ApplicationUser, ApplicationRole>()
+            services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders();
@@ -62,8 +61,8 @@ namespace PD
         public void Configure(
             IApplicationBuilder app,
             IHostingEnvironment env,
-            UserManager<ApplicationUser> userManager,
-            RoleManager<ApplicationRole> roleManager)
+            UserManager<IdentityUser> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
             if (env.IsDevelopment())
             {
@@ -99,7 +98,7 @@ namespace PD
                 if (!roleExist.Result)
                 {
                     //create the roles and seed them to the database: Question 1
-                    var task = roleManager.CreateAsync(new ApplicationRole(roleName));
+                    var task = roleManager.CreateAsync(new IdentityRole(roleName));
                     task.Wait();
                 }
             }
