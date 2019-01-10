@@ -183,14 +183,7 @@ namespace PD.Services
                     {
                         Person dbPersonRecord = Db.Persons.Where(p => p.EmployeeId == empl.EmployeeId).FirstOrDefault();
                         if (dbPersonRecord == null)
-                        {
-                            dbPersonRecord = new Person()
-                            {
-                                EmployeeId = empl.EmployeeId,
-                                Name = DataProtector.Encrypt(empl.EmployeeName)
-                            };
-                            Db.Persons.Add(dbPersonRecord);
-                        }
+                            dbPersonRecord = CreatePerson(empl.EmployeeId, DataProtector.Encrypt(empl.EmployeeName), false);
                     }
                     Db.SaveChanges();
 
@@ -609,10 +602,14 @@ namespace PD.Services
 
 
         public void UploadFECData(string fileName,
-            int evaluationYear,
-            int dataStartRow, //first row number = 1
-            int emplIdCol, //fitsy col number = 1
+            string worksheetName,
+            DateTime currentYearStartDate,
+            DateTime currentYearEndDate,
+            int firstDataRow, //first row = 1
+            int lastDataRow,
+            int emplIdCol, //fitst col = 1
             int nameCol,
+            int positionNumberCol,
             int rankCol,
             int rcdCol,
             int deptCol,
@@ -624,7 +621,86 @@ namespace PD.Services
             int meritReasonCol
             )
         {
+            FileInfo file = new FileInfo(fileName);
+            DateTime currentYearSampleDate = currentYearStartDate.AddDays(1).Date;
+            DateTime nextYearStartDate = currentYearEndDate.AddDays(1).Date;
+            DateTime nextYearSampleDate = nextYearStartDate.AddDays(1).Date;
 
+            byte[] dataBytes = File.ReadAllBytes(fileName);
+            using (MemoryStream ms = new MemoryStream(dataBytes))
+            using (ExcelPackage package = new ExcelPackage(ms))
+            {
+                StringBuilder sb = new StringBuilder();
+                ExcelWorksheet worksheet = package.Workbook.Worksheets
+                    .Where(ws => ws.Name == worksheetName)
+                    .FirstOrDefault();
+
+                int rowCount = worksheet.Dimension.Rows;
+                int ColCount = worksheet.Dimension.Columns;
+
+                
+                for(int r = firstDataRow; r <= lastDataRow; ++r)
+                {
+                    string emplId = worksheet.Cells[r, emplIdCol].Value.ToString().Trim();
+                    string name = worksheet.Cells[r, nameCol].Value.ToString().Trim();
+                    string positionNumber = worksheet.Cells[r, positionNumberCol].Value.ToString().Trim();
+                    string rank = worksheet.Cells[r, rankCol].Value.ToString().Trim();
+                    string rcd = worksheet.Cells[r, rcdCol].Value == null ? "" : worksheet.Cells[r, rcdCol].Value.ToString().Trim();
+                    string dept = worksheet.Cells[r, deptCol].Value == null ? "" : worksheet.Cells[r, deptCol].Value.ToString().Trim();
+                    string status = worksheet.Cells[r, statusCol].Value.ToString().Trim();
+                    decimal stepOnScale = worksheet.Cells[r, stepOnScaleCol].Value == null ? 0 : decimal.Parse(worksheet.Cells[r, stepOnScaleCol].Value.ToString().Trim());
+                    decimal currentSalary = worksheet.Cells[r, currentSalaryCol].Value == null ? 0m : decimal.Parse(worksheet.Cells[r, currentSalaryCol].Value.ToString().Trim());
+                    decimal marketSupplement = worksheet.Cells[r, marketSupplementCol].Value == null ? 0m : decimal.Parse(worksheet.Cells[r, marketSupplementCol].Value.ToString().Trim());
+                    decimal meritDecision = worksheet.Cells[r, meritDecisionCol].Value == null ? 0 : decimal.Parse(worksheet.Cells[r, meritDecisionCol].Value.ToString().Trim());
+                    string meritReason = worksheet.Cells[r, meritReasonCol].Value == null ? "" : worksheet.Cells[r, meritReasonCol].Value.ToString().Trim();
+
+
+                    //Retreaving the position assignment
+                    var positionAssignmentMatches = this.GetPositionAssignments(null, positionNumber, currentYearSampleDate, true, true);
+
+                    if (positionAssignmentMatches.Count() > 1)
+                        throw new Exception(string.Format("{0} positions assignments exist for the position {1} for {2}. There must only be zero or one.",
+                            positionAssignmentMatches.Count(), positionNumber, currentYearSampleDate));
+
+                    PositionAssignment pa = positionAssignmentMatches.FirstOrDefault();
+                    if (pa == null)
+                    {
+                        //Creating a new position assignment for the person and the position
+
+                        //Retreaving the person
+                        IQueryable<Person> personMatches = Db.Persons.Where(p => p.EmployeeId == emplId);
+                        if (personMatches.Count() > 1)
+                            throw new Exception(string.Format("{0} individuals found for the employee ID {1}", personMatches.Count(), emplId));
+
+                        Person person = personMatches.FirstOrDefault();
+
+                        if (person == null)
+                            person = CreatePerson(emplId, name, true);
+                        else if (DataProtector.Decrypt(person.Name) != name)
+                            throw new Exception(string.Format("Expected employee name: {0}, found {1}", name, DataProtector.Decrypt(person.Name)));
+
+                    }
+
+
+
+                }
+
+            }
+        }
+
+        public Person CreatePerson(string employeeId, string name, bool save)
+        {
+            Person person = new Person()
+            {
+                EmployeeId = employeeId,
+                Name = DataProtector.Encrypt(name)
+            };
+            Db.Persons.Add(person);
+
+            if (save)
+                Db.SaveChanges();
+
+            return person;
         }
 
     }

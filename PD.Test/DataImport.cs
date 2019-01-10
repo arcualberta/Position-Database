@@ -40,10 +40,28 @@ namespace PD.Test
             ImportService ds = new ImportService(db);
 
             string dataFile = @"C:\Users\Kamal\Documents\Projects\Position-Database-Data\Arts_Increment Report_TemplateE_2018_19.xlsx";
-            string worksheet2015_16 = "ARC Academic Salary Adj2015 16";
+            string worksheet = "Faculty";
             Assert.True(File.Exists(dataFile));
-            ds.InjestFacultySalaryAdjustmentData(dataFile, worksheet2015_16, new DateTime(2015, 7, 1).Date,
-                        new DateTime(2016, 06, 30).Date, new DateTime(2017, 06, 30).Date);
+            ds.UploadFECData(dataFile,
+                worksheet,
+                new DateTime(2018, 07, 01), //Current year start date
+                new DateTime(2019, 06, 30), //Current year end date
+                4, //First data row
+                281, //Last data row
+                1, //Employee Id column
+                'B' - 'A' + 1, //Name column
+                'C' - 'A' + 1, // position Number
+                'D' - 'A' + 1, //Rank
+                'E' - 'A' + 1, //RCD
+                'F' - 'A' + 1, //Dept
+                'G' - 'A' + 1, //Status
+                'H' - 'A' + 1, //Step on scale
+                'I' - 'A' + 1, //Current salary
+                'J' - 'A' + 1, //Market supplement
+                'S' - 'A' + 1, //Merit decision column for the given FEC year
+                'T' - 'A' + 1 //Merit reason column for the given FEC year
+                 );
+
         }
 
 

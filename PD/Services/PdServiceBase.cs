@@ -84,14 +84,14 @@ namespace PD.Services
             string positionNumber = null,
             DateTime? date = null,
             bool includePositionInfo = true,
-            bool includePersinInfo = true)
+            bool includePersonInfo = true)
         {
             if (!date.HasValue)
                 date = DateTime.Now.Date;
 
             IQueryable<PositionAssignment> positionAssignments;
 
-            if (includePersinInfo)
+            if (includePersonInfo)
                 positionAssignments = Db.PositionAssignments
                     .Include(a => a.Position)
                     .Include(a => a.Person);
