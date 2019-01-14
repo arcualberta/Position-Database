@@ -13,6 +13,8 @@ using PD.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PD
 {
@@ -35,8 +37,9 @@ namespace PD
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            string dbConnectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<ApplicationDbContext>(options =>options
-                .UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
+                .UseSqlServer(dbConnectionString)
                 .ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning)) //Disables client evaluation
                 );
 
@@ -55,6 +58,8 @@ namespace PD
 
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddDataProtection();
+
+            services.AddHangfire(x => x.UseSqlServerStorage(dbConnectionString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -121,6 +126,11 @@ namespace PD
                     }
                 }
             }
+
+            //Starting Hangfire background processing server
+            app.UseHangfireServer();
+            app.UseHangfireDashboard("/hangfire", options: new DashboardOptions { Authorization = new[] { new HangFireAuthorizationFilter() } });
+
         }
     }
 }
