@@ -63,5 +63,10 @@ namespace PD.Services
 
             Salary = salery;
         }
+
+        public void TestService(int delay)
+        {
+            System.Threading.Thread.Sleep(delay * 1000);
+        }
     }
 }

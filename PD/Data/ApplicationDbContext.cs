@@ -59,6 +59,7 @@ namespace PD.Data
         public DbSet<Adjustment> Adjustments { get; set; }
         public DbSet<ContractSettlement> ContractSettlements { get; set; }
 
+        public DbSet<HangFireJob> HangFireJobs { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
