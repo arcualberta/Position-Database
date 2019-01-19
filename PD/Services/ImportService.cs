@@ -57,7 +57,7 @@ namespace PD.Services
             bargUnitCol
         };
 
-        public void InjestFacultySalaryAdjustmentData(string fileName, string worksheetName, DateTime currentYearStartDate, DateTime currentYearEndDate, DateTime nextYearEndDate)
+        public void InjestFacultySalaryAdjustmentData(string fileName, string worksheetName, DateTime currentYearStartDate, DateTime currentYearEndDate, DateTime nextYearEndDate, bool deleteFile = false)
         {
             FileInfo file = new FileInfo(fileName);
             DateTime currentYearSampleDate = currentYearStartDate.AddDays(1).Date;
@@ -540,6 +540,9 @@ namespace PD.Services
             //{
             //    throw ex;
             //}
+
+            if(deleteFile)
+                System.IO.File.Delete(fileName);
         }
 
         protected bool AddFacultySalaryScale(string name, DateTime startDate, decimal minSalary, decimal maxSalary, decimal salaryStep, decimal contractSettlement, decimal defaultMeritDecision)

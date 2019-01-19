@@ -14,7 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Hangfire;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace PD
 {
@@ -57,8 +57,17 @@ namespace PD
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSingleton<IConfiguration>(Configuration);
-            services.AddDataProtection();
 
+            //Data protection with SQL key storage
+            //Reference: https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/implementation/key-storage-providers?view=aspnetcore-2.2&tabs=visual-studio
+            string dataProtectionDbConnectionString = Configuration.GetConnectionString("DataProtectionConnection");
+            services.AddDbContext<DataProtectionDbContext>(options => options
+                .UseSqlServer(dataProtectionDbConnectionString)
+                .ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning)) //Disables client evaluation
+                );
+            services.AddDataProtection().PersistKeysToDbContext<DataProtectionDbContext>();
+
+            //HangFire background job processing
             services.AddHangfire(x => x.UseSqlServerStorage(dbConnectionString));
         }
 

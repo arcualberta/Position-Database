@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
@@ -25,10 +26,12 @@ namespace PD.Controllers
 
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int? p = null)
         {
             BackgroundService srv = new BackgroundService(_context);
-            string jobId = srv.Enque(() => new DataService(new BackgroundService(_configuration).CreateDbContext()).TestService(60), null);
+
+            string jobKey = p.HasValue && p.Value > 0 ? null : "test-job";
+            string jobId = srv.Enque(() => new DataService(new BackgroundService(_configuration).CreateDbContext()).TestService(60), jobKey);
 
             ViewBag.Message = string.IsNullOrEmpty(jobId) ? "Previous job is still running. No new job added." : string.Format("New job Added. Job ID: {0}", jobId);
 
