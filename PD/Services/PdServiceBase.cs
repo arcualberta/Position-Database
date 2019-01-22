@@ -33,7 +33,7 @@ namespace PD.Services
                 if (_DataProtector == null)
                 {
                     var serviceCollection = new ServiceCollection();
-                    serviceCollection.AddDataProtection();
+                    serviceCollection.AddDataProtection().PersistKeysToDbContext<DataProtectionDbContext>();
                     var services = serviceCollection.BuildServiceProvider();
 
                     _DataProtector = ActivatorUtilities.CreateInstance<DataProtector>(services);

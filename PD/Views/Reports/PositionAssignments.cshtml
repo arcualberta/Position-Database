@@ -13,9 +13,9 @@
 <table class="table table-bordered">
     <thead>
         <tr>
-            @*<th>
+            <th>
                 @Html.DisplayNameFor(model => model.Person.Name)
-            </th>*@
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Person.EmployeeId)
             </th>
@@ -106,10 +106,10 @@
             }
 
         <tr class="@alertClass" style="@specialStyles" title="@name">
-            @*<td>
+            <td>
                 @Html.DisplayFor(modelItem => name)
 
-            </td>*@
+            </td>
             <td title="@name">
                 @Html.DisplayFor(modelItem => item.Person.EmployeeId)
             </td>
