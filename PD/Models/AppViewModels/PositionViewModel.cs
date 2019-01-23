@@ -42,7 +42,7 @@ namespace PD.Models.AppViewModels
 
         }
 
-        public PositionViewModel(PositionAssignment pa, DateTime sampleDate, DataProtector dp)
+        public PositionViewModel(PositionAssignment pa, DateTime sampleDate, IPdDataProtector dp)
         {
             Department = "";
             PositionNumber = pa.Position.Number;

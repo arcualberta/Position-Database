@@ -19,30 +19,6 @@ namespace PD.Services
     {
         public ApplicationDbContext Db { get; }
 
-        private DataProtector _DataProtector;
-        /// <summary>
-        /// Gets the data protector. Used for encryption and decryption of data fields.
-        /// </summary>
-        /// <value>
-        /// The data protector.
-        /// </value>
-        public DataProtector DataProtector
-        {
-            get
-            {
-                if (_DataProtector == null)
-                {
-                    var serviceCollection = new ServiceCollection();
-                    serviceCollection.AddDataProtection().PersistKeysToDbContext<DataProtectionDbContext>();
-                    var services = serviceCollection.BuildServiceProvider();
-
-                    _DataProtector = ActivatorUtilities.CreateInstance<DataProtector>(services);
-                }
-
-                return _DataProtector;
-            }
-        }
-
         public PdServiceBase(ApplicationDbContext db)
         {
             Db = db;

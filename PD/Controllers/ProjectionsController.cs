@@ -14,11 +14,12 @@ namespace PD.Controllers
     public class ProjectionsController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IConfiguration _configuration;
-        public ProjectionsController(ApplicationDbContext context, IConfiguration configuration)
+        private readonly DataService _dataService;
+
+        public ProjectionsController(ApplicationDbContext context, DataService dataService)
         {
             _context = context;
-            _configuration = configuration;
+            _dataService = dataService;
         }
 
         public void test()
@@ -31,7 +32,7 @@ namespace PD.Controllers
             BackgroundService srv = new BackgroundService(_context);
 
             string jobKey = p.HasValue && p.Value > 0 ? null : "test-job";
-            string jobId = srv.Enque(() => new DataService(new BackgroundService(_configuration).CreateDbContext()).TestService(60), jobKey);
+            string jobId = srv.Enque(() => _dataService.TestService(60), jobKey);
 
             ViewBag.Message = string.IsNullOrEmpty(jobId) ? "Previous job is still running. No new job added." : string.Format("New job Added. Job ID: {0}", jobId);
 

@@ -1,7 +1,7 @@
 ﻿@model PD.Models.Person
 
 @{ 
-    DataProtector dp = ViewBag.DataProtector as DataProtector;
+    IPdDataProtector dp = ViewBag.DataProtector as IPdDataProtector;
     string name = dp.Decrypt(Model.Name);
  }
 

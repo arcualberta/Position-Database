@@ -21,9 +21,11 @@ namespace PD.Services
 {
     public class ImportService: PdServiceBase
     {
-        public ImportService(ApplicationDbContext db)
+        private readonly DataService _dataService;
+        public ImportService(ApplicationDbContext db, DataService dataService)
             : base(db)
         {
+            _dataService = dataService;
         }
 
         private enum ColIndex
@@ -181,9 +183,11 @@ namespace PD.Services
                     //Adding new employees that are in the data file but not in the database to the database
                     foreach (var empl in employees)
                     {
+                        bool test = empl.EmployeeName.Contains("2");
+
                         Person dbPersonRecord = Db.Persons.Where(p => p.EmployeeId == empl.EmployeeId).FirstOrDefault();
                         if (dbPersonRecord == null)
-                            dbPersonRecord = CreatePerson(empl.EmployeeId, DataProtector.Encrypt(empl.EmployeeName), false);
+                            dbPersonRecord = CreatePerson(empl.EmployeeId, _dataService._dataProtector.Encrypt(empl.EmployeeName), false);
                     }
                     Db.SaveChanges();
 
@@ -268,6 +272,7 @@ namespace PD.Services
                     //Adding position records
                     foreach (var empl in employees)
                     {
+
                         //Retrieve the person record of this employee from the database
                         Person person = Db.Persons.Where(p => p.EmployeeId == empl.EmployeeId).FirstOrDefault();
 
@@ -641,8 +646,10 @@ namespace PD.Services
                 int rowCount = worksheet.Dimension.Rows;
                 int ColCount = worksheet.Dimension.Columns;
 
-                
-                for(int r = firstDataRow; r <= lastDataRow; ++r)
+
+                List<string> mismatches = new List<string>();
+
+                for (int r = firstDataRow; r <= lastDataRow; ++r)
                 {
                     string emplId = worksheet.Cells[r, emplIdCol].Value.ToString().Trim();
                     string name = worksheet.Cells[r, nameCol].Value.ToString().Trim();
@@ -678,10 +685,20 @@ namespace PD.Services
                         Person person = personMatches.FirstOrDefault();
 
                         if (person == null)
-                            person = CreatePerson(emplId, name, true);
-                        else if (DataProtector.Decrypt(person.Name) != name)
-                            throw new Exception(string.Format("Expected employee name: {0}, found {1}", name, DataProtector.Decrypt(person.Name)));
+                            person = CreatePerson(emplId, _dataService._dataProtector.Encrypt(name), true);
+                        else
+                        {
+                            string storedName = _dataService._dataProtector.Decrypt(person.Name);
 
+                            if (storedName != name)
+                                mismatches.Add(name);
+                        }
+                    }
+                    else
+                    {
+                        string storedName = _dataService._dataProtector.Decrypt(pa.Person.Name);
+                        if (storedName != name)
+                            mismatches.Add(name);
                     }
 
 
@@ -691,12 +708,12 @@ namespace PD.Services
             }
         }
 
-        public Person CreatePerson(string employeeId, string name, bool save)
+        public Person CreatePerson(string employeeId, string encrypedtName, bool save)
         {
             Person person = new Person()
             {
                 EmployeeId = employeeId,
-                Name = DataProtector.Encrypt(name)
+                Name = encrypedtName
             };
             Db.Persons.Add(person);
 

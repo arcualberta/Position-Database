@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PD.Data;
+using PD.Services;
 
 namespace PD.Test
 {
@@ -20,6 +21,15 @@ namespace PD.Test
             //Creating a service collection
             var services = new ServiceCollection();
 
+            //Registering application DB Context
+            string dbConnectionString = configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<ApplicationDbContext>(options => options
+                .UseSqlServer(dbConnectionString)
+                .ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning)) //Disables client evaluation
+                );
+
+
+            #region Data Protection Registration
             //Creating a separate database context that is connected to a separate database for storing
             //encryption keys and adding it to the service collection
             string dataProtectionDbConnectionString = configuration.GetConnectionString("DataProtectionConnection");
@@ -31,12 +41,15 @@ namespace PD.Test
             //Adding a data protection service which is tied to the above SQL database into the service collection
             services.AddDataProtection().PersistKeysToDbContext<DataProtectionDbContext>();
 
-            //Registering a custom-defined data protector interface along with an implementation class of it 
-            //with the service collection. Note that the concrete implementation of the PdDataProtector class
-            //takes an interface IDataProtectionProvider as an input argument of the constructor. The dependency
-            //injection creates an instance of this interface using the data protection added above into the service 
-            //collection and passes it on to the constructor when it instantiate the PdDataProtector class.
-            services.AddTransient<IPdDataProtector, PdDataProtector>();
+            services.AddScoped<IPdDataProtector, PdDataProtector>();
+            #endregion
+
+            #region Service Class Registration
+            services.AddScoped<DataService, DataService>();
+            services.AddScoped<ImportService, ImportService>();
+
+            #endregion
+
 
             //Creating a service provider and assigning it to the member variable so that it can be used by 
             //test methods.

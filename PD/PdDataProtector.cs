@@ -14,6 +14,22 @@ namespace PD
             _protector = provider.CreateProtector(GetType().FullName);
         }
 
+        //public string Encrypt(string value)
+        //{
+        //    byte[] bytes = System.Text.Encoding.UTF8.GetBytes(value);
+        //    byte[] result = _protector.Protect(bytes);
+
+        //    return Convert.ToBase64String(result);
+        //}
+
+        //public string Decrypt(string value)
+        //{
+        //    byte[] bytes = Convert.FromBase64String(value);
+        //    byte[] result = _protector.Unprotect(bytes);
+
+        //    return System.Text.Encoding.UTF8.GetString(result);
+        //}
+
         public string Encrypt(string value)
         {
             return _protector.Protect(value);

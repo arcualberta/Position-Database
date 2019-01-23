@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Hangfire;
 using Microsoft.AspNetCore.DataProtection;
+using PD.Services;
 
 namespace PD
 {
@@ -58,14 +59,37 @@ namespace PD
 
             services.AddSingleton<IConfiguration>(Configuration);
 
-            //Data protection with SQL key storage
+            #region Data Protection Registration
+            //Data protection registration (with SQL key storage)
+            //==================================================
             //Reference: https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/implementation/key-storage-providers?view=aspnetcore-2.2&tabs=visual-studio
+
+            //Creating a separate database context for storing encryption keys and adding it to the service collection
             string dataProtectionDbConnectionString = Configuration.GetConnectionString("DataProtectionConnection");
             services.AddDbContext<DataProtectionDbContext>(options => options
                 .UseSqlServer(dataProtectionDbConnectionString)
                 .ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning)) //Disables client evaluation
                 );
+
+            //Adding a data protection service which is tied to the above SQL database into the service collection
             services.AddDataProtection().PersistKeysToDbContext<DataProtectionDbContext>();
+
+            //Registering a custom-defined data protector interface along with an implementation class of it 
+            //with the service collection. Note that the concrete implementation of the PdDataProtector class
+            //takes an interface IDataProtectionProvider as an input argument of the constructor. The dependency
+            //injection creates an instance of this interface using the data protection added above into the service 
+            //collection and passes it on to the constructor when it instantiate the PdDataProtector class.
+            services.AddScoped<IPdDataProtector, PdDataProtector>();
+
+            #endregion
+
+            #region Service Class Registration
+            services.AddScoped<DataService, DataService>();
+            services.AddScoped<ImportService, ImportService>();
+
+            #endregion
+
+
 
             //HangFire background job processing
             services.AddHangfire(x => x.UseSqlServerStorage(dbConnectionString));

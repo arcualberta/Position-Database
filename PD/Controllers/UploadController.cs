@@ -15,14 +15,12 @@ namespace PD.Controllers
     public class UploadController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IDataProtectionProvider _provider;
-        private readonly IConfiguration _configuration;
+        private readonly ImportService _importService;
 
-        public UploadController(ApplicationDbContext context, IDataProtectionProvider provider, IConfiguration configuration)
+        public UploadController(ApplicationDbContext context, ImportService importService)
         {
             _context = context;
-            _provider = provider;
-            _configuration = configuration;
+            _importService = importService;
         }
 
         [HttpGet]
@@ -76,8 +74,7 @@ namespace PD.Controllers
 
 
                     //processing the uploaded file
-                    ImportService ds = new ImportService(_context);
-                    ds.InjestFacultySalaryAdjustmentData(tmpFile, worksheetName, new DateTime(2015, 7, 1).Date,
+                    _importService.InjestFacultySalaryAdjustmentData(tmpFile, worksheetName, new DateTime(2015, 7, 1).Date,
                         new DateTime(2016, 06, 30).Date, new DateTime(2017, 06, 30).Date);
 
                     //Deleting the temporary file

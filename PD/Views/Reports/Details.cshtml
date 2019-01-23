@@ -47,7 +47,7 @@
         </dt>
         <dd>
             @{
-                DataProtector dp = ViewBag.DataProtector as DataProtector;
+                IPdDataProtector dp = ViewBag.DataProtector as IPdDataProtector;
                 string name = dp.Decrypt(@Model.Person.Name);
             }
             <span title="@name">@Html.DisplayFor(model => model.Person.EmployeeId)</span>

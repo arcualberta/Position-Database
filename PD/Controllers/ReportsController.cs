@@ -18,10 +18,13 @@ namespace PD.Controllers
     public class ReportsController : Controller
     {
         private readonly ApplicationDbContext _context;
-        public ReportsController(ApplicationDbContext context)
+        private readonly DataService _dataService;
+        public ReportsController(ApplicationDbContext context, DataService dataService)
         {
             _context = context;
+            _dataService = dataService;
         }
+
         public IActionResult Positions(PositionFilter filter)
         {
             if (filter == null)
@@ -31,7 +34,7 @@ namespace PD.Controllers
             IQueryable<PositionAssignment> positionAssignments = srv.GetPositionAssignments(filter);
 
             ViewBag.Filter = filter;
-            ViewBag.DataProtector = srv.DataProtector;
+            ViewBag.DataProtector = _dataService._dataProtector;
 
             return View("PositionAssignments", positionAssignments);
             //return View(positionAssignments.ToList().Select(pp => new PositionViewModel(pp, filter.Date, srv.DataProtector)));
@@ -43,7 +46,7 @@ namespace PD.Controllers
             PositionAssignment pa = srv.GetPositionAssignment(id, targetDate, true, true, true, true);
 
             ViewBag.Filter = new PositionFilter() { Date = targetDate };
-            ViewBag.DataProtector = srv.DataProtector;
+            ViewBag.DataProtector = _dataService._dataProtector;
 
             return View(pa);
         }
