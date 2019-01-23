@@ -72,7 +72,8 @@ namespace PD
                 );
 
             //Adding a data protection service which is tied to the above SQL database into the service collection
-            services.AddDataProtection().PersistKeysToDbContext<DataProtectionDbContext>();
+            services.AddDataProtection()
+                .PersistKeysToDbContext<DataProtectionDbContext>();
 
             //Registering a custom-defined data protector interface along with an implementation class of it 
             //with the service collection. Note that the concrete implementation of the PdDataProtector class
