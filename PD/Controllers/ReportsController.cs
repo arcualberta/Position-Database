@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using PD.Data;
 using PD.Models;
 using PD.Models.AppViewModels;
@@ -19,10 +21,12 @@ namespace PD.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly DataService _dataService;
-        public ReportsController(ApplicationDbContext context, DataService dataService)
+        private readonly IPdDataProtector _dataProtector;
+        public ReportsController(ApplicationDbContext context, DataService dataService, IPdDataProtector dataProtector)
         {
             _context = context;
             _dataService = dataService;
+            _dataProtector = dataProtector;
         }
 
         public IActionResult Positions(PositionFilter filter)

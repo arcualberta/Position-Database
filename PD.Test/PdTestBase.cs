@@ -39,7 +39,9 @@ namespace PD.Test
                 );
 
             //Adding a data protection service which is tied to the above SQL database into the service collection
-            services.AddDataProtection().PersistKeysToDbContext<DataProtectionDbContext>();
+            services.AddDataProtection()
+                .SetApplicationName("ARC.PositionDatabase")
+                .PersistKeysToDbContext<DataProtectionDbContext>();
 
             services.AddScoped<IPdDataProtector, PdDataProtector>();
             #endregion

@@ -39,7 +39,7 @@ namespace PD
             });
 
             string dbConnectionString = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<ApplicationDbContext>(options =>options
+            services.AddDbContext<ApplicationDbContext>(options => options
                 .UseSqlServer(dbConnectionString)
                 .ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning)) //Disables client evaluation
                 );
@@ -57,7 +57,7 @@ namespace PD
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddSingleton<IConfiguration>(Configuration);
+            ////services.AddSingleton<IConfiguration>(Configuration);
 
             #region Data Protection Registration
             //Data protection registration (with SQL key storage)
@@ -72,7 +72,9 @@ namespace PD
                 );
 
             //Adding a data protection service which is tied to the above SQL database into the service collection
+            //Reference: https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/configuration/overview?view=aspnetcore-2.2
             services.AddDataProtection()
+                .SetApplicationName("ARC.PositionDatabase") //If we don't specify the app name then keys are tied to where the application is running from on the file system.
                 .PersistKeysToDbContext<DataProtectionDbContext>();
 
             //Registering a custom-defined data protector interface along with an implementation class of it 
@@ -89,8 +91,6 @@ namespace PD
             services.AddScoped<ImportService, ImportService>();
 
             #endregion
-
-
 
             //HangFire background job processing
             services.AddHangfire(x => x.UseSqlServerStorage(dbConnectionString));

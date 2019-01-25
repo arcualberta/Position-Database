@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,7 +13,8 @@ namespace PD
         private IDataProtector _protector;
         public PdDataProtector(IDataProtectionProvider provider)
         {
-            _protector = provider.CreateProtector(GetType().FullName);
+            var typeName = GetType().FullName;
+            _protector = provider.CreateProtector(typeName);
         }
 
         //public string Encrypt(string value)
@@ -55,9 +57,9 @@ namespace PD
 
             ////string unprotectedData = Encoding.ASCII.GetString(unprotectedBytes);
             ////return unprotectedData;
+            ///
 
             return _protector.Unprotect(value);
-
         }
 
     }
