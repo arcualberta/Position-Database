@@ -612,7 +612,9 @@ namespace PD.Services
         }
 
 
-        public void UploadFECData(string fileName,
+        public void UploadFECData(
+            string fileName,
+            bool isEncrypted,
             string worksheetName,
             DateTime currentYearStartDate,
             DateTime currentYearEndDate,
@@ -637,7 +639,16 @@ namespace PD.Services
             DateTime nextYearStartDate = currentYearEndDate.AddDays(1).Date;
             DateTime nextYearSampleDate = nextYearStartDate.AddDays(1).Date;
 
-            byte[] dataBytes = File.ReadAllBytes(fileName);
+            byte[] dataBytes;
+            if (isEncrypted)
+            {
+                string data = File.ReadAllText(fileName);
+                data = _dataService._dataProtector.Decrypt(data);
+                dataBytes = Convert.FromBase64String(data);
+            }
+            else
+                dataBytes = File.ReadAllBytes(fileName);
+
             using (MemoryStream ms = new MemoryStream(dataBytes))
             using (ExcelPackage package = new ExcelPackage(ms))
             {

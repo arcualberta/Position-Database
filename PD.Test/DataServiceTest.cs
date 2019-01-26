@@ -79,6 +79,7 @@ namespace PD.Test
             string worksheet = "Faculty";
             Assert.True(File.Exists(dataFile));
             ds.UploadFECData(dataFile,
+                false,
                 worksheet,
                 new DateTime(2018, 07, 01), //Current year start date
                 new DateTime(2019, 06, 30), //Current year end date
