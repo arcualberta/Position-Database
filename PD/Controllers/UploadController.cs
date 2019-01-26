@@ -17,11 +17,13 @@ namespace PD.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ImportService _importService;
+        private readonly IPdDataProtector _dataProtector;
 
-        public UploadController(ApplicationDbContext context, ImportService importService)
+        public UploadController(ApplicationDbContext context, ImportService importService, IPdDataProtector dataProtector)
         {
             _context = context;
             _importService = importService;
+            _dataProtector = dataProtector;
         }
 
         [HttpGet]
@@ -33,6 +35,8 @@ namespace PD.Controllers
         [HttpPost]
         public async Task<IActionResult> FacultySalaryAdjustmentData(List<IFormFile> files)
         {
+            bool encrypt = true;
+
             long size = files.Sum(f => f.Length);
             string worksheetName = "ARC Academic Salary Adj2015 16";
 
@@ -45,10 +49,25 @@ namespace PD.Controllers
                 var formFile = files[0];
                 if (formFile.Length > 0)
                 {
-                    string tmpFile = Path.Combine(path, filenamePrefix).Replace('.', '_') + "_" + formFile.FileName;
-                    using (var stream = new FileStream(tmpFile, FileMode.Create))
+                    string tmpFile = Path.Combine(path, filenamePrefix).Replace('.', '_') + "_" + formFile.FileName + ".dat";
+
+                    if (encrypt)
                     {
-                        await formFile.CopyToAsync(stream);
+                        using (var ms = new MemoryStream())
+                        {
+                            formFile.CopyTo(ms);
+                            byte[] bytes = ms.ToArray();
+                            string data = Convert.ToBase64String(bytes);
+                            data = _dataProtector.Encrypt(data);
+                            System.IO.File.WriteAllText(tmpFile, data);
+                        }
+                    }
+                    else
+                    {
+                        using (var stream = new FileStream(tmpFile, FileMode.Create))
+                        {
+                            await formFile.CopyToAsync(stream);
+                        }
                     }
 
                     string jobKey = "Faculty Data import";
@@ -62,6 +81,7 @@ namespace PD.Controllers
                     {
                         var jobId = BackgroundJob.Enqueue<ImportService>(srv => srv.InjestFacultySalaryAdjustmentData(
                             tmpFile,
+                            encrypt,
                             worksheetName,
                             new DateTime(2015, 7, 1).Date,
                             new DateTime(2016, 06, 30).Date,

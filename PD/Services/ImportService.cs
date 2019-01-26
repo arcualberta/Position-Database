@@ -59,17 +59,25 @@ namespace PD.Services
             bargUnitCol
         };
 
-        public void InjestFacultySalaryAdjustmentData(string fileName, string worksheetName, DateTime currentYearStartDate, DateTime currentYearEndDate, DateTime nextYearEndDate, bool deleteFile = false)
+        public void InjestFacultySalaryAdjustmentData(string fileName, bool isEncrypted, string worksheetName, DateTime currentYearStartDate, DateTime currentYearEndDate, DateTime nextYearEndDate, bool deleteFile = false)
         {
             FileInfo file = new FileInfo(fileName);
             DateTime currentYearSampleDate = currentYearStartDate.AddDays(1).Date;
             DateTime nextYearStartDate = currentYearEndDate.AddDays(1).Date;
             DateTime nextYearSampleDate = nextYearStartDate.AddDays(1).Date;
 
-            //try
+            byte[] dataBytes;
+            if (isEncrypted)
             {
-                byte[] dataBytes = File.ReadAllBytes(fileName);
-                using (MemoryStream ms = new MemoryStream(dataBytes))
+                string data = File.ReadAllText(fileName);
+                data = _dataService._dataProtector.Decrypt(data);
+                dataBytes = Convert.FromBase64String(data);
+            }
+            else
+                dataBytes = File.ReadAllBytes(fileName);
+
+            using (MemoryStream ms = new MemoryStream(dataBytes))
+            {
                 using (ExcelPackage package = new ExcelPackage(ms))
                 {
                     StringBuilder sb = new StringBuilder();
@@ -166,7 +174,7 @@ namespace PD.Services
                         empl.FacultySalary.SpecialAdjustment = decimal.Parse(worksheet.Cells[row, (int)ColIndex.specialAdjustCol].Value.ToString().Trim());
                         empl.FacultySalary.Speedcode = new Speedcode() { Value = worksheet.Cells[row, (int)ColIndex.scCol].Value.ToString().Trim() };
                         empl.ContractStatus = Enum.Parse<Position.eContractType>(worksheet.Cells[row, (int)ColIndex.statusCol].Value.ToString().Trim());
-                        
+
                         employees.Add(empl);
                     }
 
@@ -266,7 +274,7 @@ namespace PD.Services
                     //Creating speedcodes
                     foreach (var empl in employees)
                     {
-                        
+
                     }
 
                     //Adding position records
@@ -311,7 +319,7 @@ namespace PD.Services
                         IQueryable<Position> positions = Db.Positions
                             .Where(p => p.Number == empl.PositionNumber && p.StartDate <= currentYearSampleDate && (!p.EndDate.HasValue || currentYearSampleDate <= p.EndDate));
                         if (positions.Count() != 1)
-                            throw new Exception("Data Error: Exactly 1 position with position number " + empl.PositionNumber +" is requred for the time period " + currentYearSampleDate.Date);
+                            throw new Exception("Data Error: Exactly 1 position with position number " + empl.PositionNumber + " is requred for the time period " + currentYearSampleDate.Date);
                         Position position = positions.First();
 
                         if (positionAssignments.Count() == 0)
@@ -339,7 +347,7 @@ namespace PD.Services
                         var position = Db.Positions.Where(pos => pos.Number == empl.PositionNumber).FirstOrDefault();
                         var chartStringId = GetChartStringIds(empl.Salary.DeptId.Id, empl.Salary.Fund.Id, empl.Salary.Program.Id, empl.Salary.Account.Id).First();
 
-                        if(!Db.PositionAccounts.Where(pa => pa.PositionId == position.Id && pa.ChartStringId == chartStringId).Any())
+                        if (!Db.PositionAccounts.Where(pa => pa.PositionId == position.Id && pa.ChartStringId == chartStringId).Any())
                         {
                             PositionAccount pa = new PositionAccount();
                             pa.ValuePercentage = 100;
@@ -541,12 +549,7 @@ namespace PD.Services
                     Db.SaveChanges();
                 }
             }
-            //catch (Exception ex)
-            //{
-            //    throw ex;
-            //}
-
-            if(deleteFile)
+            if (deleteFile)
                 System.IO.File.Delete(fileName);
         }
 
