@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
 using PD.Models.Positions;
+using Hangfire;
 
 namespace PD.Services
 {
@@ -102,6 +103,19 @@ namespace PD.Services
                     );
 
             return associations;
+        }
+
+        public bool IsJobActive(string jobKey)
+        {
+            var job = Db.HangFireJobs.Where(j => j.JobKey == jobKey).FirstOrDefault();
+            if (job != null)
+            {
+                var jobInfo = JobStorage.Current.GetMonitoringApi().JobDetails(job.JobId);
+                if (jobInfo != null && 
+                    !(jobInfo.History[0].StateName == "Succeeded" || jobInfo.History[0].StateName == "Deleted"))
+                    return true;
+            }
+            return false;
         }
     }
 }
