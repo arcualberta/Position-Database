@@ -4,158 +4,187 @@
 
 <h2>Positions</h2>
 
+<style>
+    .tableFixHead {
+        overflow-y: auto;
+        height: 680px;
+        margin:0;
+    }
+
+        .tableFixHead th {
+            position: sticky;
+            top: 0;
+        }
+
+    /* Just common table stuff. Really. */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        padding: 8px 16px;
+    }
+
+    th {
+        background: #eee;
+    }
+</style>
+
 @{
     IPdDataProtector dp = ViewBag.DataProtector as IPdDataProtector;
     PositionFilter filter = ViewBag.Filter as PositionFilter;
 }
 
 @Html.EditorFor(model => filter, new { controller = "reports", action = "positions" })
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Person.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Person.EmployeeId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Position.Title)
-            </th>
-            <th>
-                @Html.DisplayName("Previous Salary")
-            </th>
-            <th>
-                @Html.DisplayName("ATB")
-            </th>
-            <th>
-                @Html.DisplayName("Merit")
-            </th>
-            <th>
-                @Html.DisplayName("Special Adjustment")
-            </th>
-            <th>
-                @Html.DisplayName("Projected Salary")
-            </th>
-            <th>
-                @Html.DisplayName("Actual Salary")
-            </th>
-            <th>
-                @Html.DisplayName("Promoted")
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StartDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EndDate)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            string name = dp.Decrypt(item.Person.Name);
-            string startDate = item.Position.StartDate.HasValue ? item.Position.StartDate.Value.ToString("yyyy-MM-dd") : "";
-            string endDate = item.Position.EndDate.HasValue ? item.Position.EndDate.Value.ToString("yyyy-MM-dd") : "";
-
-            var previousSalary = item.GetCompensation<Salary>(filter.Date.AddYears(-1), false);
-            string previousSalaryVal = previousSalary != null ? previousSalary.Value.ToString() : "";
-
-            var atbVal = item.GetCompensation<ContractSettlement>(filter.Date, true);
-            string atb = atbVal != null ? atbVal.Value.ToString() : "";
-
-            var projectedBaseSalary = item.GetCompensation<Salary>(filter.Date, true);
-            string projectedBaseSalaryVal = projectedBaseSalary != null && projectedBaseSalary.Value > 0 ? projectedBaseSalary.Value.ToString() : "";
-
-            var actualBaseSalary = item.GetCompensation<Salary>(filter.Date, false);
-            string actualBaseSalaryVal = actualBaseSalary != null ? actualBaseSalary.Value.ToString() : "";
-
-            var merit = item.GetCompensation<Merit>(filter.Date, false);
-            string meritIncrement = merit != null ? merit.Value.ToString() : "";
-            string promoted = merit != null && merit.IsPromoted ? "promoted" : "";
-
-            var specialAdjustments = item.GetAdjustments(filter.Date, true).Select(adj => adj.Value.ToString());
-            string specialAdjustmentsVal = string.Join(", ", specialAdjustments);
-
-            string specialStyles = projectedBaseSalary != null && projectedBaseSalary.IsMaxed ? "color:green;font-weight:bold;" : "";
-
-            List<string> issues = item.AuditTrail.Where(au => au.AuditType == AuditRecord.eAuditRecordType.Error || au.AuditType == AuditRecord.eAuditRecordType.Warning)
-                .Select(au => au.Message).ToList();
-            string issueIndicatorStyles = issues.Any() ? "color:red !important;background-color:yellow !important;" : "";
-            string issueSummary = string.Join(" &#10; ", issues);
-
-            string alertClass = "";
-            if (string.IsNullOrEmpty(projectedBaseSalaryVal) || string.IsNullOrEmpty(actualBaseSalaryVal))
+<div class="tableFixHead">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Person.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Person.EmployeeId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Position.Title)
+                </th>
+                <th>
+                    @Html.DisplayName("Previous Salary")
+                </th>
+                <th>
+                    @Html.DisplayName("ATB")
+                </th>
+                <th>
+                    @Html.DisplayName("Merit")
+                </th>
+                <th>
+                    @Html.DisplayName("Special Adjustment")
+                </th>
+                <th>
+                    @Html.DisplayName("Projected Salary")
+                </th>
+                <th>
+                    @Html.DisplayName("Actual Salary")
+                </th>
+                <th>
+                    @Html.DisplayName("Promoted")
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Status)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.StartDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EndDate)
+                </th>
+                @*<th></th>*@
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
             {
-                alertClass = "alert alert-info";
-            }
-            else if (projectedBaseSalaryVal != actualBaseSalaryVal)
-            {
-                if (Math.Abs(projectedBaseSalary.Value - actualBaseSalary.Value) <= 5)
+                string name = dp.Decrypt(item.Person.Name);
+                string startDate = item.Position.StartDate.HasValue ? item.Position.StartDate.Value.ToString("yyyy-MM-dd") : "";
+                string endDate = item.Position.EndDate.HasValue ? item.Position.EndDate.Value.ToString("yyyy-MM-dd") : "";
+
+                var previousSalary = item.GetCompensation<Salary>(filter.Date.AddYears(-1), false);
+                string previousSalaryVal = previousSalary != null ? previousSalary.Value.ToString("N") : "";
+
+                var atbVal = item.GetCompensation<ContractSettlement>(filter.Date, true);
+                string atb = atbVal != null ? atbVal.Value.ToString("N") : "";
+
+                var projectedBaseSalary = item.GetCompensation<Salary>(filter.Date, true);
+                string projectedBaseSalaryVal = projectedBaseSalary != null && projectedBaseSalary.Value > 0 ? projectedBaseSalary.Value.ToString("N") : "";
+
+                var actualBaseSalary = item.GetCompensation<Salary>(filter.Date, false);
+                string actualBaseSalaryVal = actualBaseSalary != null ? actualBaseSalary.Value.ToString("N") : "";
+
+                var merit = item.GetCompensation<Merit>(filter.Date, false);
+                string meritIncrement = merit != null ? merit.Value.ToString("N") : "";
+                string promoted = merit != null && merit.IsPromoted ? "promoted" : "";
+
+                var specialAdjustments = item.GetAdjustments(filter.Date, true).Select(adj => adj.Value.ToString("N"));
+                string specialAdjustmentsVal = string.Join(", ", specialAdjustments);
+
+                string specialStyles = projectedBaseSalary != null && projectedBaseSalary.IsMaxed ? "color:green;font-weight:bold;" : "";
+
+                List<string> issues = item.AuditTrail.Where(au => au.AuditType == AuditRecord.eAuditRecordType.Error || au.AuditType == AuditRecord.eAuditRecordType.Warning)
+                    .Select(au => au.Message).ToList();
+                string issueIndicatorStyles = issues.Any() ? "color:red !important;background-color:yellow !important;" : "";
+                string issueSummary = string.Join(" &#10; ", issues);
+
+                string alertClass = "";
+                if (string.IsNullOrEmpty(projectedBaseSalaryVal) || string.IsNullOrEmpty(actualBaseSalaryVal))
                 {
-                    alertClass = "alert alert-warning";
+                    alertClass = "alert alert-info";
                 }
-                else
+                else if (projectedBaseSalaryVal != actualBaseSalaryVal)
                 {
-                    alertClass = "alert alert-danger";
+                    if (Math.Abs(projectedBaseSalary.Value - actualBaseSalary.Value) <= 5)
+                    {
+                        alertClass = "alert alert-warning";
+                    }
+                    else
+                    {
+                        alertClass = "alert alert-danger";
+                    }
                 }
+
+                <tr class="@alertClass" style="@specialStyles" title="@name">
+                    <td>
+                        @Html.DisplayFor(modelItem => name)
+
+                    </td>
+                    <td title="@name">
+                        <a asp-action="Details" asp-route-id="@item.Id" asp-all-route-data="@{new Dictionary<string, string>() { { "targetDate", filter.Date.ToShortDateString() }, { "id", item.Id.ToString() } }}">@item.Person.EmployeeId</a>
+                        @*@Html.DisplayFor(modelItem => item.Person.EmployeeId)*@
+                    </td>
+                    @*<td title="@Html.DisplayNameFor(model => item.Person.EmployeeId)">
+                            @Html.DisplayFor(modelItem => item.Person.EmployeeId)
+                        </td>*@
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Position.Title)
+                    </td>
+                    <td title="Old salary">
+                        @Html.DisplayFor(modelItem => previousSalaryVal)
+                    </td>
+                    <td title="ATB">
+                        @Html.DisplayFor(modelItem => atb)
+                    </td>
+                    <td title="Merit">
+                        @Html.DisplayFor(modelItem => meritIncrement)
+                    </td>
+                    <td title="Special adjustment">
+                        @Html.DisplayFor(modelItem => specialAdjustmentsVal)
+                    </td>
+                    <td title="Projected new salary @issueSummary" style="@issueIndicatorStyles">
+                        @Html.DisplayFor(model => projectedBaseSalaryVal)
+                    </td>
+                    <td title="Actual new salary">
+                        @Html.DisplayFor(model => actualBaseSalaryVal)
+                    </td>
+                    <td title="Is promoted?">
+                        @Html.DisplayFor(model => promoted)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => startDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => endDate)
+                    </td>
+                    <td>
+                        @*<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |*@
+                        @*<a asp-action="Details" asp-route-id="@item.Id" asp-all-route-data="@{new Dictionary<string, string>() { { "targetDate", filter.Date.ToShortDateString() }, { "id", item.Id.ToString() } }}">Details</a>*@
+                    </td>
+                </tr>
             }
-
-        <tr class="@alertClass" style="@specialStyles" title="@name">
-            <td>
-                @Html.DisplayFor(modelItem => name)
-
-            </td>
-            <td title="@name">
-                @Html.DisplayFor(modelItem => item.Person.EmployeeId)
-            </td>
-            @*<td title="@Html.DisplayNameFor(model => item.Person.EmployeeId)">
-            @Html.DisplayFor(modelItem => item.Person.EmployeeId)
-        </td>*@
-            <td>
-                @Html.DisplayFor(modelItem => item.Position.Title)
-            </td>
-            <td title="Old salary">
-                @Html.DisplayFor(modelItem => previousSalaryVal)
-            </td>
-            <td title="ATB">
-                @Html.DisplayFor(modelItem => atb)
-            </td>
-            <td title="Merit">
-                @Html.DisplayFor(modelItem => meritIncrement)
-            </td>
-            <td title="Special adjustment">
-                @Html.DisplayFor(modelItem => specialAdjustmentsVal)
-            </td>
-            <td title="Projected new salary @issueSummary" style="@issueIndicatorStyles">
-                @Html.DisplayFor(model => projectedBaseSalaryVal)
-            </td>
-            <td title="Actual new salary">
-                @Html.DisplayFor(model => actualBaseSalaryVal)
-            </td>
-            <td title="Is promoted?">
-                @Html.DisplayFor(model => promoted)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => startDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => endDate)
-            </td>
-            <td>
-                @*                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |*@
-                <a asp-action="Details" asp-route-id="@item.Id" asp-all-route-data="@{new Dictionary<string, string>() { { "targetDate", filter.Date.ToShortDateString() }, { "id", item.Id.ToString() } }}">Details</a>
-            </td>
-        </tr>
-        }
-    </tbody>
-</table>
-
+        </tbody>
+    </table>
+</div>   
 
