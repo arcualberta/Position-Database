@@ -64,6 +64,10 @@ body {
     margin-bottom:20px !important;
 }
 
+.pd-warning {
+    color: #e43934;
+}
+
 /*Table formatting*/
 /*
 .fixed_header {

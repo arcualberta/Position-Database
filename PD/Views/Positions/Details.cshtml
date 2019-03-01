@@ -2,12 +2,12 @@
 
 @{ 
     IPdDataProtector dp = ViewBag.DataProtector as IPdDataProtector;
-    string dept = Model.Position.PrimaryDepartment != null ? Model.Position.PrimaryDepartment.Name : "[Department unknown]";
+    string dept = Model.Position.PrimaryDepartment != null ? Model.Position.PrimaryDepartment.Name : "<span class='pd-warning'>[Home department unknown]</span>";
  }
 
 <div>
     <h4>@dp.Decrypt(@Model.Person.Name) (Employee ID @dp.Decrypt(Model.Person.EmployeeId))</h4>
-    <div>@Model.Position.Title (position #@Model.Position.Number), @dept</div>
+    <div>@Model.Position.Title (position #@Model.Position.Number), @Html.Raw(dept)</div>
     <hr />
     <dl class="dl-horizontal">
         <dt>

@@ -56,7 +56,7 @@ namespace PD.Services
                 matches = matches.Include(x => x.AuditTrail);
 
             if (includePosition)
-                matches = matches.Include(x => x.Position);
+                matches = matches.Include(x => x.Position.PrimaryDepartment);
 
             if (includePerson)
                 matches = matches.Include(x => x.Person);
@@ -147,6 +147,8 @@ namespace PD.Services
 
             return person;
         }
+
+
 
     }
 }
