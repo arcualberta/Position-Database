@@ -139,7 +139,7 @@
 
                     </td>
                     <td title="@name">
-                        <a asp-controller="Positions" asp-action="Details" asp-route-id="@item.Id" asp-all-route-data="@{new Dictionary<string, string>() {{ "id", item.Id.ToString() } }}">@item.Person.EmployeeId</a>
+                        <a asp-controller="Positions" asp-action="Details" asp-route-id="@item.Id" asp-all-route-data="@{new Dictionary<string, string>() {{ "id", item.Id.ToString() } }}">@dp.Decrypt(item.Person.EmployeeId)</a>
                         @*@Html.DisplayFor(modelItem => item.Person.EmployeeId)*@
                     </td>
                     @*<td title="@Html.DisplayNameFor(model => item.Person.EmployeeId)">

@@ -108,7 +108,7 @@ namespace PD.Test
             SqlServerDb server = new SqlServerDb();
             ApplicationDbContext db = server.Db;
 
-            FacultyProjectionService srv = new FacultyProjectionService(db);
+            FacultyProjectionService srv = _serviceProvider.GetService<FacultyProjectionService>();
             srv.ProjectSalaries(new DateTime(2016, 7, 1).Date);
         }
     }

@@ -13,8 +13,8 @@ namespace PD.Services
 {
     public class ReportService : PdServiceBase
     {
-        public ReportService(ApplicationDbContext db)
-            : base(db)
+        public ReportService(ApplicationDbContext db, IPdDataProtector dataProtector)
+            : base(db, dataProtector)
         {
         }
     }

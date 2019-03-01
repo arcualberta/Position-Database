@@ -11,8 +11,8 @@ namespace PD.Services
 {
     public abstract class ProjectionService : PdServiceBase
     {
-        public ProjectionService(ApplicationDbContext db)
-            : base(db)
+        public ProjectionService(ApplicationDbContext db, IPdDataProtector dataProtector)
+            : base(db, dataProtector)
         {
         }
 

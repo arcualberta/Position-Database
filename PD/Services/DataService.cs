@@ -15,12 +15,10 @@ namespace PD.Services
 {
     public class DataService : PdServiceBase
     {
-        public readonly IPdDataProtector _dataProtector; 
 
         public DataService(ApplicationDbContext db, IPdDataProtector dataProtector)
-            :base(db)
+            :base(db, dataProtector)
         {
-            _dataProtector = dataProtector;
         }
 
         ////public void ComputeFacultySalary(int positionAssignmentId, string baseYear, string nextYear)

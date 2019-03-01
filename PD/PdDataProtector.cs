@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.DataProtection;
+﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.AspNetCore.DataProtection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,8 @@ namespace PD
 {
     public class PdDataProtector : IPdDataProtector
     {
+        private readonly string __SEED = "j9q;)MyU+ksb8@k=mF#E$;QcJYC}`!]M";
+
         private IDataProtector _protector;
         public PdDataProtector(IDataProtectionProvider provider)
         {
@@ -62,5 +65,18 @@ namespace PD
             return _protector.Unprotect(value);
         }
 
+        public string Hash(string key)
+        {
+            byte[] salt = Encoding.UTF8.GetBytes(__SEED);
+
+            string hash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+            password: key,
+            salt: salt,
+            prf: KeyDerivationPrf.HMACSHA1,
+            iterationCount: 10000,
+            numBytesRequested: 256 / 8));
+
+            return hash;
+        }
     }
 }

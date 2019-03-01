@@ -19,10 +19,12 @@ namespace PD.Services
     public class PdServiceBase
     {
         public ApplicationDbContext Db { get; }
+        public readonly IPdDataProtector _dataProtector;
 
-        public PdServiceBase(ApplicationDbContext db)
+        public PdServiceBase(ApplicationDbContext db, IPdDataProtector dataProtector)
         {
             Db = db;
+            _dataProtector = dataProtector;
         }
 
         /// <summary>
@@ -129,5 +131,22 @@ namespace PD.Services
             }
             return false;
         }
+
+        public Person GetPerson(string employeeId)
+        {
+            var matches = Db.Persons.Where(p => p.Hash == _dataProtector.Hash(employeeId));
+            Person person = null;
+            foreach(var match in matches)
+            {
+                if(_dataProtector.Decrypt(match.EmployeeId) == employeeId)
+                {
+                    person = match;
+                    break;
+                }
+            }
+
+            return person;
+        }
+
     }
 }

@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Hangfire;
 using Microsoft.AspNetCore.DataProtection;
 using PD.Services;
+using PD.Services.Projections;
 
 namespace PD
 {
@@ -89,7 +90,8 @@ namespace PD
             #region Service Class Registration
             services.AddScoped<DataService, DataService>();
             services.AddScoped<ImportService, ImportService>();
-
+            services.AddScoped<ReportService, ReportService>();
+            services.AddScoped<FacultyProjectionService, FacultyProjectionService>();
             #endregion
 
             //HangFire background job processing

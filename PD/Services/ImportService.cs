@@ -21,11 +21,9 @@ namespace PD.Services
 {
     public class ImportService: PdServiceBase
     {
-        private readonly DataService _dataService;
-        public ImportService(ApplicationDbContext db, DataService dataService)
-            : base(db)
+        public ImportService(ApplicationDbContext db, IPdDataProtector dataProtector)
+            : base(db, dataProtector)
         {
-            _dataService = dataService;
         }
 
         private enum ColIndex
@@ -70,7 +68,7 @@ namespace PD.Services
             if (isEncrypted)
             {
                 string data = File.ReadAllText(fileName);
-                data = _dataService._dataProtector.Decrypt(data);
+                data = _dataProtector.Decrypt(data);
                 dataBytes = Convert.FromBase64String(data);
             }
             else
@@ -193,11 +191,12 @@ namespace PD.Services
                     {
                         bool test = empl.EmployeeName.Contains("2");
 
-                        Person dbPersonRecord = Db.Persons.Where(p => p.EmployeeId == empl.EmployeeId).FirstOrDefault();
+                        Person dbPersonRecord = GetPerson(empl.EmployeeId);
                         if (dbPersonRecord == null)
                             dbPersonRecord = CreatePerson(
-                                _dataService._dataProtector.Encrypt(empl.EmployeeId),
-                                _dataService._dataProtector.Encrypt(empl.EmployeeName), 
+                                _dataProtector.Encrypt(empl.EmployeeId),
+                                _dataProtector.Encrypt(empl.EmployeeName),
+                                _dataProtector.Hash(empl.EmployeeId),
                                 false);
                     }
                     Db.SaveChanges();
@@ -285,7 +284,7 @@ namespace PD.Services
                     {
 
                         //Retrieve the person record of this employee from the database
-                        Person person = Db.Persons.Where(p => p.EmployeeId == empl.EmployeeId).FirstOrDefault();
+                        Person person = GetPerson(empl.EmployeeId);
 
                         //Retrieve the active position record with the given position number from the database
                         Faculty position = Db.Faculty
@@ -327,7 +326,7 @@ namespace PD.Services
 
                         if (positionAssignments.Count() == 0)
                         {
-                            Person person = Db.Persons.Where(p => p.EmployeeId == empl.EmployeeId).FirstOrDefault();
+                            Person person = GetPerson(empl.EmployeeId);
 
                             PositionAssignment pa = new PositionAssignment();
                             pa.Status = PositionAssignment.eStatus.Active;
@@ -592,8 +591,8 @@ namespace PD.Services
         public void UpdateEmployee(FacultyEmployeeViewModel empl)
         {
             //Creating the employee if does not exist in the database
-            Person emplDbRecord = Db.Persons.Where(p => p.EmployeeId == empl.EmployeeId).FirstOrDefault();
-            if(emplDbRecord == null)
+            Person emplDbRecord = GetPerson(empl.EmployeeId);
+            if (emplDbRecord == null)
             {
                 emplDbRecord = new Person()
                 {
@@ -646,7 +645,7 @@ namespace PD.Services
             if (isEncrypted)
             {
                 string data = File.ReadAllText(fileName);
-                data = _dataService._dataProtector.Decrypt(data);
+                data = _dataProtector.Decrypt(data);
                 dataBytes = Convert.FromBase64String(data);
             }
             else
@@ -695,17 +694,13 @@ namespace PD.Services
                         //Creating a new position assignment for the person and the position
 
                         //Retreaving the person
-                        IQueryable<Person> personMatches = Db.Persons.Where(p => p.EmployeeId == emplId);
-                        if (personMatches.Count() > 1)
-                            throw new Exception(string.Format("{0} individuals found for the employee ID {1}", personMatches.Count(), emplId));
-
-                        Person person = personMatches.FirstOrDefault();
+                        Person person = GetPerson(emplId);
 
                         if (person == null)
-                            person = CreatePerson(emplId, _dataService._dataProtector.Encrypt(name), true);
+                            person = CreatePerson(emplId, _dataProtector.Encrypt(name), _dataProtector.Hash(emplId), true);
                         else
                         {
-                            string storedName = _dataService._dataProtector.Decrypt(person.Name);
+                            string storedName = _dataProtector.Decrypt(person.Name);
 
                             if (storedName != name)
                                 mismatches.Add(name);
@@ -713,7 +708,7 @@ namespace PD.Services
                     }
                     else
                     {
-                        string storedName = _dataService._dataProtector.Decrypt(pa.Person.Name);
+                        string storedName = _dataProtector.Decrypt(pa.Person.Name);
                         if (storedName != name)
                             mismatches.Add(name);
                     }
@@ -725,12 +720,13 @@ namespace PD.Services
             }
         }
 
-        public Person CreatePerson(string employeeId, string encrypedtName, bool save)
+        public Person CreatePerson(string employeeId, string encrypedtName, string hash, bool save)
         {
             Person person = new Person()
             {
                 EmployeeId = employeeId,
-                Name = encrypedtName
+                Name = encrypedtName,
+                Hash = hash
             };
             Db.Persons.Add(person);
 

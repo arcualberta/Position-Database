@@ -20,6 +20,8 @@ namespace PD.Models
         [Display(Name = "Birth Date")]
         public DateTime? BirthDate { get; set; }
 
+        public string Hash { get; set; }
+
         public virtual ICollection<PositionAssignment> PositionAssignments { get; set; } = new List<PositionAssignment>();
     }
 }

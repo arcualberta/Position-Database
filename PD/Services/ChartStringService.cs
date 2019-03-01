@@ -14,8 +14,8 @@ namespace PD.Services
     /// </summary>
     public class ChartStringService : PdServiceBase
     {
-        public ChartStringService(ApplicationDbContext db)
-            : base(db)
+        public ChartStringService(ApplicationDbContext db, IPdDataProtector dataProtector)
+            : base(db, dataProtector)
         {
         }
         /// <summary>

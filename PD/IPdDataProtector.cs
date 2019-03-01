@@ -10,5 +10,7 @@ namespace PD
         string Encrypt(string value);
 
         string Decrypt(string value);
+
+        string Hash(string key);
     }
 }

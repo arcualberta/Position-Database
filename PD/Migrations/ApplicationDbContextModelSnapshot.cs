@@ -324,6 +324,8 @@ namespace PD.Migrations
 
                     b.Property<string>("EmployeeId");
 
+                    b.Property<string>("Hash");
+
                     b.Property<string>("Name");
 
                     b.HasKey("Id");

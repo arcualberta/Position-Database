@@ -16,8 +16,8 @@ namespace PD.Services.Projections
 {
     public class FacultyProjectionService: ProjectionService
     {
-        public FacultyProjectionService(ApplicationDbContext db)
-           : base(db)
+        public FacultyProjectionService(ApplicationDbContext db, IPdDataProtector dataProtector)
+           : base(db, dataProtector)
         {
         }
 

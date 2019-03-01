@@ -20,13 +20,11 @@ namespace PD.Controllers
     public class ReportsController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly DataService _dataService;
-        //private readonly IPdDataProtector _dataProtector;
-        public ReportsController(ApplicationDbContext context, DataService dataService/*, IPdDataProtector dataProtector*/)
+        private readonly ReportService _reportService;
+        public ReportsController(ApplicationDbContext context, ReportService reportService/*, IPdDataProtector dataProtector*/)
         {
             _context = context;
-            _dataService = dataService;
-            //_dataProtector = dataProtector;
+            _reportService = reportService;
         }
 
         public IActionResult Positions(PositionFilter filter)
@@ -34,11 +32,10 @@ namespace PD.Controllers
             if (filter == null)
                 filter = new PositionFilter();
 
-            ReportService srv = new ReportService(_context);
-            IQueryable<PositionAssignment> positionAssignments = srv.GetPositionAssignments(filter);
+            IQueryable<PositionAssignment> positionAssignments = _reportService.GetPositionAssignments(filter);
 
             ViewBag.Filter = filter;
-            ViewBag.DataProtector = _dataService._dataProtector;
+            ViewBag.DataProtector = _reportService._dataProtector;
 
             return View("PositionAssignments", positionAssignments);
             //return View(positionAssignments.ToList().Select(pp => new PositionViewModel(pp, filter.Date, srv.DataProtector)));
@@ -46,11 +43,10 @@ namespace PD.Controllers
 
         public IActionResult Details(int id, DateTime targetDate)
         {
-            ReportService srv = new ReportService(_context);
-            PositionAssignment pa = srv.GetPositionAssignment(id, targetDate, true, true, true, true);
+            PositionAssignment pa = _reportService.GetPositionAssignment(id, targetDate, true, true, true, true);
 
             ViewBag.Filter = new PositionFilter() { Date = targetDate };
-            ViewBag.DataProtector = _dataService._dataProtector;
+            ViewBag.DataProtector = _reportService._dataProtector;
 
             return View(pa);
         }

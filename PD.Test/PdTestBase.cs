@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PD.Data;
 using PD.Services;
+using PD.Services.Projections;
 
 namespace PD.Test
 {
@@ -49,6 +50,7 @@ namespace PD.Test
             #region Service Class Registration
             services.AddScoped<DataService, DataService>();
             services.AddScoped<ImportService, ImportService>();
+            services.AddScoped<FacultyProjectionService, FacultyProjectionService>();
 
             #endregion
 
