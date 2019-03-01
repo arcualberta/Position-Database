@@ -195,7 +195,10 @@ namespace PD.Services
 
                         Person dbPersonRecord = Db.Persons.Where(p => p.EmployeeId == empl.EmployeeId).FirstOrDefault();
                         if (dbPersonRecord == null)
-                            dbPersonRecord = CreatePerson(empl.EmployeeId, _dataService._dataProtector.Encrypt(empl.EmployeeName), false);
+                            dbPersonRecord = CreatePerson(
+                                _dataService._dataProtector.Encrypt(empl.EmployeeId),
+                                _dataService._dataProtector.Encrypt(empl.EmployeeName), 
+                                false);
                     }
                     Db.SaveChanges();
 
@@ -302,7 +305,7 @@ namespace PD.Services
                             position.Rank = Enum.Parse<Faculty.eRank>(empl.Rank);
                             position.Workload = empl.Workload;
                             position.ContractType = empl.ContractStatus;
-
+                            position.PrimaryDepartmentId = Db.Departments.Where(d => d.Name == empl.DeptName).Select(d => d.Id).FirstOrDefault();
                             Db.Positions.Add(position);
                             Db.SaveChanges();
                         }

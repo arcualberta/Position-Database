@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PD.Data;
 
 namespace PD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190228211007_AddedSuccessorToPositionAssignment")]
+    partial class AddedSuccessorToPositionAssignment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -411,8 +413,6 @@ namespace PD.Migrations
 
                     b.Property<string>("Number");
 
-                    b.Property<int?>("PrimaryDepartmentId");
-
                     b.Property<DateTime?>("StartDate");
 
                     b.Property<string>("Title");
@@ -421,8 +421,6 @@ namespace PD.Migrations
                         .HasColumnType("decimal(19, 5)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PrimaryDepartmentId");
 
                     b.ToTable("Positions");
 
@@ -734,13 +732,6 @@ namespace PD.Migrations
                     b.HasOne("PD.Models.PositionAssignment", "Predecessor")
                         .WithOne("Succcessor")
                         .HasForeignKey("PD.Models.PositionAssignment", "PredecessorId");
-                });
-
-            modelBuilder.Entity("PD.Models.Positions.Position", b =>
-                {
-                    b.HasOne("PD.Models.Department", "PrimaryDepartment")
-                        .WithMany()
-                        .HasForeignKey("PrimaryDepartmentId");
                 });
 
             modelBuilder.Entity("PD.Models.ChartFields.DeptID", b =>

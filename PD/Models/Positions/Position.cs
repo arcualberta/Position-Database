@@ -39,6 +39,16 @@ namespace PD.Models.Positions
 
         public string Description { get; set; }
 
+        public int? PrimaryDepartmentId { get; set; }
+        /// <summary>
+        /// Primary department to which this position belongs. Each position can belong to only one primary department.
+        /// </summary>
+        /// <value>
+        /// The primary department.
+        /// </value>
+        public Department PrimaryDepartment { get; set; }
+
+
         [Range(0, 1)]
         public decimal Workload { get; set; }
 

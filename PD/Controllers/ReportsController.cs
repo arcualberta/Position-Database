@@ -21,12 +21,12 @@ namespace PD.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly DataService _dataService;
-        private readonly IPdDataProtector _dataProtector;
-        public ReportsController(ApplicationDbContext context, DataService dataService, IPdDataProtector dataProtector)
+        //private readonly IPdDataProtector _dataProtector;
+        public ReportsController(ApplicationDbContext context, DataService dataService/*, IPdDataProtector dataProtector*/)
         {
             _context = context;
             _dataService = dataService;
-            _dataProtector = dataProtector;
+            //_dataProtector = dataProtector;
         }
 
         public IActionResult Positions(PositionFilter filter)

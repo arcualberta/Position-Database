@@ -1,0 +1,60 @@
+﻿@model PD.Models.PositionAssignment
+
+@{ IPdDataProtector dp = ViewBag.DataProtector as IPdDataProtector; }
+
+<div>
+    <h4>@dp.Decrypt(@Model.Person.Name) (Employee ID @Model.Person.EmployeeId)</h4>
+    <div>@Model.Position.Title (position #@Model.Position.Number), @Model.Position.PrimaryDepartment.Name</div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.StartDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.StartDate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.EndDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.EndDate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SalaryCycleStartMonth)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SalaryCycleStartMonth)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SalaryCycleStartDay)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SalaryCycleStartDay)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Position)
+        </dt>
+        <dt>
+            @Html.DisplayNameFor(model => model.Person)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Person.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Predecessor)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Predecessor.Id)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

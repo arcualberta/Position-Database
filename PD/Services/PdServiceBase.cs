@@ -25,9 +25,20 @@ namespace PD.Services
             Db = db;
         }
 
+        /// <summary>
+        /// Gets the position assignment with a given ID irrespective of the time.
+        /// The returned object includes the associated objects such as person, position, compensations, etc.) 
+        /// </summary>
+        /// <param name="id">The unique ID (database primary key, NOT the position number)</param>
+        /// <returns>PositionAssignment object, or null if no position assignment with the given ID exists.</returns>
+        public PositionAssignment GetPositionAssignment(int id)
+        {
+            return GetPositionAssignment(id, null, true, true, true, true, true);
+        }
+
         public PositionAssignment GetPositionAssignment(
             int id, 
-            DateTime sampleDate,
+            DateTime? sampleDate,
             bool includeCompensations = false,
             bool includeAuditTrail = false,
             bool includePosition = false,
@@ -51,7 +62,8 @@ namespace PD.Services
             if(includePredecessorPositionAssignment)
                 matches = matches.Include(x => x.Predecessor);
 
-            matches = matches.Where(x => x.Id == id && x.StartDate <= sampleDate && (!x.EndDate.HasValue || x.EndDate >= sampleDate));
+            if (sampleDate.HasValue)
+                matches = matches.Where(x => x.Id == id && x.StartDate <= sampleDate && (!x.EndDate.HasValue || x.EndDate >= sampleDate));
 
             return matches.FirstOrDefault();
         }

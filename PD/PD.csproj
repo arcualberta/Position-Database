@@ -17,6 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="docfx.console" Version="2.40.11">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="EPPlus" Version="4.5.2.1" />
     <PackageReference Include="HangFire" Version="1.6.21" />
     <PackageReference Include="Microsoft.AspNetCore.App" />

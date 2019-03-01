@@ -54,7 +54,29 @@ namespace PD.Models
         public virtual ICollection<AuditRecord> AuditTrail { get; set; } = new LinkedList<AuditRecord>();
 
         public int? PredecessorId { get; set; }
+        /// <summary>
+        /// Predecessor to this position assignment. 
+        /// When the Status of a PositionAssignment is changed (e.g. a person goes from active to pre-retirement
+        /// then instead of changing the Status of the original assignment, an end-date must be put on the original
+        /// PositionAssignment and a new PositionAssignment must be created with the new Status. In this case the
+        /// Predecessor of the new PositionAssignment must refer to the original PositionAssignment.
+        /// </summary>
+        /// <value>
+        /// </value>
         public PositionAssignment Predecessor { get; set; }
+
+        public int? SucccessorId { get; set; }
+        /// <summary>
+        /// Succcessor of this position assignment. 
+        /// When the Status of a PositionAssignment is changed (e.g. a person goes from active to pre-retirement
+        /// then instead of changing the Status of the original assignment, an end-date must be put on the original
+        /// PositionAssignment and a new PositionAssignment must be created with the new Status. In this case the
+        /// Succcessor of the original PositionAssignment must refer to the new PositionAssignment.
+        /// </summary>
+        /// <value>
+        /// </value>
+        public PositionAssignment Succcessor { get; set; }
+
 
         /// <summary>
         /// Returns the projected or confirmed compensation of the give type T for the target date
