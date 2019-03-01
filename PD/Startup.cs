@@ -142,25 +142,6 @@ namespace PD
                 }
             }
 
-            //Checking admins
-            var checkAdmin = userManager.GetUsersInRoleAsync("Admin");
-            checkAdmin.Wait();
-
-            if(checkAdmin.Result.Count() == 0)
-            {
-                var firstUser = userManager.Users.FirstOrDefault();
-                if(firstUser != null)
-                {
-                    Task task = userManager.AddToRoleAsync(firstUser, "Admin");
-                    task.Wait();
-
-                    if (!task.IsCompletedSuccessfully)
-                    {
-                        throw new Exception("Failed to assign Admin role to default admin user.");
-                    }
-                }
-            }
-
             //Starting Hangfire background processing server
             app.UseHangfireServer();
             app.UseHangfireDashboard("/hangfire", options: new DashboardOptions { Authorization = new[] { new HangFireAuthorizationFilter() } });
