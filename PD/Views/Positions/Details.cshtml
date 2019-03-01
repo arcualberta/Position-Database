@@ -1,10 +1,13 @@
 ﻿@model PD.Models.PositionAssignment
 
-@{ IPdDataProtector dp = ViewBag.DataProtector as IPdDataProtector; }
+@{ 
+    IPdDataProtector dp = ViewBag.DataProtector as IPdDataProtector;
+    string dept = Model.Position.PrimaryDepartment != null ? Model.Position.PrimaryDepartment.Name : "[Department unknown]";
+ }
 
 <div>
-    <h4>@dp.Decrypt(@Model.Person.Name) (Employee ID @Model.Person.EmployeeId)</h4>
-    <div>@Model.Position.Title (position #@Model.Position.Number), @Model.Position.PrimaryDepartment.Name</div>
+    <h4>@dp.Decrypt(@Model.Person.Name) (Employee ID @dp.Decrypt(Model.Person.EmployeeId))</h4>
+    <div>@Model.Position.Title (position #@Model.Position.Number), @dept</div>
     <hr />
     <dl class="dl-horizontal">
         <dt>
