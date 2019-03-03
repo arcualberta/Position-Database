@@ -38,7 +38,7 @@
                 contentType: "application/json",
                 data: function (d) {
                     // note: d is created by datatable, the structure of d is the same with DataTableParameters model above
-                    console.log(d);
+                    //console.log(d);
                     return JSON.stringify(d);
                 }
                 ////DEBUG: Enable the following "success" handler to show data on the console instead of on the table.
@@ -52,11 +52,12 @@
         });
 
         // peopleTable - on selection of a row
-        $('#peopleTable').on('select', function (e, dt, type, indexes) {
+        var peopleTable = $('#peopleTable').DataTable();
+        peopleTable.on('select', function (e, dt, type, indexes) {
             if (type === 'row') {
-                var data = table.rows(indexes).data().pluck('id');
-
+                var id = peopleTable.rows(indexes).data().pluck('id')[0];
                 // do something with the ID of the selected items
+                console.log(id);
             }
         });
     });
