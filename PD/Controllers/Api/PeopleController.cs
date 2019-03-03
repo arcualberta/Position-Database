@@ -42,6 +42,7 @@ namespace PD.Controllers.Api
         {
             //Loading all objects and decrypting the names and employee IDs
             List<Person> persons = await _context.Persons.ToListAsync();
+            int total = persons.Count;
 
             foreach (Person p in persons)
             {
@@ -60,9 +61,25 @@ namespace PD.Controllers.Api
                 else
                     persons = persons.Where(p => p.Name.Contains(search, StringComparison.CurrentCultureIgnoreCase)).ToList();
             }
+            int totalFiltered = persons.Count;
 
             //Sorting with the given column and given direction
-            persons = persons.OrderBy(p => p.Name).ToList();
+            if (dataTableParameters.Order.Count > 0)
+            {
+                switch (dataTableParameters.Order[0].Column)
+                {
+                    case 0:
+                        persons = dataTableParameters.Order[0].Dir == "asc"
+                            ? persons.OrderBy(p => p.Name).ToList()
+                            : persons.OrderByDescending(p => p.Name).ToList();
+                        break;
+                    case 1:
+                        persons = dataTableParameters.Order[0].Dir == "asc"
+                            ? persons.OrderBy(p => p.EmployeeId).ToList()
+                            : persons.OrderByDescending(p => p.EmployeeId).ToList();
+                        break;
+                }
+            }
 
             //Selecting appropriate subset for return
             string[][] result = persons
@@ -74,8 +91,8 @@ namespace PD.Controllers.Api
             return new DataTableResponse()
             {
                 Draw = dataTableParameters.Draw + 1,
-                RecordsTotal = 600,
-                RecordsFiltered = 320,
+                RecordsTotal = total,
+                RecordsFiltered = totalFiltered,
                 Data = result
             };
         }
