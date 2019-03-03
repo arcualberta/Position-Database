@@ -42,6 +42,9 @@
 
         $('#peopleTable').dataTable(
             {
+                select: {
+                    style: 'single'
+                },
                 "iDisplayLength": 100,
                 "sPaginationType": "full_numbers",
                 processing: true,
@@ -55,11 +58,10 @@
                     contentType: "application/json",
                     data: function (d) {
                         // note: d is created by datatable, the structure of d is the same with DataTableParameters model above
-                        console.log(JSON.stringify(d));
+                        //console.log(JSON.stringify(d));
                         return JSON.stringify(d);
                     }
                 }
             });
-
     });
 </script>
