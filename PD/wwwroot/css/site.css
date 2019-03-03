@@ -68,6 +68,10 @@ body {
     color: #e43934;
 }
 
+div.clear{
+    clear:both;
+}
+
 /*Table formatting*/
 /*
 .fixed_header {

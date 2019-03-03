@@ -84,7 +84,7 @@ namespace PD.Controllers.Api
             //Selecting appropriate subset for return
             string[][] result = persons
                 .Skip(dataTableParameters.Start)
-                .Take(20)
+                .Take(dataTableParameters.Length)
                 .Select(p => new string[] { p.Name, p.EmployeeId })
                 .ToArray();
 

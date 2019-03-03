@@ -1,21 +1,23 @@
-﻿<h2>Employees</h2>
+﻿
+<div id="employees" class="col-sm-6">
+    <h3>Employees</h3>
 
-<table id="peopleTable" class="display" style="width:100%">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>EmployeeId</th>
-        </tr>
-    </thead>
-    <tfoot>
-        <tr>
-            <th>Name</th>
-            <th>EmployeeId</th>
-        </tr>
-    </tfoot>
-</table>
-
-
+    <table id="peopleTable" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Employee Id</th>
+            </tr>
+        </thead>
+        @*<tfoot>
+            <tr>
+                <th>Name</th>
+                <th>Employee Id</th>
+            </tr>
+        </tfoot>*@
+    </table>
+</div>
+<div class="clear"></div>
 <script>
     $(function () {
         // start testing post data to GetData Action Result
@@ -40,10 +42,13 @@
 
         $('#peopleTable').dataTable(
             {
-                "iDisplayLength": 20,
+                "iDisplayLength": 100,
                 "sPaginationType": "full_numbers",
                 processing: true,
                 serverSide: true,
+                info: false,
+                "scrollY": "400px",
+                "scrollCollapse": true,
                 ajax: {
                     url: '/api/People',
                     type: "post",
@@ -54,11 +59,6 @@
                         return JSON.stringify(d);
                     }
                 }
-                //,
-                //"columns": [
-                //    { "data": "name" },
-                //    { "data": "employeeId" }
-                //]
             });
 
     });
