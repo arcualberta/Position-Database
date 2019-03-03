@@ -40,18 +40,36 @@ namespace PD.Controllers.Api
         [HttpPost]
         public async Task<ActionResult<DataTableResponse>> GetPersons([FromBody] DataTableParameters dataTableParameters)
         {
-            var people =  await _context.Persons.ToListAsync();
-            var query = people
-                .Select(p => new string[] { p.Name, p.EmployeeId })
-                .Skip(dataTableParameters.Start)
-                .Take(20);
+            //Loading all objects and decrypting the names and employee IDs
+            List<Person> persons = await _context.Persons.ToListAsync();
 
-            var result = query.ToArray();
-            foreach (var p in result)
+            foreach (Person p in persons)
             {
-                p[0] = _dataService._dataProtector.Decrypt(p[0]);
-                p[1] = _dataService._dataProtector.Decrypt(p[1]);
+                p.Name = string.IsNullOrEmpty(p.Name) ? "" : _dataService._dataProtector.Decrypt(p.Name);
+                p.EmployeeId = string.IsNullOrEmpty(p.EmployeeId) ? "" : _dataService._dataProtector.Decrypt(p.EmployeeId);
             }
+
+            //If search is specified, search on the employee IDs or names depending on whether the 
+            //search string is starting with a number or not
+            var search = dataTableParameters.Search.Value;
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim();
+                if (Char.IsNumber(search.First()))
+                    persons = persons.Where(p => p.EmployeeId.StartsWith(search)).ToList();
+                else
+                    persons = persons.Where(p => p.Name.Contains(search, StringComparison.CurrentCultureIgnoreCase)).ToList();
+            }
+
+            //Sorting with the given column and given direction
+            persons = persons.OrderBy(p => p.Name).ToList();
+
+            //Selecting appropriate subset for return
+            string[][] result = persons
+                .Skip(dataTableParameters.Start)
+                .Take(20)
+                .Select(p => new string[] { p.Name, p.EmployeeId })
+                .ToArray();
 
             return new DataTableResponse()
             {
