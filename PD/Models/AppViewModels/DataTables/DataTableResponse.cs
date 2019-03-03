@@ -7,11 +7,11 @@ namespace PD.Models.AppViewModels.DataTables
 {
     public class DataTableResponse
     {
-        public int draw { get; set; }
-        public long recordsTotal { get; set; }
-        public int recordsFiltered { get; set; }
-        public object[] data { get; set; }
-        public string error { get; set; }
+        public int Draw { get; set; }
+        public long RecordsTotal { get; set; }
+        public int RecordsFiltered { get; set; }
+        public object[] Data { get; set; }
+        public string Error { get; set; }
     }
 
     public class PersonVM

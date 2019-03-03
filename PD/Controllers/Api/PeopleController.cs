@@ -40,24 +40,25 @@ namespace PD.Controllers.Api
         [HttpPost]
         public async Task<ActionResult<DataTableResponse>> GetPersons([FromBody] DataTableParameters dataTableParameters)
         {
-
             var people =  await _context.Persons.ToListAsync();
-            var result = people.Select(p => new PersonVM() { Name = p.Name, EmployeeId = p.EmployeeId }).Take(20).ToList();
+            var query = people
+                .Select(p => new string[] { p.Name, p.EmployeeId })
+                .Skip(dataTableParameters.Start)
+                .Take(20);
 
+            var result = query.ToArray();
             foreach (var p in result)
             {
-                p.Name = _dataService._dataProtector.Decrypt(p.Name);
-                p.EmployeeId = _dataService._dataProtector.Decrypt(p.EmployeeId);
+                p[0] = _dataService._dataProtector.Decrypt(p[0]);
+                p[1] = _dataService._dataProtector.Decrypt(p[1]);
             }
-
-            var res2 = result.Select(p => new string[] { p.Name, p.EmployeeId }).ToArray(); // string.Format("[\"name\":\"{0}\", \"employeeId\":\"{1}\"]", p.Name, p.EmployeeId)).ToArray();
 
             return new DataTableResponse()
             {
-                draw = 2,
-                recordsTotal = 600,
-                recordsFiltered = 320,
-                data = res2
+                Draw = dataTableParameters.Draw + 1,
+                RecordsTotal = 600,
+                RecordsFiltered = 320,
+                Data = result
             };
         }
 
