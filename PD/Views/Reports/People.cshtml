@@ -20,48 +20,44 @@
 <div class="clear"></div>
 <script>
     $(function () {
-        // start testing post data to GetData Action Result
-        @*var mobileFilter = {
-            CompanyNAME2: "a",
-            mobiletypes: [1, 2, 3]
-        };
-        var data = { "draw": 1, "columns": [{ "data": 0, "name": "", "searchable": true, "orderable": true, "search": { "value": "", "regex": false } }, { "data": 1, "name": "", "searchable": true, "orderable": true, "search": { "value": "", "regex": false } }, { "data": 2, "name": "", "searchable": true, "orderable": true, "search": { "value": "", "regex": false } }, { "data": 3, "name": "", "searchable": true, "orderable": true, "search": { "value": "", "regex": false } }, { "data": 4, "name": "", "searchable": true, "orderable": true, "search": { "value": "", "regex": false } }, { "data": 5, "name": "", "searchable": true, "orderable": true, "search": { "value": "", "regex": false } }, { "data": 6, "name": "", "searchable": true, "orderable": true, "search": { "value": "", "regex": false } }, { "data": 7, "name": "", "searchable": true, "orderable": true, "search": { "value": "", "regex": false } }, { "data": 8, "name": "", "searchable": true, "orderable": true, "search": { "value": "", "regex": false } }], "order": [{ "column": 0, "dir": "asc" }], "start": 0, "length": 10, "search": { "value": "", "regex": false } }
-        //var data = { "draw": 1, "length": 10, "start": 1 };
-
-        console.log(JSON.stringify(data));
-        $.ajax('@Url.Action("GetIndex", "Employees")', {
-            datatype: 'json',
-            contentType: 'application/json',
-            type: 'post',
-            data: JSON.stringify({ dataTableParameters: data }),
-            success: function (response) {
-                console.log(response);
-            }
-        });*@
-
-
-        $('#peopleTable').dataTable(
-            {
-                select: {
-                    style: 'single'
-                },
-                "iDisplayLength": 100,
-                "sPaginationType": "full_numbers",
-                processing: true,
-                serverSide: true,
-                info: false,
-                "scrollY": "400px",
-                "scrollCollapse": true,
-                ajax: {
-                    url: '/api/People',
-                    type: "post",
-                    contentType: "application/json",
-                    data: function (d) {
-                        // note: d is created by datatable, the structure of d is the same with DataTableParameters model above
-                        //console.log(JSON.stringify(d));
-                        return JSON.stringify(d);
-                    }
+        // peopleTable - initialization
+        $('#peopleTable').dataTable({
+            select: {
+                style: 'single'
+            },
+            "iDisplayLength": 100,
+            "sPaginationType": "full_numbers",
+            processing: true,
+            serverSide: true,
+            info: false,
+            "scrollY": "400px",
+            "scrollCollapse": true,
+            ajax: {
+                url: '/api/People',
+                type: "post",
+                contentType: "application/json",
+                data: function (d) {
+                    // note: d is created by datatable, the structure of d is the same with DataTableParameters model above
+                    console.log(d);
+                    return JSON.stringify(d);
                 }
-            });
+                ////DEBUG: Enable the following "success" handler to show data on the console instead of on the table.
+                //, success: function (response) { console.log(response); res = response; }
+            },
+            "columns": [
+                { "data": "name" },
+                { "data": "empId" }
+            ],
+            rowId: "id"
+        });
+
+        // peopleTable - on selection of a row
+        $('#peopleTable').on('select', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                var data = table.rows(indexes).data().pluck('id');
+
+                // do something with the ID of the selected items
+            }
+        });
     });
 </script>

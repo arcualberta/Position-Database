@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -50,43 +51,56 @@ namespace PD.Controllers.Api
                 p.EmployeeId = string.IsNullOrEmpty(p.EmployeeId) ? "" : _dataService._dataProtector.Decrypt(p.EmployeeId);
             }
 
+            IEnumerable<Person> query = persons;
+
             //If search is specified, search on the employee IDs or names depending on whether the 
             //search string is starting with a number or not
-            var search = dataTableParameters.Search.Value;
-            if (!string.IsNullOrWhiteSpace(search))
+            if (dataTableParameters.Search != null && !string.IsNullOrWhiteSpace(dataTableParameters.Search.Value))
             {
-                search = search.Trim();
+                string search = dataTableParameters.Search.Value.Trim();
                 if (Char.IsNumber(search.First()))
-                    persons = persons.Where(p => p.EmployeeId.StartsWith(search)).ToList();
+                    query = query.Where(p => p.EmployeeId.StartsWith(search));
                 else
-                    persons = persons.Where(p => p.Name.Contains(search, StringComparison.CurrentCultureIgnoreCase)).ToList();
+                    query = query.Where(p => p.Name.Contains(search, StringComparison.CurrentCultureIgnoreCase));
             }
-            int totalFiltered = persons.Count;
+            int totalFiltered = query.Count();
 
             //Sorting with the given column and given direction
-            if (dataTableParameters.Order.Count > 0)
+            if (dataTableParameters.Order != null && dataTableParameters.Order.Count > 0)
             {
                 switch (dataTableParameters.Order[0].Column)
                 {
                     case 0:
-                        persons = dataTableParameters.Order[0].Dir == "asc"
-                            ? persons.OrderBy(p => p.Name).ToList()
-                            : persons.OrderByDescending(p => p.Name).ToList();
+                        query = dataTableParameters.Order[0].Dir == "asc"
+                            ? query.OrderBy(p => p.Name)
+                            : query.OrderByDescending(p => p.Name);
                         break;
                     case 1:
-                        persons = dataTableParameters.Order[0].Dir == "asc"
-                            ? persons.OrderBy(p => p.EmployeeId).ToList()
-                            : persons.OrderByDescending(p => p.EmployeeId).ToList();
+                        query = dataTableParameters.Order[0].Dir == "asc"
+                            ? query.OrderBy(p => p.EmployeeId)
+                            : query.OrderByDescending(p => p.EmployeeId);
                         break;
                 }
             }
 
             //Selecting appropriate subset for return
-            string[][] result = persons
-                .Skip(dataTableParameters.Start)
-                .Take(dataTableParameters.Length)
-                .Select(p => new string[] { p.Name, p.EmployeeId })
-                .ToArray();
+            if (dataTableParameters.Start > 0)
+                query = query.Skip(dataTableParameters.Start);
+            if (dataTableParameters.Length >= 0)
+                query = query.Take(dataTableParameters.Length);
+
+
+            //string[][] result = query
+            //    .Select(p => new string[] { p.Name, p.EmployeeId })
+            //    .ToArray();
+
+            //var result = query
+            //     .Select(p => JsonConvert.SerializeObject(new { name = p.Name, employeeId = p.EmployeeId }))
+            //     .ToArray();
+
+            var result = query
+                 .Select(p => new { id = p.Id, name = p.Name, empId = p.EmployeeId })
+                 .ToArray();
 
             return new DataTableResponse()
             {

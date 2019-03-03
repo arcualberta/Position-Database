@@ -11,6 +11,7 @@ namespace PD.Models.AppViewModels.DataTables
         public long RecordsTotal { get; set; }
         public int RecordsFiltered { get; set; }
         public object[] Data { get; set; }
+        public string[] Id { get; set; }
         public string Error { get; set; }
     }
 
