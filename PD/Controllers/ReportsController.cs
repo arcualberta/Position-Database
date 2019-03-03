@@ -27,6 +27,19 @@ namespace PD.Controllers
             _reportService = reportService;
         }
 
+        public IActionResult People(/*PositionFilter filter*/)
+        {
+            //if (filter == null)
+            //    filter = new PositionFilter();
+
+            //IQueryable<PositionAssignment> positionAssignments = _reportService.GetPositionAssignments(filter);
+
+            //ViewBag.Filter = filter;
+            //ViewBag.DataProtector = _reportService._dataProtector;
+
+            return View();
+        }
+
         public IActionResult Positions(PositionFilter filter)
         {
             if (filter == null)
