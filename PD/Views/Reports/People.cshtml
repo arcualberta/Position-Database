@@ -1,21 +1,35 @@
-﻿
-<div id="employees" class="col-sm-6">
-    <h3>Employees</h3>
-
-    <table id="peopleTable" class="display" style="width:100%">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Employee Id</th>
-            </tr>
-        </thead>
-        @*<tfoot>
-            <tr>
-                <th>Name</th>
-                <th>Employee Id</th>
-            </tr>
-        </tfoot>*@
-    </table>
+﻿<h2>People</h2>
+<div id="peoplePanel" class="col-sm-6 pd-panel">
+    <div class="panel panel-default">
+        <div class="panel-heading">List of Employees</div>
+        <div class="panel-body">
+            <table id="peopleTable" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Employee Id</th>
+                    </tr>
+                </thead>
+                @*<tfoot>
+                    <tr>
+                        <th>Name</th>
+                        <th>Employee Id</th>
+                    </tr>
+                </tfoot>*@
+            </table>
+        </div>
+    </div>
+</div>
+<div id="personInfo" class="col-sm-6 pd-panel">
+    <div class="panel panel-default">
+        <div class="panel-heading">Employee Details</div>
+        <div class="panel-body">
+            <div id="init-message">Select an employee from the list.</div>
+            <div id="person-info">
+                <h4>Personal Info</h4>
+            </div>
+        </div>
+    </div>
 </div>
 <div class="clear"></div>
 <script>
@@ -56,9 +70,18 @@
         peopleTable.on('select', function (e, dt, type, indexes) {
             if (type === 'row') {
                 var id = peopleTable.rows(indexes).data().pluck('id')[0];
-                // do something with the ID of the selected items
                 console.log(id);
+
+
+                // do something with the ID of the selected items
             }
         });
-    });
+    }); //ENDS: $(function () { xxxx
+
+   // This method is invoked when a person is selected from the people table
+    function showPersonInfo(personId) {
+
+
+    }
+
 </script>
