@@ -22,11 +22,21 @@
 </div>
 <div id="personInfo" class="col-sm-6 pd-panel">
     <div class="panel panel-default">
-        <div class="panel-heading">Employee Details</div>
+        <div class="panel-heading">Position Details</div>
         <div class="panel-body">
             <div id="init-message">Select an employee from the list.</div>
-            <div id="person-info">
-                <h4>Personal Info</h4>
+            <div id="person-info" style="visibility:hidden">
+                <h4 id="personName"></h4>
+                <table id="positionAssignmentsTable" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Position</th>
+                            <th>Home Dept.</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
         </div>
     </div>
@@ -34,6 +44,7 @@
 <div class="clear"></div>
 <script>
     $(function () {
+
         // peopleTable - initialization
         $('#peopleTable').dataTable({
             select: {
@@ -47,7 +58,7 @@
             "scrollY": "400px",
             "scrollCollapse": true,
             ajax: {
-                url: '/api/People',
+                url: '/api/people',
                 type: "post",
                 contentType: "application/json",
                 data: function (d) {
@@ -63,24 +74,60 @@
                 { "data": "empId" }
             ],
             rowId: "id"
-        });
+        }); //ENDS: $('#peopleTable').dataTable({ xxx
 
         // peopleTable - on selection of a row
         var peopleTable = $('#peopleTable').DataTable();
         peopleTable.on('select', function (e, dt, type, indexes) {
             if (type === 'row') {
                 var id = peopleTable.rows(indexes).data().pluck('id')[0];
-                console.log(id);
+                var name = peopleTable.rows(indexes).data().pluck('name')[0]
+                //console.log(id);
 
-
+                $('#personInfo .panel-body #init-message').hide();
+                $('#personInfo .panel-body #personName').html(name);
+                $('#personInfo .panel-body #person-info').css({ 'visibility': '' });
                 // do something with the ID of the selected items
+                showPositionInfo(id)
             }
-        });
+        }); //ENDs: peopleTable.on('select, xxx
+
+
+        // positionAssignmentsTable - Initialization
+        $('#positionAssignmentsTable').dataTable({
+            paging: false,
+            searching: false,
+            processing: true,
+            serverSide: true,
+            info: false,
+            "deferLoading": 0, //Makes sure the ajax call is not made during initilization.
+            ajax: {
+                url: '',
+                type: "post",
+                contentType: "application/json",
+                data: function (d) {
+                    // note: d is created by datatable, the structure of d is the same with DataTableParameters model above
+                    //console.log(d);
+                    return JSON.stringify(d);
+                }
+                ////DEBUG: Enable the following "success" handler to show data on the console instead of on the table.
+                //, success: function (response) { console.log(response); res = response; }
+            },
+            "columns": [
+                { "data": "positionTitle" },
+                { "data": "primaryDepartment" },
+                { "data": "startDate" },
+                { "data": "endDate" }
+            ],
+            rowId: "id"
+        }); //ENDS: $('#positionAssignmentsTable').dataTable({ xxx
+
     }); //ENDS: $(function () { xxxx
 
    // This method is invoked when a person is selected from the people table
-    function showPersonInfo(personId) {
-
+    function showPositionInfo(personId) {
+        var table = $('#positionAssignmentsTable').DataTable();
+        table.ajax.url('/api/people/' + personId).load();
 
     }
 

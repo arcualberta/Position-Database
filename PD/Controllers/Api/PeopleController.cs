@@ -33,7 +33,6 @@ namespace PD.Controllers.Api
         ////[HttpPost]
         ////public async Task<ActionResult<IEnumerable<Person>>> GetPersons([FromBody] DataTableParameters dataTableParameters)
         ////{
-
         ////    return await _context.Persons.ToListAsync();
         ////}
 
@@ -89,15 +88,6 @@ namespace PD.Controllers.Api
             if (dataTableParameters.Length >= 0)
                 query = query.Take(dataTableParameters.Length);
 
-
-            //string[][] result = query
-            //    .Select(p => new string[] { p.Name, p.EmployeeId })
-            //    .ToArray();
-
-            //var result = query
-            //     .Select(p => JsonConvert.SerializeObject(new { name = p.Name, employeeId = p.EmployeeId }))
-            //     .ToArray();
-
             var result = query
                  .Select(p => new { id = p.Id, name = p.Name, empId = p.EmployeeId })
                  .ToArray();
@@ -112,18 +102,31 @@ namespace PD.Controllers.Api
         }
 
 
-        // GET: api/People/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Person>> GetPerson(int id)
+        // POST: api/People/5
+        [HttpPost("{id}")]
+        public async Task<ActionResult<DataTableResponse>> GetPerson(int id, [FromBody] DataTableParameters dataTableParameters)
         {
-            var person = await _context.Persons.FindAsync(id);
+            var positionAssignments = await _context.PositionAssignments
+                .Where(pa => pa.PersonId == id)
+                .Include(pa => pa.Position)
+                .Include(pa => pa.Compensations)
+                .Select(pa => new
+                {
+                    id = pa.Id,
+                    positionTitle = pa.Position.Title,
+                    primaryDepartment = pa.Position.PrimaryDepartment.Name,
+                    startDate = pa.StartDate,
+                    endDate = pa.EndDate
+                })
+                .ToArrayAsync();
 
-            if (person == null)
+            return new DataTableResponse()
             {
-                return NotFound();
-            }
-
-            return person;
+                Draw = dataTableParameters.Draw + 1,
+                RecordsTotal = positionAssignments.Count(),
+                RecordsFiltered = positionAssignments.Count(),
+                Data = positionAssignments
+            };
         }
 
         // PUT: api/People/5
