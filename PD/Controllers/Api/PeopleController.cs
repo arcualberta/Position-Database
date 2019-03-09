@@ -101,6 +101,19 @@ namespace PD.Controllers.Api
             };
         }
 
+        // GET: api/People/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PositionAssignment[]>> GetPerson(int id)
+        {
+            var positionAssignments = await _context.PositionAssignments
+                .Where(pa => pa.PersonId == id)
+                .Include(pa => pa.Position)
+                .Include(pa => pa.Compensations)
+                .Include(pa => pa.Position.PrimaryDepartment)
+                .ToArrayAsync();
+
+            return positionAssignments;
+        }
 
         // POST: api/People/5
         [HttpPost("{id}")]

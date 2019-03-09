@@ -58,7 +58,8 @@ namespace PD
 
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
-                ;
+                .AddJsonOptions(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore)
+                .AddJsonOptions(options => options.SerializerSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects);
 
             ////services.AddSingleton<IConfiguration>(Configuration);
 

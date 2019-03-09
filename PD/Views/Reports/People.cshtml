@@ -1,7 +1,11 @@
 ﻿<h2>People</h2>
+
+@*
+    Child rows in tables: https://datatables.net/examples/api/row_details.html
+*@
 <div id="peoplePanel" class="col-sm-6 pd-panel">
     <div class="panel panel-default">
-        <div class="panel-heading">List of Employees</div>
+        <div class="panel-heading">Employees</div>
         <div class="panel-body">
             <table id="peopleTable" class="display" style="width:100%">
                 <thead>
@@ -11,34 +15,18 @@
                     </tr>
                 </thead>
                 @*<tfoot>
-                    <tr>
-                        <th>Name</th>
-                        <th>Employee Id</th>
-                    </tr>
-                </tfoot>*@
+                        <tr>
+                            <th>Name</th>
+                            <th>Employee Id</th>
+                        </tr>
+                    </tfoot>*@
             </table>
         </div>
     </div>
 </div>
-<div id="personInfo" class="col-sm-6 pd-panel">
-    <div class="panel panel-default">
-        <div class="panel-heading">Position Details</div>
-        <div class="panel-body">
-            <div id="init-message">Select an employee from the list.</div>
-            <div id="person-info" style="visibility:hidden">
-                <h4 id="personName"></h4>
-                <table id="positionAssignmentsTable" class="display" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Position</th>
-                            <th>Home Dept.</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
-        </div>
+<div class="col-sm-6 pd-panel">
+    <h4 id="personDetailsHead">Select an employee from the list.</h4>
+    <div id="personInfo">
     </div>
 </div>
 <div class="clear"></div>
@@ -84,52 +72,137 @@
                 var name = peopleTable.rows(indexes).data().pluck('name')[0]
                 //console.log(id);
 
-                $('#personInfo .panel-body #init-message').hide();
-                $('#personInfo .panel-body #personName').html(name);
-                $('#personInfo .panel-body #person-info').css({ 'visibility': '' });
-                // do something with the ID of the selected items
-                showPositionInfo(id)
+                $('#personDetailsHead').html(name);
+
+                loadPositionInfo(id)
             }
         }); //ENDs: peopleTable.on('select, xxx
 
+        peopleTable.on('deselect', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                $('#personDetailsHead').html('Select an employee from the list.');
+                $('#personInfo').html('');
+            }
+        }); //ENDs: peopleTable.on('deselect, xxx
 
         // positionAssignmentsTable - Initialization
-        $('#positionAssignmentsTable').dataTable({
-            paging: false,
-            searching: false,
-            ordering: false,
-            processing: true,
-            serverSide: true,
-            info: false,
-            "deferLoading": 0, //Makes sure the ajax call is not made during initilization.
-            ajax: {
-                url: '',
-                type: "post",
-                contentType: "application/json",
-                data: function (d) {
-                    // note: d is created by datatable, the structure of d is the same with DataTableParameters model above
-                    //console.log(d);
-                    return JSON.stringify(d);
-                }
-                ////DEBUG: Enable the following "success" handler to show data on the console instead of on the table.
-                //, success: function (response) { console.log(response); res = response; }
-            },
-            "columns": [
-                { "data": "positionTitle" },
-                { "data": "primaryDepartment" },
-                { "data": "startDate" },
-                { "data": "endDate" }
-            ],
-            rowId: "id"
-        }); //ENDS: $('#positionAssignmentsTable').dataTable({ xxx
+        ////////$('#positionAssignmentsTable').dataTable({
+        ////////    paging: false,
+        ////////    searching: false,
+        ////////    ordering: false,
+        ////////    processing: true,
+        ////////    serverSide: true,
+        ////////    info: false,
+        ////////    "deferLoading": 0, //Makes sure the ajax call is not made during initilization.
+        ////////    ajax: {
+        ////////        url: '',
+        ////////        type: "post",
+        ////////        contentType: "application/json",
+        ////////        data: function (d) {
+        ////////            // note: d is created by datatable, the structure of d is the same with DataTableParameters model above
+        ////////            //console.log(d);
+        ////////            return JSON.stringify(d);
+        ////////        }
+        ////////        ////DEBUG: Enable the following "success" handler to show data on the console instead of on the table.
+        ////////        //, success: function (response) { console.log(response); res = response; }
+        ////////    },
+        ////////    "columns": [
+        ////////        { "data": "positionTitle" }
+        ////////    ],
+        ////////    rowId: "id",
+        ////////    "drawCallback": function (settings) { // Ref: https://datatables.net/reference/option/drawCallback
+        ////////        console.log(settings);
+        ////////    }
+        ////////}); //ENDS: $('#positionAssignmentsTable').dataTable({ xxx
+
+        ////////// positionAssignmentsTable - preDraw event
+        ////////// Ref: https://datatables.net/reference/event/preDraw#top
+        ////////var startTime;
+        ////////$('#positionAssignmentsTable').on('preDraw.dt', function (e, settings) {
+
+        ////////    startTime = new Date().getTime();
+        ////////}).on('draw.dt', function (e, settings) {
+        ////////    console.log('Redraw took at: ' + (new Date().getTime() - startTime) + 'mS');
+        ////////});
 
     }); //ENDS: $(function () { xxxx
 
-   // This method is invoked when a person is selected from the people table
-    function showPositionInfo(personId) {
-        var table = $('#positionAssignmentsTable').DataTable();
-        table.ajax.url('/api/people/' + personId).load();
+    // This method is invoked when a person is selected from the people table
+    function loadPositionInfo(personId) {
 
+        ////////var table = $('#positionAssignmentsTable').DataTable();
+        ////////table.ajax.url('/api/people/' + personId).load();
+
+        $.ajax({
+            url: '/api/people/' + personId,
+            type: "get",
+            contentType: "application/json",
+            dataType: "json",
+            success: function (data, status, jqXHR) {
+                showPositionInfo(data);
+            },
+            error: function (jqXHR, status, err) {
+                console.error(err);
+            },
+        });
     }
 
+    function showPositionInfo(data) {
+        $('#personInfo').html('');
+        $.each(data, function (idx, pos) {
+            var panel = createPositionPanel(pos);
+            $('#personInfo').append(panel);
+        });
+    }
+
+    function createPositionPanel(posAssignment) {
+        var panel = $('<div class="panel panel-default"></div>');
+        panel.attr('id', 'pa-' + posAssignment.id);
+
+        var panelHeading = $('<div class="panel-heading"><b>' + posAssignment.position.title + '</b> | ' + posAssignment.position.primaryDepartment.name + '</div>');
+        panel.append(panelHeading);
+
+        var panelBody = $('<div class="panel-body"></div>')
+        panel.append(panelBody);
+
+        $.each(posAssignment.compensations, function (idx, comp) {
+            var compPanel = createCompensationPanel(comp);
+            panelBody.append(compPanel);
+        });
+
+        return panel;
+    }
+
+
+    function createCompensationPanel(comp) {
+        var panel = $('<div class="panel panel-default"></div>');
+        panel.attr('id', 'pa-' + comp.id);
+
+        var compensationType = comp.$type;
+        compensationType = compensationType.substr(0, compensationType.lastIndexOf(','));
+        compensationType = compensationType.substr(compensationType.lastIndexOf('.') + 1);
+        var panelHeading = $('<div class="panel-heading"><b>' + compensationType + '</div>');
+        panel.append(panelHeading);
+
+        return panel;
+    }
 </script>
+
+
+
+@*<div class="panel panel-default">
+    <div class="panel-heading">Position Details</div>
+    <div class="panel-body">
+
+        <div id="person-info">
+
+            <table id="positionAssignmentsTable" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Position</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>*@
