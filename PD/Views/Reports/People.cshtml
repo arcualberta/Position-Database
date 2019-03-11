@@ -165,69 +165,123 @@
         var panelBody = $('<div class="panel-body"></div>')
         panel.append(panelBody);
 
+        var timeDelimitedGroups = [];
+
+        //Iterating through all compensations and creating a list of time-delimited panels. Each panel
+        //lists all compensation types applicable to that time interval along with their propoerty details.
         $.each(posAssignment.compensations, function (idx, comp) {
-            var compPanel = createCompensationPanel(comp);
-            panelBody.append(compPanel);
+            var start = comp.startDate == undefined ? "" : comp.startDate.substr(0, 10);
+            var stop = comp.endDate == undefined ? "" : comp.endDate.substr(0, 10);
+            var key = start + ' to ' + stop; //key used to uniquely identify a time-delimited panel
+            var yearRange = start.substr(0, 4) + ' - ' + stop.substr(0, 4);
+
+            //taking the correct time-delimited panel for this compensation object
+            var matchedCompensation = timeDelimitedGroups.find(x => x.interval === key)
+
+            //Creating a new panel and adding it to the array of panels if it hasn't been created yet.
+            if (matchedCompensation == undefined) {
+                matchedCompensation = { interval: key };
+                matchedCompensation.value = $('<div class="panel panel-default pd-inner-panel"></div>');
+                matchedCompensation.value.append($('<div class="panel-heading"><b>' + yearRange + '</b></div>'));
+                matchedCompensation.value.append($('<div class="panel-body"><div>Period: ' + key + '</div>'));
+                timeDelimitedGroups.push(matchedCompensation);
+            }
+
+            //Taking the body of the 
+            var container = $(matchedCompensation.value).children('.panel-body');
+
+            //Adding the information about the current compensation into the selected time-delimited panel.
+            var compensationType = comp.$type;
+            compensationType = compensationType.substr(0, compensationType.lastIndexOf(','));
+            compensationType = compensationType.substr(compensationType.lastIndexOf('.') + 1);
+            var indicator = comp.isProjection ? "<span style='color:red'>*</span>" : "";
+            switch (compensationType) {
+                case "Salary":
+                    container.append($('<div>Salary: $' + comp.value.toLocaleString("en") + indicator+ '</div>'));
+                    break;
+                case "Adjustment":
+                    container.append($('<div>' + comp.name + ': $' + comp.value.toLocaleString("en") + indicator + '</div>'));
+                    break;
+                case "ContractSettlement":
+                    container.append($('<div>ATB: $' + comp.value.toLocaleString("en") + indicator + '</div>'));
+                case "Merit":
+                    container.append($('<div>Merit Decision: ' + comp.meritDecision + indicator + '</div>'));
+                    container.append($('<div>Merit: $' + comp.value.toLocaleString("en") + indicator + '</div>'));
+                    break;
+                default:
+                    container.append($('<div>' + comp.name + ': $' + comp.value.toLocaleString("en") + indicator + '</div>'));
+                    break;
+            }
+
+//            var compPanel = createCompensationPanel(comp);
+//            panelBody.append(compPanel);
+        });
+
+        //Sorting time intervals in the reverse chronological order.
+        timeDelimitedGroups.sort((a, b) => (a.interval < b.interval) ? 1 : -1);
+
+        $.each(timeDelimitedGroups, function (key, item) {
+            panel.append(item.value);
         });
 
         return panel;
     }
 
 
-    function createCompensationPanel(comp) {
-        var panel = $('<div class="panel panel-default"></div>');
-        panel.attr('id', 'pa-' + comp.id);
+    ////function createCompensationPanel(comp) {
+    ////    var panel = $('<div class="panel panel-default"></div>');
+    ////    panel.attr('id', 'pa-' + comp.id);
 
-        //Creating compensation panel header
-        var compensationType = comp.$type;
-        compensationType = compensationType.substr(0, compensationType.lastIndexOf(','));
-        compensationType = compensationType.substr(compensationType.lastIndexOf('.') + 1);
-        var panelHeading = $('<div class="panel-heading"><b>' + compensationType + '</b></div>');
-        panel.append(panelHeading);
+    ////    //Creating compensation panel header
+    ////    var compensationType = comp.$type;
+    ////    compensationType = compensationType.substr(0, compensationType.lastIndexOf(','));
+    ////    compensationType = compensationType.substr(compensationType.lastIndexOf('.') + 1);
+    ////    var panelHeading = $('<div class="panel-heading"><b>' + compensationType + '</b></div>');
+    ////    panel.append(panelHeading);
 
-        //Creating compensation panel body
-        var compDetails = $('<div class="panel-body error"></div>');
-        panel.append(compDetails);
+    ////    //Creating compensation panel body
+    ////    var compDetails = $('<div class="panel-body error"></div>');
+    ////    panel.append(compDetails);
 
-        var startDate = $('<div>Start Date: ' + comp.startDate + '</div>');
-        compDetails.append(startDate);
+    ////    var startDate = $('<div>Start Date: ' + comp.startDate + '</div>');
+    ////    compDetails.append(startDate);
 
-        var endDate = $('<div>End Date: ' + comp.endDate + '</div>');
-        compDetails.append(endDate);
+    ////    var endDate = $('<div>End Date: ' + comp.endDate + '</div>');
+    ////    compDetails.append(endDate);
 
-        var value;
+    ////    var value;
 
-        switch (compensationType) {
-            case "Salary":
-                value = $('<div>Salary: ' + comp.value + '</div>');
-                compDetails.append(value);
-                break;
-            case "Adjustment":
-                value = $('<div>' + comp.name + ': ' + comp.value + '</div>');
-                compDetails.append(value);
-                break;
-            case "ContractSettlement":
-                value = $('<div>ATB: ' + comp.value + '</div>');
-                compDetails.append(value);
-                break;
-            case "Merit":
-                value = $('<div>Merit: ' + comp.value + '</div>');
-                compDetails.append(value);
-                break;
-            default:
-                compDetails = $('<div class="panel-body error">Unknown compensation type: ' + compensationType + '</div>');
-                break;
-        }
+    ////    switch (compensationType) {
+    ////        case "Salary":
+    ////            value = $('<div>Salary: ' + comp.value + '</div>');
+    ////            compDetails.append(value);
+    ////            break;
+    ////        case "Adjustment":
+    ////            value = $('<div>' + comp.name + ': ' + comp.value + '</div>');
+    ////            compDetails.append(value);
+    ////            break;
+    ////        case "ContractSettlement":
+    ////            value = $('<div>ATB: ' + comp.value + '</div>');
+    ////            compDetails.append(value);
+    ////            break;
+    ////        case "Merit":
+    ////            value = $('<div>Merit: ' + comp.value + '</div>');
+    ////            compDetails.append(value);
+    ////            break;
+    ////        default:
+    ////            compDetails = $('<div class="panel-body error">Unknown compensation type: ' + compensationType + '</div>');
+    ////            break;
+    ////    }
 
-        compDetails.append(value);
+    ////    compDetails.append(value);
 
-        if (comp.notes != undefined && comp.notes != "") {
-            var amount = $('<div>Notes: ' + comp.notes + '</div>');
-            compDetails.append(amount);
-        }
+    ////    if (comp.notes != undefined && comp.notes != "") {
+    ////        var amount = $('<div>Notes: ' + comp.notes + '</div>');
+    ////        compDetails.append(amount);
+    ////    }
 
-        return panel;
-    }
+    ////    return panel;
+    ////}
 
 </script>
 

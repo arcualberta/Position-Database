@@ -76,6 +76,10 @@ div.clear{
     margin: 10px 0;
 }
 
+.pd-inner-panel {
+    margin-left: 10px;
+    margin-right: 10px;
+}
 /*Table formatting*/
 /*
 .fixed_header {
