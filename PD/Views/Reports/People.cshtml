@@ -178,14 +178,57 @@
         var panel = $('<div class="panel panel-default"></div>');
         panel.attr('id', 'pa-' + comp.id);
 
+        //Creating compensation panel header
         var compensationType = comp.$type;
         compensationType = compensationType.substr(0, compensationType.lastIndexOf(','));
         compensationType = compensationType.substr(compensationType.lastIndexOf('.') + 1);
-        var panelHeading = $('<div class="panel-heading"><b>' + compensationType + '</div>');
+        var panelHeading = $('<div class="panel-heading"><b>' + compensationType + '</b></div>');
         panel.append(panelHeading);
+
+        //Creating compensation panel body
+        var compDetails = $('<div class="panel-body error"></div>');
+        panel.append(compDetails);
+
+        var startDate = $('<div>Start Date: ' + comp.startDate + '</div>');
+        compDetails.append(startDate);
+
+        var endDate = $('<div>End Date: ' + comp.endDate + '</div>');
+        compDetails.append(endDate);
+
+        var value;
+
+        switch (compensationType) {
+            case "Salary":
+                value = $('<div>Salary: ' + comp.value + '</div>');
+                compDetails.append(value);
+                break;
+            case "Adjustment":
+                value = $('<div>' + comp.name + ': ' + comp.value + '</div>');
+                compDetails.append(value);
+                break;
+            case "ContractSettlement":
+                value = $('<div>ATB: ' + comp.value + '</div>');
+                compDetails.append(value);
+                break;
+            case "Merit":
+                value = $('<div>Merit: ' + comp.value + '</div>');
+                compDetails.append(value);
+                break;
+            default:
+                compDetails = $('<div class="panel-body error">Unknown compensation type: ' + compensationType + '</div>');
+                break;
+        }
+
+        compDetails.append(value);
+
+        if (comp.notes != undefined && comp.notes != "") {
+            var amount = $('<div>Notes: ' + comp.notes + '</div>');
+            compDetails.append(amount);
+        }
 
         return panel;
     }
+
 </script>
 
 
