@@ -30,6 +30,9 @@ namespace PD.Models.SalaryScales
         [Display(Name = "Default Merit Decision")]
         public decimal DefaultMeritDecision { get; set; }
 
+        [Display(Name = "Is Projection?")]
+        public bool IsProjection { get; set; }
+
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
     }

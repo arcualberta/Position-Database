@@ -38,7 +38,7 @@ namespace PD.Services.Projections.Rules.ContractSettlementComputations
                     {
                         StartDate = startDate,
                         EndDate = startDate.AddYears(1).AddDays(-1),
-                        IsProjection = true,
+                        IsProjection = scale.IsProjection,
                         Notes = string.Format("Projected on {0}", DateTime.Now)
                     };
                     pa.Compensations.Add(atb);
