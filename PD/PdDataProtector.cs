@@ -38,6 +38,9 @@ namespace PD
 
         public string Encrypt(string value)
         {
+            return value;
+
+
             //////Reference: https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/consumer-apis/dangerous-unprotect?view=aspnetcore-2.2
             ////var persistedProtector = _protector as IPersistedDataProtector;
             ////string protectedValue = persistedProtector.Protect(value);
@@ -48,6 +51,9 @@ namespace PD
 
         public string Decrypt(string value)
         {
+            return value;
+
+
             //////Reference: https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/consumer-apis/dangerous-unprotect?view=aspnetcore-2.2
             ////var persistedProtector = _protector as IPersistedDataProtector;
             ////byte[] protectedBytes = Encoding.ASCII.GetBytes(value);

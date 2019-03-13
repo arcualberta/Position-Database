@@ -36,24 +36,27 @@ namespace PD.Services.Projections.Rules
 
                 pa.LogInfo("Aggregating base salary components.", pa.GetCycleYearRange(targetDate), true);
 
-                Salary salary = pa.GetCompensation<Salary>(targetDate, true);
+                Salary salary = pa.GetCompensation<Salary>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
+
                 if (salary == null)
                 {
                     DateTime startDate = pa.GetCycleStartDate(targetDate);
                     salary = new Salary()
                     {
                         StartDate = startDate,
-                        EndDate = startDate.AddYears(1).AddDays(-1),
-                        IsProjection = true,
-                        Notes = string.Format("Projected on {0}", DateTime.Now.ToString())
+                        EndDate = startDate.AddYears(1).AddDays(-1)
                     };
                     pa.Compensations.Add(salary);
                 }
 
                 salary.Value = pastSalary.Value + merit.Value + atb.Value;
+                salary.IsProjection = pastSalary.IsProjection || merit.IsProjection || atb.IsProjection;
 
                 foreach (Adjustment adj in adjustments)
+                {
                     salary.Value += adj.Value;
+                    salary.IsProjection |= adj.IsProjection;
+                }
 
                 salary.Value = Math.Round(salary.Value);
                 pa.LogInfo("Aggregated salary: $" + salary.Value, pa.GetCycleYearRange(targetDate), true);

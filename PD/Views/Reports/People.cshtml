@@ -197,13 +197,17 @@
             var indicator = comp.isProjection ? "<span style='color:red'>*</span>" : "";
             switch (compensationType) {
                 case "Salary":
-                    container.append($('<div>Salary: $' + comp.value.toLocaleString("en") + indicator+ '</div>'));
+                    container.append($('<div>Salary: $' + comp.value.toLocaleString("en") + indicator + '</div>'));
+                    if (comp.manualOverride > 0) {
+                        container.append($('<div>Salary Override: $' + comp.manualOverride.toLocaleString("en") + '</div>'));
+                    }
                     break;
                 case "Adjustment":
                     container.append($('<div>' + comp.name + ': $' + comp.value.toLocaleString("en") + indicator + '</div>'));
                     break;
                 case "ContractSettlement":
                     container.append($('<div>ATB: $' + comp.value.toLocaleString("en") + indicator + '</div>'));
+                    break;
                 case "Merit":
                     container.append($('<div>Merit Decision: ' + comp.meritDecision + indicator + '</div>'));
                     container.append($('<div>Merit: $' + comp.value.toLocaleString("en") + indicator + '</div>'));

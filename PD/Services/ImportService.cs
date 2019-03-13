@@ -498,7 +498,7 @@ namespace PD.Services
                         {
                             salary = new Salary()
                             {
-                                Value = empl.Salary.NextSalary,
+                                ManualOverride = empl.Salary.NextSalary,
                                 StartDate = nextYearStartDate,
                                 EndDate = nextYearEndDate,
                                 IsProjection = false
