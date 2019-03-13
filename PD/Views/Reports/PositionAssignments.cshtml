@@ -96,11 +96,9 @@
                 var atbVal = item.GetCompensation<ContractSettlement>(filter.Date, true);
                 string atb = atbVal != null ? atbVal.Value.ToString("N") : "";
 
-                var projectedBaseSalary = item.GetCompensation<Salary>(filter.Date, true);
-                string projectedBaseSalaryVal = projectedBaseSalary != null && projectedBaseSalary.Value > 0 ? projectedBaseSalary.Value.ToString("N") : "";
-
-                var actualBaseSalary = item.GetCompensation<Salary>(filter.Date, false);
-                string actualBaseSalaryVal = actualBaseSalary != null ? actualBaseSalary.Value.ToString("N") : "";
+                var salary = item.GetCompensation<Salary>(filter.Date, false);
+                string projectedBaseSalaryVal = salary != null && salary.Value > 0 ? salary.Value.ToString("N") : "";
+                string actualBaseSalaryVal = salary != null && salary.ManualOverride > 0 ? salary.ManualOverride.ToString("N") : "";
 
                 var merit = item.GetCompensation<Merit>(filter.Date, false);
                 string meritIncrement = merit != null ? merit.Value.ToString("N") : "";
@@ -109,7 +107,7 @@
                 var specialAdjustments = item.GetAdjustments(filter.Date, true).Select(adj => adj.Value.ToString("N"));
                 string specialAdjustmentsVal = string.Join(", ", specialAdjustments);
 
-                string specialStyles = projectedBaseSalary != null && projectedBaseSalary.IsMaxed ? "color:green;font-weight:bold;" : "";
+                string specialStyles = salary != null && salary.IsMaxed ? "color:green;font-weight:bold;" : "";
 
                 List<string> issues = item.AuditTrail.Where(au => au.AuditType == AuditRecord.eAuditRecordType.Error || au.AuditType == AuditRecord.eAuditRecordType.Warning)
                     .Select(au => au.Message).ToList();
@@ -123,7 +121,7 @@
                 }
                 else if (projectedBaseSalaryVal != actualBaseSalaryVal)
                 {
-                    if (Math.Abs(projectedBaseSalary.Value - actualBaseSalary.Value) <= 5)
+                    if (Math.Abs(salary.Value - salary.ManualOverride) <= 5)
                     {
                         alertClass = "alert alert-warning";
                     }
