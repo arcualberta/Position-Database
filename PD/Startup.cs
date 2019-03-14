@@ -129,7 +129,7 @@ namespace PD
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Reports}/{action=Index}/{id?}");
             });
 
 

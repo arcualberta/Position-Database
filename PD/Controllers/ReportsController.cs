@@ -27,6 +27,12 @@ namespace PD.Controllers
             _reportService = reportService;
         }
 
+        public IActionResult Index()
+        {
+
+            return View();
+        }
+
         public IActionResult People(/*PositionFilter filter*/)
         {
             //if (filter == null)
