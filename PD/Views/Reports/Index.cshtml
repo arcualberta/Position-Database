@@ -1,42 +1,159 @@
 ﻿
-<canvas id="myChart" width="400" height="200"></canvas>
-
+<div style="width:75%;">
+    <canvas id="canvas"></canvas>
+</div>
 <script>
-var ctx = document.getElementById("myChart").getContext('2d');
-var myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-        datasets: [{
-            label: '# of Votes',
-            data: [12, 19, 3, 5, 2, 3],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero:true
-                }
-            }]
-        }
+    $(function () {
+        loadBudgetInfo('2015-07-01', '2019-06-30', 6);
+    });
+
+    function loadBudgetInfo(from, to, stepInMonths, deptId) {
+        $.ajax({
+            url: '/api/budget/?from=' + from + '&to=' + to + '&stepInMonths=' + stepInMonths + '&deptId=' + deptId,
+            type: "get",
+            contentType: "application/json",
+            dataType: "json",
+            success: function (data, status, jqXHR) {
+                plotBudget(data);
+            },
+            error: function (jqXHR, status, err) {
+                console.error(err);
+            },
+        });
     }
-});
+
+    function plotBudget(data) {
+        var n = data.length;
+        var budget = data.map(x => x.budget);
+        var positionCount = data.map(x => x.positionCount);
+        var xLabels = data.map(x => x.date.substr(0, 10));
+
+        var lineChartData = {
+            labels: xLabels,
+            datasets: [{
+                label: 'Budget',
+                borderColor: window.chartColors.red,
+                backgroundColor: window.chartColors.red,
+                fill: false,
+                steppedLine: true,
+                data: budget,
+                yAxisID: 'y-axis-1',
+            }, {
+                label: 'Active Position Count',
+                borderColor: window.chartColors.blue,
+                backgroundColor: window.chartColors.blue,
+                fill: false,
+                steppedLine: true,
+                data: positionCount,
+                yAxisID: 'y-axis-2'
+            }]
+        };
+
+
+        var ctx = document.getElementById('canvas').getContext('2d');
+        window.myLine = Chart.Line(ctx, {
+            data: lineChartData,
+            options: {
+                responsive: true,
+                hoverMode: 'index',
+                stacked: false,
+                title: {
+                    display: true,
+                    text: 'Chart.js Line Chart - Multi Axis'
+                },
+                scales: {
+                    yAxes: [{
+                        type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                        display: true,
+                        position: 'left',
+                        id: 'y-axis-1',
+                    }, {
+                        type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                        display: true,
+                        position: 'right',
+                        id: 'y-axis-2',
+
+                        // grid line settings
+                        gridLines: {
+                            drawOnChartArea: false, // only want the grid lines for one axis to show up
+                        },
+                    }],
+                }
+            }
+        })
+    }
+
+    ////var lineChartData = {
+    ////    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+    ////    datasets: [{
+    ////        label: 'My First dataset',
+    ////        borderColor: window.chartColors.red,
+    ////        backgroundColor: window.chartColors.red,
+    ////        fill: false,
+    ////        steppedLine: true,
+    ////        data: [
+    ////            randomScalingFactor(),
+    ////            randomScalingFactor(),
+    ////            randomScalingFactor(),
+    ////            randomScalingFactor(),
+    ////            randomScalingFactor(),
+    ////            randomScalingFactor(),
+    ////            randomScalingFactor()
+    ////        ],
+    ////        yAxisID: 'y-axis-1',
+    ////    }, {
+    ////        label: 'My Second dataset',
+    ////        borderColor: window.chartColors.blue,
+    ////        backgroundColor: window.chartColors.blue,
+    ////        fill: false,
+    ////        steppedLine: true,
+    ////        data: [
+    ////            randomScalingFactor(),
+    ////            randomScalingFactor(),
+    ////            randomScalingFactor(),
+    ////            randomScalingFactor(),
+    ////            randomScalingFactor(),
+    ////            randomScalingFactor(),
+    ////            randomScalingFactor()
+    ////        ],
+    ////        yAxisID: 'y-axis-2'
+    ////    }]
+    ////};
+
+    ////window.onload = function () {
+    ////    var ctx = document.getElementById('canvas').getContext('2d');
+    ////    window.myLine = Chart.Line(ctx, {
+    ////        data: lineChartData,
+    ////        options: {
+    ////            responsive: true,
+    ////            hoverMode: 'index',
+    ////            stacked: false,
+    ////            title: {
+    ////                display: true,
+    ////                text: 'Chart.js Line Chart - Multi Axis'
+    ////            },
+    ////            scales: {
+    ////                yAxes: [{
+    ////                    type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+    ////                    display: true,
+    ////                    position: 'left',
+    ////                    id: 'y-axis-1',
+    ////                }, {
+    ////                    type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+    ////                    display: true,
+    ////                    position: 'right',
+    ////                    id: 'y-axis-2',
+
+    ////                    // grid line settings
+    ////                    gridLines: {
+    ////                        drawOnChartArea: false, // only want the grid lines for one axis to show up
+    ////                    },
+    ////                }],
+    ////            }
+    ////        }
+    ////    });
+    ////};
+
+
 </script>
+
