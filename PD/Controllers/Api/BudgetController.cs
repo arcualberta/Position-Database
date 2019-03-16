@@ -25,7 +25,7 @@ namespace PD.Controllers.Api
 
         // GET: api/People/5
         [HttpGet]
-        public async Task<ActionResult<BudgetSummary[]>> Index(DateTime from, DateTime to, int stepInMonths = 1, int? deptId)
+        public async Task<ActionResult<BudgetSummary[]>> Index(DateTime from, DateTime to, int stepInMonths = 1, int? deptId = null)
         {
             int numDataPoints = (int) Math.Ceiling((double) ((to - from).Days / (stepInMonths * 30)));
             List<BudgetSummary> ret = new List<BudgetSummary>(numDataPoints);
@@ -41,14 +41,17 @@ namespace PD.Controllers.Api
                                       )
                           );
 
+                if (deptId.HasValue)
+                    compensations = compensations.Where(comp => comp.PositionAssignment.Position.PrimaryDepartmentId == deptId);
                 var x = compensations.ToList();
+                decimal budget = await compensations.Select(c => c.Value).SumAsync();
+                int positionCount = await compensations.Select(c => c.PositionAssignment.Id).Distinct().CountAsync();
                 BudgetSummary budgetSummary = new BudgetSummary()
                 {
                     Date = t,
-                    Budget = await compensations.Select(c => c.Value).SumAsync(),
-                    PositionCount = await compensations.Select(c => c.PositionAssignment.Id).Distinct().CountAsync()
+                    Budget = budget > 0 ? budget : (decimal?)null,
+                    PositionCount = positionCount > 0 ? positionCount : (int?)null
                 };
-
                 ret.Add(budgetSummary);
             }
             

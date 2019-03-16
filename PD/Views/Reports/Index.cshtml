@@ -8,6 +8,9 @@
     });
 
     function loadBudgetInfo(from, to, stepInMonths, deptId) {
+        if (deptId == undefined)
+            deptId = "";
+
         $.ajax({
             url: '/api/budget/?from=' + from + '&to=' + to + '&stepInMonths=' + stepInMonths + '&deptId=' + deptId,
             type: "get",
@@ -37,7 +40,7 @@
                 fill: false,
                 steppedLine: true,
                 data: budget,
-                yAxisID: 'y-axis-1',
+                yAxisID: 'y-axis-1'
             }, {
                 label: 'Active Position Count',
                 borderColor: window.chartColors.blue,
@@ -61,12 +64,47 @@
                     display: true,
                     text: 'Chart.js Line Chart - Multi Axis'
                 },
+                tooltips: {
+                    callbacks: {
+                        label: function (tooltipItem, data) {
+                            var tips = [];
+                            var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+
+                            if (tooltipItem.datasetIndex == 0) {
+                                //This is the budget data
+
+                                label += currencyString(tooltipItem.yLabel);
+                                tips.push(label);
+                                if (tooltipItem.index > 0) {
+                                    budgetVals = data.datasets[0].data;
+                                    var diff = Math.round(budgetVals[tooltipItem.index] - budgetVals[tooltipItem.index - 1]);
+                                    if (diff > 0)
+                                        tips.push("Difference: " + currencyString(diff));
+                                }
+                            }
+                            else {
+                                label += tooltipItem.yLabel;
+                                tips.push(label);
+                            }
+                            return tips;
+                        }
+                    }
+                },
                 scales: {
                     yAxes: [{
                         type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
                         display: true,
                         position: 'left',
                         id: 'y-axis-1',
+                        ticks: {
+                            // Include a dollar sign and group by thouands in the ticks
+                            callback: function (value, index, values) {
+                                return currencyString(value);
+                            }
+                        }
                     }, {
                         type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
                         display: true,
@@ -83,77 +121,8 @@
         })
     }
 
-    ////var lineChartData = {
-    ////    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-    ////    datasets: [{
-    ////        label: 'My First dataset',
-    ////        borderColor: window.chartColors.red,
-    ////        backgroundColor: window.chartColors.red,
-    ////        fill: false,
-    ////        steppedLine: true,
-    ////        data: [
-    ////            randomScalingFactor(),
-    ////            randomScalingFactor(),
-    ////            randomScalingFactor(),
-    ////            randomScalingFactor(),
-    ////            randomScalingFactor(),
-    ////            randomScalingFactor(),
-    ////            randomScalingFactor()
-    ////        ],
-    ////        yAxisID: 'y-axis-1',
-    ////    }, {
-    ////        label: 'My Second dataset',
-    ////        borderColor: window.chartColors.blue,
-    ////        backgroundColor: window.chartColors.blue,
-    ////        fill: false,
-    ////        steppedLine: true,
-    ////        data: [
-    ////            randomScalingFactor(),
-    ////            randomScalingFactor(),
-    ////            randomScalingFactor(),
-    ////            randomScalingFactor(),
-    ////            randomScalingFactor(),
-    ////            randomScalingFactor(),
-    ////            randomScalingFactor()
-    ////        ],
-    ////        yAxisID: 'y-axis-2'
-    ////    }]
-    ////};
-
-    ////window.onload = function () {
-    ////    var ctx = document.getElementById('canvas').getContext('2d');
-    ////    window.myLine = Chart.Line(ctx, {
-    ////        data: lineChartData,
-    ////        options: {
-    ////            responsive: true,
-    ////            hoverMode: 'index',
-    ////            stacked: false,
-    ////            title: {
-    ////                display: true,
-    ////                text: 'Chart.js Line Chart - Multi Axis'
-    ////            },
-    ////            scales: {
-    ////                yAxes: [{
-    ////                    type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-    ////                    display: true,
-    ////                    position: 'left',
-    ////                    id: 'y-axis-1',
-    ////                }, {
-    ////                    type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-    ////                    display: true,
-    ////                    position: 'right',
-    ////                    id: 'y-axis-2',
-
-    ////                    // grid line settings
-    ////                    gridLines: {
-    ////                        drawOnChartArea: false, // only want the grid lines for one axis to show up
-    ////                    },
-    ////                }],
-    ////            }
-    ////        }
-    ////    });
-    ////};
-
-
+    function currencyString(value) {
+        return (value < 0 ? '-$' : '$') + Math.abs(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
 </script>
 
