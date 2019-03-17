@@ -171,13 +171,12 @@ namespace PD.Models
             AuditTrail.Add(record);
         }
 
-        public void LogWarning(string message, string salaryCycle, bool isProjectionLog)
+        public void LogWarning(string message, string salaryCycle)
         {
             AuditRecord record = new AuditRecord(AuditRecord.eAuditRecordType.Warning)
             {
                 Message = message,
-                SalaryCycle = salaryCycle,
-                IsProjectionLog = isProjectionLog
+                SalaryCycle = salaryCycle
             };
             AuditTrail.Add(record);
         }

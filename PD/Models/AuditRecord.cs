@@ -15,7 +15,6 @@ namespace PD.Models
         public DateTime Timestamp { get; set; } = DateTime.Now;
         public string Message { get; set; }
         public eAuditRecordType AuditType { get; set; }
-        public bool IsProjectionLog { get; set; } = false;
         public string SalaryCycle { get; set; }
 
 

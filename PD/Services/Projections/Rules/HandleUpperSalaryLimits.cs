@@ -88,7 +88,7 @@ namespace PD.Services.Projections.Rules
 
                 //If we still have excess, then we will report it as a warning.
                 if (excess > 0m)
-                    pa.LogWarning("Overpaid beyond the max salary limit for the scale!", pa.GetCycleYearRange(targetDate), true);
+                    pa.LogWarning("Overpaid beyond the max salary limit for the scale!", pa.GetCycleYearRange(targetDate));
 
                 return true;
 
