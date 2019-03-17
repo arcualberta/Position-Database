@@ -111,7 +111,7 @@ namespace PD.Services.Projections.Rules
             }
             catch (Exception ex)
             {
-                pa.LogError(ex.Message, pa.GetCycleYearRange(promotionStartDate), true);
+                pa.LogError(ex.Message, pa.GetCycleYearRange(promotionStartDate));
                 return false;
             }
         }

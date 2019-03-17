@@ -161,13 +161,12 @@ namespace PD.Models
                 : string.Format("{0}-{1}", cycleStartDate.Year.ToString(), (cycleStartDate.Year + 1).ToString());
         }
 
-        public void LogError(string message, string salaryCycle, bool isProjectionLog)
+        public void LogError(string message, string salaryCycle)
         {
             AuditRecord record = new AuditRecord(AuditRecord.eAuditRecordType.Error)
             {
                 Message = message,
-                SalaryCycle = salaryCycle,
-                IsProjectionLog = isProjectionLog
+                SalaryCycle = salaryCycle
             };
             AuditTrail.Add(record);
         }
