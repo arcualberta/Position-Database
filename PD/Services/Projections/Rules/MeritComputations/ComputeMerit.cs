@@ -12,8 +12,8 @@ namespace PD.Services.Projections.Rules.MeritComputations
 {
     public class ComputeMerit : AbstractProjectionRule
     {
-        public ComputeMerit(ApplicationDbContext db)
-            : base(db, "Compute Merit", "This rule computes the standard merit based on the merit decision, merit step and the position workload.")
+        public ComputeMerit(ApplicationDbContext db, IPdDataProtector dp)
+            : base(db, dp, "Compute Merit", "This rule computes the standard merit based on the merit decision, merit step and the position workload.")
         {
 
         }

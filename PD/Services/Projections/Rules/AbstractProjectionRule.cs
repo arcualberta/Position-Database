@@ -18,13 +18,17 @@ namespace PD.Services.Projections.Rules
 
         public ApplicationDbContext Db { get; set; }
 
+        public IPdDataProtector Dp { get; set; }
+
+
         public abstract bool Execute(ref PositionAssignment pa, DateTime targetDate);
 
-        public AbstractProjectionRule(ApplicationDbContext db, string name, string description)
+        public AbstractProjectionRule(ApplicationDbContext db, IPdDataProtector dp, string name, string description)
         {
             Name = name;
             Description = description;
             Db = db;
+            Dp = dp;
         }
 
         public SalaryScale GetSalaryScale(string positionTitle, DateTime targetDate)

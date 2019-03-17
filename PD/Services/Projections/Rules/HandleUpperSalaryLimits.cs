@@ -12,8 +12,8 @@ namespace PD.Services.Projections.Rules
 {
     public class HandleUpperSalaryLimits : AbstractProjectionRule
     {
-        public HandleUpperSalaryLimits(ApplicationDbContext db)
-            : base(db, "Handle upper salary limits", "")
+        public HandleUpperSalaryLimits(ApplicationDbContext db, IPdDataProtector dp)
+            : base(db, dp, "Handle upper salary limits", "")
         {
         }
 

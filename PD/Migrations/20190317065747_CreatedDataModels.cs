@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PD.Migrations
 {
-    public partial class CreatingDataModels : Migration
+    public partial class CreatedDataModels : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -75,6 +75,20 @@ namespace PD.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "HangFireJobs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    JobKey = table.Column<string>(nullable: true),
+                    JobId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_HangFireJobs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Persons",
                 columns: table => new
                 {
@@ -82,31 +96,12 @@ namespace PD.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: true),
                     EmployeeId = table.Column<string>(nullable: true),
-                    BirthDate = table.Column<DateTime>(nullable: true)
+                    BirthDate = table.Column<DateTime>(nullable: true),
+                    Hash = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Persons", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Positions",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Number = table.Column<string>(nullable: true),
-                    Title = table.Column<string>(nullable: true),
-                    Description = table.Column<string>(nullable: true),
-                    Workload = table.Column<decimal>(type: "decimal(19, 5)", nullable: false),
-                    ContractType = table.Column<int>(nullable: false),
-                    StartDate = table.Column<DateTime>(nullable: true),
-                    EndDate = table.Column<DateTime>(nullable: true),
-                    Discriminator = table.Column<string>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Positions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -135,6 +130,7 @@ namespace PD.Migrations
                     StepValue = table.Column<decimal>(type: "decimal(19, 5)", nullable: false),
                     ContractSettlement = table.Column<decimal>(type: "decimal(19, 5)", nullable: false),
                     DefaultMeritDecision = table.Column<decimal>(type: "decimal(19, 5)", nullable: false),
+                    IsProjection = table.Column<bool>(nullable: false),
                     StartDate = table.Column<DateTime>(nullable: true),
                     EndDate = table.Column<DateTime>(nullable: true),
                     Discriminator = table.Column<string>(nullable: false)
@@ -203,8 +199,8 @@ namespace PD.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(maxLength:128, nullable: false),
-                    ProviderKey = table.Column<string>(maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(nullable: false),
+                    ProviderKey = table.Column<string>(nullable: false),
                     ProviderDisplayName = table.Column<string>(nullable: true),
                     UserId = table.Column<string>(nullable: false)
                 },
@@ -247,9 +243,9 @@ namespace PD.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(maxLength: 128, nullable: false),
-                    LoginProvider = table.Column<string>(maxLength: 128, nullable: false),
-                    Name = table.Column<string>(maxLength: 128, nullable: false),
+                    UserId = table.Column<string>(nullable: false),
+                    LoginProvider = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(nullable: false),
                     Value = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -280,6 +276,57 @@ namespace PD.Migrations
                         name: "FK_ChartFields_Departments_DepartmentId",
                         column: x => x.DepartmentId,
                         principalTable: "Departments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Positions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Number = table.Column<string>(nullable: true),
+                    Title = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
+                    PrimaryDepartmentId = table.Column<int>(nullable: true),
+                    Workload = table.Column<decimal>(type: "decimal(19, 5)", nullable: false),
+                    ContractType = table.Column<int>(nullable: false),
+                    StartDate = table.Column<DateTime>(nullable: true),
+                    EndDate = table.Column<DateTime>(nullable: true),
+                    Discriminator = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Positions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Positions_Departments_PrimaryDepartmentId",
+                        column: x => x.PrimaryDepartmentId,
+                        principalTable: "Departments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ChartField2ChartStringJoins",
+                columns: table => new
+                {
+                    ChartStringId = table.Column<int>(nullable: false),
+                    ChartFieldId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChartField2ChartStringJoins", x => new { x.ChartFieldId, x.ChartStringId });
+                    table.ForeignKey(
+                        name: "FK_ChartField2ChartStringJoins_ChartFields_ChartFieldId",
+                        column: x => x.ChartFieldId,
+                        principalTable: "ChartFields",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ChartField2ChartStringJoins_ChartStrings_ChartStringId",
+                        column: x => x.ChartStringId,
+                        principalTable: "ChartStrings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -326,7 +373,8 @@ namespace PD.Migrations
                     SalaryCycleStartDay = table.Column<int>(nullable: false),
                     PositionId = table.Column<int>(nullable: true),
                     PersonId = table.Column<int>(nullable: true),
-                    PredecessorId = table.Column<int>(nullable: true)
+                    PredecessorId = table.Column<int>(nullable: true),
+                    SucccessorId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -352,30 +400,6 @@ namespace PD.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ChartField2ChartStringJoins",
-                columns: table => new
-                {
-                    ChartStringId = table.Column<int>(nullable: false),
-                    ChartFieldId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ChartField2ChartStringJoins", x => new { x.ChartFieldId, x.ChartStringId });
-                    table.ForeignKey(
-                        name: "FK_ChartField2ChartStringJoins_ChartFields_ChartFieldId",
-                        column: x => x.ChartFieldId,
-                        principalTable: "ChartFields",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ChartField2ChartStringJoins_ChartStrings_ChartStringId",
-                        column: x => x.ChartStringId,
-                        principalTable: "ChartStrings",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AuditTrail",
                 columns: table => new
                 {
@@ -385,7 +409,6 @@ namespace PD.Migrations
                     Timestamp = table.Column<DateTime>(nullable: false),
                     Message = table.Column<string>(nullable: true),
                     AuditType = table.Column<int>(nullable: false),
-                    IsProjectionLog = table.Column<bool>(nullable: false),
                     SalaryCycle = table.Column<string>(nullable: true),
                     PositionAssignmentId = table.Column<int>(nullable: true)
                 },
@@ -407,8 +430,9 @@ namespace PD.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Value = table.Column<decimal>(type: "decimal(19, 5)", nullable: false),
+                    ManualOverride = table.Column<decimal>(nullable: true),
                     StartDate = table.Column<DateTime>(nullable: false),
-                    EndDate = table.Column<DateTime>(nullable: false),
+                    EndDate = table.Column<DateTime>(nullable: true),
                     IsProjection = table.Column<bool>(nullable: false),
                     Notes = table.Column<string>(nullable: true),
                     PositionAssignmentId = table.Column<int>(nullable: false),
@@ -512,7 +536,14 @@ namespace PD.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_PositionAssignments_PredecessorId",
                 table: "PositionAssignments",
-                column: "PredecessorId");
+                column: "PredecessorId",
+                unique: true,
+                filter: "[PredecessorId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Positions_PrimaryDepartmentId",
+                table: "Positions",
+                column: "PrimaryDepartmentId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -542,6 +573,9 @@ namespace PD.Migrations
                 name: "Compensations");
 
             migrationBuilder.DropTable(
+                name: "HangFireJobs");
+
+            migrationBuilder.DropTable(
                 name: "PositionAccounts");
 
             migrationBuilder.DropTable(
@@ -569,13 +603,13 @@ namespace PD.Migrations
                 name: "ChartStrings");
 
             migrationBuilder.DropTable(
-                name: "Departments");
-
-            migrationBuilder.DropTable(
                 name: "Persons");
 
             migrationBuilder.DropTable(
                 name: "Positions");
+
+            migrationBuilder.DropTable(
+                name: "Departments");
         }
     }
 }

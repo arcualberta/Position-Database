@@ -11,8 +11,8 @@ namespace PD.Services.Projections.Rules.ContractSettlementComputations
 {
     public class ComputeContractSettlement : AbstractProjectionRule
     {
-        public ComputeContractSettlement(ApplicationDbContext db)
-            : base(db, "Contract Settlement", "This rule computes contract settlement of the salary")
+        public ComputeContractSettlement(ApplicationDbContext db, IPdDataProtector dp)
+            : base(db, dp, "Contract Settlement", "This rule computes contract settlement of the salary")
         {
         }
 
@@ -21,11 +21,13 @@ namespace PD.Services.Projections.Rules.ContractSettlementComputations
                 //Previous year's salary
                 Salary pastSalary = pa.GetCompensation<Salary>(targetDate.AddYears(-1), PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
             if (pastSalary == null)
-                throw new Exception(string.Format("Past year's salary not found for the target date of {0}", targetDate));
+                throw new Exception(string.Format("Past year's salary not found for the target date of {0} for the position of {1} of {2}", 
+                    targetDate, pa.Position.Title, Dp.Decrypt(pa.Person.Name)));
 
             SalaryScale scale = GetSalaryScale(pa.Position.Title, targetDate);
             if (scale == null)
-                throw new Exception(string.Format("Salary scale not found for the year of {0}", targetDate));
+                throw new Exception(string.Format("Salary scale not found for the year of {0} for the position of {1} of {2}",
+                    targetDate, pa.Position.Title, Dp.Decrypt(pa.Person.Name)));
 
             pa.LogInfo("Computing contract settlement.", pa.GetCycleYearRange(targetDate));
             ContractSettlement atb = pa.Compensations

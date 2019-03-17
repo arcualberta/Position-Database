@@ -104,7 +104,7 @@ namespace PD.Services.Projections
             //Creating instances of salary-calculation rules in the correct order of applying them
             List<AbstractProjectionRule> rules = new List<AbstractProjectionRule>()
             {
-                new ComputeContractSettlement(Db)/*,
+                new ComputeContractSettlement(Db, _dataProtector)/*,
                 new ComputeMerit(Db),
                 new ComputeFullProfessorMerit(Db),
                 new AggregateBaseSalaryComponents(Db),
@@ -115,6 +115,7 @@ namespace PD.Services.Projections
             //Select all faculty position assignments which are active by the given target date
             List<PositionAssignment> facultyPositions = Db.PositionAssignments
                 .Include(pa => pa.Position)
+                .Include(pa => pa.Person)
                 .Include(pa => pa.AuditTrail)
                 .Include(pa => pa.Compensations)
                 .Where(pa => pa.Position is Faculty

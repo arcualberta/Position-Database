@@ -10,14 +10,14 @@ using PD.Data;
 namespace PD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190114230227_CreatedHangFireJobTracker")]
-    partial class CreatedHangFireJobTracker
+    [Migration("20190317065747_CreatedDataModels")]
+    partial class CreatedDataModels
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.0-rtm-35687")
+                .HasAnnotation("ProductVersion", "2.2.1-servicing-10028")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -192,8 +192,6 @@ namespace PD.Migrations
 
                     b.Property<int>("AuditType");
 
-                    b.Property<bool>("IsProjectionLog");
-
                     b.Property<string>("Message");
 
                     b.Property<int?>("PositionAssignmentId");
@@ -266,9 +264,11 @@ namespace PD.Migrations
                     b.Property<string>("Discriminator")
                         .IsRequired();
 
-                    b.Property<DateTime>("EndDate");
+                    b.Property<DateTime?>("EndDate");
 
                     b.Property<bool>("IsProjection");
+
+                    b.Property<decimal?>("ManualOverride");
 
                     b.Property<string>("Notes");
 
@@ -326,6 +326,8 @@ namespace PD.Migrations
 
                     b.Property<string>("EmployeeId");
 
+                    b.Property<string>("Hash");
+
                     b.Property<string>("Name");
 
                     b.HasKey("Id");
@@ -381,13 +383,17 @@ namespace PD.Migrations
 
                     b.Property<int>("Status");
 
+                    b.Property<int?>("SucccessorId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PersonId");
 
                     b.HasIndex("PositionId");
 
-                    b.HasIndex("PredecessorId");
+                    b.HasIndex("PredecessorId")
+                        .IsUnique()
+                        .HasFilter("[PredecessorId] IS NOT NULL");
 
                     b.ToTable("PositionAssignments");
                 });
@@ -409,6 +415,8 @@ namespace PD.Migrations
 
                     b.Property<string>("Number");
 
+                    b.Property<int?>("PrimaryDepartmentId");
+
                     b.Property<DateTime?>("StartDate");
 
                     b.Property<string>("Title");
@@ -417,6 +425,8 @@ namespace PD.Migrations
                         .HasColumnType("decimal(19, 5)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PrimaryDepartmentId");
 
                     b.ToTable("Positions");
 
@@ -454,6 +464,8 @@ namespace PD.Migrations
                         .IsRequired();
 
                     b.Property<DateTime?>("EndDate");
+
+                    b.Property<bool>("IsProjection");
 
                     b.Property<decimal>("Maximum")
                         .HasColumnType("decimal(19, 5)");
@@ -726,8 +738,15 @@ namespace PD.Migrations
                         .HasForeignKey("PositionId");
 
                     b.HasOne("PD.Models.PositionAssignment", "Predecessor")
+                        .WithOne("Succcessor")
+                        .HasForeignKey("PD.Models.PositionAssignment", "PredecessorId");
+                });
+
+            modelBuilder.Entity("PD.Models.Positions.Position", b =>
+                {
+                    b.HasOne("PD.Models.Department", "PrimaryDepartment")
                         .WithMany()
-                        .HasForeignKey("PredecessorId");
+                        .HasForeignKey("PrimaryDepartmentId");
                 });
 
             modelBuilder.Entity("PD.Models.ChartFields.DeptID", b =>
