@@ -109,7 +109,8 @@ namespace PD.Test
             ApplicationDbContext db = server.Db;
 
             FacultyProjectionService srv = _serviceProvider.GetService<FacultyProjectionService>();
-            srv.ProjectFacultySalaries(new DateTime(2018, 7, 1).Date);
+            var result = srv.ProjectFacultySalaries(new DateTime(2016, 7, 1).Date);
+            var successes = result.Successes;
         }
     }
 }

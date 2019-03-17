@@ -93,6 +93,7 @@ namespace PD.Models
                 .FirstOrDefault() as T;
         }
 
+
         /// <summary>
         /// Returns the confirmed compensation of the give type T for the target date
         /// from the compensations already loaded into memory. If it's not available but a projected one available that matches the criteria, then 

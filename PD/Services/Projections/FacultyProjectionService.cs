@@ -99,29 +99,28 @@ namespace PD.Services.Projections
         /// </summary>
         /// <param name="targetDate">The target date.
         /// </param>
-        public void ProjectFacultySalaries(DateTime targetDate)
+        public ComputationResult ProjectFacultySalaries(DateTime targetDate)
         {
-            //Select all faculty position assignments which are active by the given target date
-            List<PositionAssignment> facultyPositions = Db.PositionAssignments
-                .Include(pa => pa.Position)
-                .Include(pa=>pa.Person)
-                .Include(pa => pa.Compensations)
-                .Include(pa => pa.AuditTrail)
-                .Where(pa => pa.Position is Faculty 
-                            && pa.StartDate <= targetDate 
-                            && (pa.EndDate.HasValue == false || pa.EndDate >= targetDate))
-                .ToList();
-
             //Creating instances of salary-calculation rules in the correct order of applying them
             List<AbstractProjectionRule> rules = new List<AbstractProjectionRule>()
             {
-                new ComputeContractSettlement(Db),
+                new ComputeContractSettlement(Db)/*,
                 new ComputeMerit(Db),
                 new ComputeFullProfessorMerit(Db),
                 new AggregateBaseSalaryComponents(Db),
                 new HandleNonFullProfessorPromotions(Db),
-                new HandleUpperSalaryLimits(Db)
+                new HandleUpperSalaryLimits(Db)*/
             };
+
+            //Select all faculty position assignments which are active by the given target date
+            List<PositionAssignment> facultyPositions = Db.PositionAssignments
+                .Include(pa => pa.Position)
+                .Include(pa => pa.AuditTrail)
+                .Include(pa => pa.Compensations)
+                .Where(pa => pa.Position is Faculty
+                            && pa.StartDate <= targetDate
+                            && (pa.EndDate.HasValue == false || pa.EndDate >= targetDate))
+                .ToList();
 
             //Iterating through each position assignment
             ComputationResult result = new ComputationResult();
@@ -144,9 +143,11 @@ namespace PD.Services.Projections
                     try
                     {
                         rule.Execute(ref pa, targetDate);
+                        ++successCount;
                     }
                     catch (Exception ex)
                     {
+                        result.Errors.Add(ex.Message);
                     }
                 }
 
@@ -155,8 +156,7 @@ namespace PD.Services.Projections
             }
             result.Successes.Add(string.Format("{0} salaries calcuated", successCount));
 
+            return result;
         }
-
-
     }
 }

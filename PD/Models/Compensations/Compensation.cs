@@ -45,7 +45,7 @@ namespace PD.Models.Compensations
         /// The end date.
         /// </value>
         [Display(Name = "End Date")]
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is projection.
