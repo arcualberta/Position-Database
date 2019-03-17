@@ -12,10 +12,50 @@ namespace PD.Models.Compensations
     {
         [Key]
         public int Id { get; set; }
+        /// <summary>
+        /// Gets or sets the compensation value calculated in dollars.
+        /// </summary>
+        /// <value>
+        /// The compensation value calculated in dollars.
+        /// </value>
         public decimal Value { get; set; }
+
+        /// <summary>
+        /// Gets or sets the manually-overriden value of compensation in dollars, if any.
+        /// </summary>
+        /// <value>
+        /// The manually-overriden value of compensation in dollars, if any.
+        /// </value>
+        [Display(Name = "Manual Override Value:")]
+        public decimal? ManualOverride { get; set; }
+
+        /// <summary>
+        /// Gets or sets the start date for the compensation.
+        /// </summary>
+        /// <value>
+        /// The start date.
+        /// </value>
+        [Display(Name = "Start Date")]
         public DateTime StartDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the end date for the compensation.
+        /// </summary>
+        /// <value>
+        /// The end date.
+        /// </value>
+        [Display(Name = "End Date")]
         public DateTime EndDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is projection.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is projection; otherwise, <c>false</c>.
+        /// </value>
+        [Display(Name = "Is Projection?")]
         public bool IsProjection { get; set; }
+
         public string Notes { get; set; }
 
         public int PositionAssignmentId { get; set; }

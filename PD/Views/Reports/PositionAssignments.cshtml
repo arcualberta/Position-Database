@@ -98,7 +98,7 @@
 
                 var salary = item.GetCompensation<Salary>(filter.Date, false);
                 string projectedBaseSalaryVal = salary != null && salary.Value > 0 ? salary.Value.ToString("N") : "";
-                string actualBaseSalaryVal = salary != null && salary.ManualOverride > 0 ? salary.ManualOverride.ToString("N") : "";
+                string actualBaseSalaryVal = salary != null && salary.ManualOverride.HasValue ? salary.ManualOverride.Value.ToString("N") : "";
 
                 var merit = item.GetCompensation<Merit>(filter.Date, false);
                 string meritIncrement = merit != null ? merit.Value.ToString("N") : "";
@@ -121,7 +121,7 @@
                 }
                 else if (projectedBaseSalaryVal != actualBaseSalaryVal)
                 {
-                    if (Math.Abs(salary.Value - salary.ManualOverride) <= 5)
+                    if (Math.Abs(salary.Value - salary.ManualOverride.Value) <= 5)
                     {
                         alertClass = "alert alert-warning";
                     }

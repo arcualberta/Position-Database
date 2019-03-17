@@ -41,10 +41,12 @@ namespace PD.Services.Projections.Rules.ContractSettlementComputations
                     };
                     pa.Compensations.Add(atb);
                 }
-                atb.Value = Math.Round((scale.ContractSettlement * pastSalary.Value) / 100m);
+
+                atb.Value = (scale.ContractSettlement * pastSalary.Value) / 100m;
+                atb.Value = Math.Round(atb.Value);
+
                 atb.IsProjection = scale.IsProjection;
 
-                //atb.Value = (scale.ContractSettlement * pastSalary.Value) / 100m;
                 pa.LogInfo("Contract Settlement: $" + atb.Value, pa.GetCycleYearRange(targetDate));
                 return true;
             }

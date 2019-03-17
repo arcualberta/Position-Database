@@ -266,6 +266,9 @@ namespace PD.Migrations
 
                     b.Property<bool>("IsProjection");
 
+                    b.Property<decimal>("ManualOverride")
+                        .HasColumnType("decimal(19, 5)");
+
                     b.Property<string>("Notes");
 
                     b.Property<int>("PositionAssignmentId");
@@ -591,9 +594,6 @@ namespace PD.Migrations
                     b.HasBaseType("PD.Models.Compensations.Compensation");
 
                     b.Property<bool>("IsMaxed");
-
-                    b.Property<decimal>("ManualOverride")
-                        .HasColumnType("decimal(19, 5)");
 
                     b.HasDiscriminator().HasValue("Salary");
                 });
