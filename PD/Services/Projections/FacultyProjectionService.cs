@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using PD.Services.Projections.Rules;
 using PD.Services.Projections.Rules.MeritComputations;
 using PD.Services.Projections.Rules.ContractSettlementComputations;
+using PD.Models.AppViewModels;
 
 namespace PD.Services.Projections
 {
@@ -91,16 +92,27 @@ namespace PD.Services.Projections
         //////}
 
 
-        public void ProjectSalaries(DateTime targetDate)
+        /// <summary>
+        /// Projects the faculty salaries for the period identified by the targetDate.
+        /// The salary information for the previous salary period must have been calculated 
+        /// for each employee.
+        /// </summary>
+        /// <param name="targetDate">The target date.
+        /// </param>
+        public void ProjectFacultySalaries(DateTime targetDate)
         {
+            //Select all faculty position assignments which are active by the given target date
             List<PositionAssignment> facultyPositions = Db.PositionAssignments
                 .Include(pa => pa.Position)
                 .Include(pa=>pa.Person)
                 .Include(pa => pa.Compensations)
                 .Include(pa => pa.AuditTrail)
-                .Where(pa => pa.Position is Faculty && pa.StartDate <= targetDate && (pa.EndDate.HasValue == false || pa.EndDate >= targetDate))
+                .Where(pa => pa.Position is Faculty 
+                            && pa.StartDate <= targetDate 
+                            && (pa.EndDate.HasValue == false || pa.EndDate >= targetDate))
                 .ToList();
 
+            //Creating instances of salary-calculation rules in the correct order of applying them
             List<AbstractProjectionRule> rules = new List<AbstractProjectionRule>()
             {
                 new ComputeContractSettlement(Db),
@@ -111,7 +123,9 @@ namespace PD.Services.Projections
                 new HandleUpperSalaryLimits(Db)
             };
 
-
+            //Iterating through each position assignment
+            ComputationResult result = new ComputationResult();
+            int successCount = 0;
             foreach(PositionAssignment posAssignment in facultyPositions)
             {
                 PositionAssignment pa = posAssignment;
@@ -139,6 +153,7 @@ namespace PD.Services.Projections
                 Db.SaveChanges();
 
             }
+            result.Successes.Add(string.Format("{0} salaries calcuated", successCount));
 
         }
 
