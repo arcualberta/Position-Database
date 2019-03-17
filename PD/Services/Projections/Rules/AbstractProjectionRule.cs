@@ -105,7 +105,7 @@ namespace PD.Services.Projections.Rules
                         (c as Merit).IsPromoted = false;
                 }
 
-                pa.LogInfo("New position created", pa.GetCycleYearRange(promotionStartDate), true);
+                pa.LogInfo("New position created", pa.GetCycleYearRange(promotionStartDate));
 
                 return true;
             }

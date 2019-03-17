@@ -29,7 +29,7 @@ namespace PD.Services.Projections.Rules.ContractSettlementComputations
                 if (scale == null)
                     throw new Exception(string.Format("Salary scale not found for the year of {0}", targetDate));
 
-                pa.LogInfo("Computing contract settlement.", pa.GetCycleYearRange(targetDate), true);
+                pa.LogInfo("Computing contract settlement.", pa.GetCycleYearRange(targetDate));
                 ContractSettlement atb = pa.GetCompensation<ContractSettlement>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
                 if (atb == null)
                 {
@@ -45,7 +45,7 @@ namespace PD.Services.Projections.Rules.ContractSettlementComputations
                 atb.IsProjection = scale.IsProjection;
 
                 //atb.Value = (scale.ContractSettlement * pastSalary.Value) / 100m;
-                pa.LogInfo("Contract Settlement: $" + atb.Value, pa.GetCycleYearRange(targetDate), true);
+                pa.LogInfo("Contract Settlement: $" + atb.Value, pa.GetCycleYearRange(targetDate));
                 return true;
             }
             catch (Exception ex)

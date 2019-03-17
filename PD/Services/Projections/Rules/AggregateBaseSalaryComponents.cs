@@ -34,7 +34,7 @@ namespace PD.Services.Projections.Rules
 
                 List<Adjustment> adjustments = pa.GetAdjustments(targetDate, true).ToList();
 
-                pa.LogInfo("Aggregating base salary components.", pa.GetCycleYearRange(targetDate), true);
+                pa.LogInfo("Aggregating base salary components.", pa.GetCycleYearRange(targetDate));
 
                 Salary salary = pa.GetCompensation<Salary>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
 
@@ -59,7 +59,7 @@ namespace PD.Services.Projections.Rules
                 }
 
                 salary.Value = Math.Round(salary.Value);
-                pa.LogInfo("Aggregated salary: $" + salary.Value, pa.GetCycleYearRange(targetDate), true);
+                pa.LogInfo("Aggregated salary: $" + salary.Value, pa.GetCycleYearRange(targetDate));
                 return true;
 
             }
