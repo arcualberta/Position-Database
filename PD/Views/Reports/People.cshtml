@@ -14,12 +14,6 @@
                         <th>Employee Id</th>
                     </tr>
                 </thead>
-                @*<tfoot>
-                        <tr>
-                            <th>Name</th>
-                            <th>Employee Id</th>
-                        </tr>
-                    </tfoot>*@
             </table>
         </div>
     </div>
@@ -84,54 +78,10 @@
                 $('#personInfo').html('');
             }
         }); //ENDs: peopleTable.on('deselect, xxx
-
-        // positionAssignmentsTable - Initialization
-        ////////$('#positionAssignmentsTable').dataTable({
-        ////////    paging: false,
-        ////////    searching: false,
-        ////////    ordering: false,
-        ////////    processing: true,
-        ////////    serverSide: true,
-        ////////    info: false,
-        ////////    "deferLoading": 0, //Makes sure the ajax call is not made during initilization.
-        ////////    ajax: {
-        ////////        url: '',
-        ////////        type: "post",
-        ////////        contentType: "application/json",
-        ////////        data: function (d) {
-        ////////            // note: d is created by datatable, the structure of d is the same with DataTableParameters model above
-        ////////            //console.log(d);
-        ////////            return JSON.stringify(d);
-        ////////        }
-        ////////        ////DEBUG: Enable the following "success" handler to show data on the console instead of on the table.
-        ////////        //, success: function (response) { console.log(response); res = response; }
-        ////////    },
-        ////////    "columns": [
-        ////////        { "data": "positionTitle" }
-        ////////    ],
-        ////////    rowId: "id",
-        ////////    "drawCallback": function (settings) { // Ref: https://datatables.net/reference/option/drawCallback
-        ////////        console.log(settings);
-        ////////    }
-        ////////}); //ENDS: $('#positionAssignmentsTable').dataTable({ xxx
-
-        ////////// positionAssignmentsTable - preDraw event
-        ////////// Ref: https://datatables.net/reference/event/preDraw#top
-        ////////var startTime;
-        ////////$('#positionAssignmentsTable').on('preDraw.dt', function (e, settings) {
-
-        ////////    startTime = new Date().getTime();
-        ////////}).on('draw.dt', function (e, settings) {
-        ////////    console.log('Redraw took at: ' + (new Date().getTime() - startTime) + 'mS');
-        ////////});
-
     }); //ENDS: $(function () { xxxx
 
     // This method is invoked when a person is selected from the people table
     function loadPositionInfo(personId) {
-
-        ////////var table = $('#positionAssignmentsTable').DataTable();
-        ////////table.ajax.url('/api/people/' + personId).load();
 
         $.ajax({
             url: '/api/people/' + personId,
@@ -180,57 +130,31 @@
 
             //Creating a new panel and adding it to the array of panels if it hasn't been created yet.
             if (matchedCompensation == undefined) {
-                matchedCompensation = { interval: key };
+                matchedCompensation = { interval: key, data: [], start: start, stop: stop };
 
-                matchedCompensation.value = $('<div class="panel panel-default pd-inner-panel"></div>');
+                matchedCompensation.panel = $('<div class="panel panel-default pd-inner-panel"></div>');
 
                 var compensationPanelHead = $('<div class="panel-heading"><b>' + yearRange + '</b></div>');
-                matchedCompensation.value.append(compensationPanelHead);
+                matchedCompensation.panel.append(compensationPanelHead);
 
                 var btnPanel = createCompensationButtonPanel(posAssignment.id, comp.startDate, comp.endDate);
                 compensationPanelHead.append(btnPanel);
 
                 var panelBodyId = compensationPanelId(start, stop);
-                matchedCompensation.value.append($('<div class="panel-body" id="' + panelBodyId +'"></div>'));
+                matchedCompensation.panel.append($('<div class="panel-body" id="' + panelBodyId +'"></div>'));
                 timeDelimitedGroups.push(matchedCompensation);
             }
 
-            //Taking the body of the 
-            var container = $(matchedCompensation.value).children('.panel-body');
-
-            //Adding the information about the current compensation into the selected time-delimited panel.
-            var compensationType = comp.$type;
-            compensationType = compensationType.substr(0, compensationType.lastIndexOf(','));
-            compensationType = compensationType.substr(compensationType.lastIndexOf('.') + 1);
-            var indicator = comp.isProjection ? "<span style='color:red'>*</span>" : "";
-            switch (compensationType) {
-                case "Salary":
-                    container.append($('<div>Salary: $' + comp.value.toLocaleString("en") + indicator + '</div>'));
-                    if (comp.manualOverride > 0) {
-                        container.append($('<div>Salary Override: $' + comp.manualOverride.toLocaleString("en") + '</div>'));
-                    }
-                    break;
-                case "Adjustment":
-                    container.append($('<div>' + comp.name + ': $' + comp.value.toLocaleString("en") + indicator + '</div>'));
-                    break;
-                case "ContractSettlement":
-                    container.append($('<div>ATB: $' + comp.value.toLocaleString("en") + indicator + '</div>'));
-                    break;
-                case "Merit":
-                    container.append($('<div>Merit Decision: ' + comp.meritDecision + indicator + '</div>'));
-                    container.append($('<div>Merit: $' + comp.value.toLocaleString("en") + indicator + '</div>'));
-                    break;
-                default:
-                    container.append($('<div>' + comp.name + ': $' + comp.value.toLocaleString("en") + indicator + '</div>'));
-                    break;
-            }
+            matchedCompensation.data.push(comp);
         });
 
         //Sorting time intervals in the reverse chronological order.
         timeDelimitedGroups.sort((a, b) => (a.interval < b.interval) ? 1 : -1);
 
         $.each(timeDelimitedGroups, function (key, item) {
-            panel.append(item.value);
+            panel.append(item.panel);
+            var container = $(item.panel).children('.panel-body');
+            updateCompensationPanelContent(item.data, item.start, item.stop, container);
         });
 
         return panel;
@@ -277,21 +201,29 @@
             }
         });
 
-        if (successMessages != undefined && successMessages.length > 0) {
-            var info = $('<div class="alert alert-success"></div>');
-            container.append(info);
-            $.each(successMessages, function (idx, message) {
-                info.append($('<div>' + message + '</div>'));
-            });
-        }
-
         if (errorMessages != undefined && errorMessages.length > 0) {
-            var info = $('<div class="alert alert-danger"></div>');
+            var info = $('<div class="alert alert-danger fade in"></div>');
+            info.append($('<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'));
             container.append(info);
             $.each(errorMessages, function (idx, message) {
                 info.append($('<div>' + message + '</div>'));
             });
         }
+        else {
+            if (successMessages != undefined) {
+                if (successMessages.length == 0)
+                    successMessages.push("success ...");
+
+                var info = $('<div class="alert alert-success"></div>');
+                info.append($('<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'));
+                container.append(info);
+                $.each(successMessages, function (idx, message) {
+                    info.append($('<div>' + message + '</div>'));
+                });
+            }
+        }
+
+
     }
 
     function createCompensationButtonPanel(paId, compStartDate, compEndDate) {

@@ -81,9 +81,14 @@ div.clear{
     margin-right: 10px;
 }
 
+    .pd-inner-panel .alert {
+        margin-top: 15px;
+    }
+
 .pd-compensation-action-panel{
     float:right;
 }
+
 /*Table formatting*/
 /*
 .fixed_header {
