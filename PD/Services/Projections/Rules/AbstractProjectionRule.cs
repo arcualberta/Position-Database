@@ -33,9 +33,32 @@ namespace PD.Services.Projections.Rules
 
         public SalaryScale GetSalaryScale(string positionTitle, DateTime targetDate)
         {
-            return Db.SalaryScales
+            SalaryScale scale = Db.SalaryScales
                 .Where(sc => sc.StartDate <= targetDate && sc.EndDate >= targetDate && sc.Name == positionTitle)
                 .FirstOrDefault();
+
+            if (scale == null)
+                throw new Exception(string.Format("Salary scale not found for the year of {0} for the position of {1}",
+                    targetDate, positionTitle));
+
+            return scale;
+        }
+
+        public Salary GetPastSalary(PositionAssignment pa, DateTime targetDate)
+        {
+            DateTime lastDayOfPastSalaryCycle = pa.GetCycleStartDate(targetDate).AddDays(-1);
+
+            Salary pastSalary = pa.Compensations
+                .Where(c => c is Salary
+                    && c.StartDate <= lastDayOfPastSalaryCycle
+                    && (c.EndDate.HasValue == false || c.EndDate >= lastDayOfPastSalaryCycle))
+                .FirstOrDefault() as Salary;
+
+            if (pastSalary == null)
+                throw new Exception(string.Format("Past year's salary not found for the target date of {0} for the position of {1} of {2}",
+                    targetDate, pa.Position.Title, Dp.Decrypt(pa.Person.Name)));
+
+            return pastSalary;
         }
 
         public bool PromoteToFacultyPosition(ref PositionAssignment pa, string newPositionTitle, DateTime promotionStartDate)

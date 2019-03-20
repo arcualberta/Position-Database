@@ -17,57 +17,53 @@ namespace PD.Services.Projections.Rules
 
         public override bool Execute(ref PositionAssignment pa, DateTime targetDate)
         {
-            try
-            {
-                //Past year's salary
-                Salary pastSalary = pa.GetCompensation<Salary>(targetDate.AddYears(-1), PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
-                if (pastSalary == null)
-                    throw new Exception(string.Format("Past year's salary not found for the target date of {0}", targetDate));
-
-                Merit merit = pa.GetCompensation<Merit>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
-                if (merit == null)
-                    throw new Exception(string.Format("Merit not found for the year of {0}", targetDate));
-
-                ContractSettlement atb = pa.GetCompensation<ContractSettlement>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
-                if (atb == null)
-                    throw new Exception(string.Format("Contract Settlement not found for the year of {0}", targetDate));
-
-                List<Adjustment> adjustments = pa.GetAdjustments(targetDate, true).ToList();
-
-                pa.LogInfo("Aggregating base salary components.", pa.GetCycleYearRange(targetDate));
-
-                Salary salary = pa.GetCompensation<Salary>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
-
-                if (salary == null)
-                {
-                    DateTime startDate = pa.GetCycleStartDate(targetDate);
-                    salary = new Salary()
-                    {
-                        StartDate = startDate,
-                        EndDate = startDate.AddYears(1).AddDays(-1)
-                    };
-                    pa.Compensations.Add(salary);
-                }
-
-                salary.Value = pastSalary.Value + merit.Value + atb.Value;
-                salary.IsProjection = pastSalary.IsProjection || merit.IsProjection || atb.IsProjection;
-
-                foreach (Adjustment adj in adjustments)
-                {
-                    salary.Value += adj.Value;
-                    salary.IsProjection |= adj.IsProjection;
-                }
-
-                salary.Value = Math.Round(salary.Value);
-                pa.LogInfo("Aggregated salary: $" + salary.Value, pa.GetCycleYearRange(targetDate));
+            if (!pa.IsPaidOn(targetDate))
                 return true;
 
-            }
-            catch (Exception ex)
+            //Previous year's salary
+            Salary pastSalary = GetPastSalary(pa, targetDate);
+
+            pa.LogInfo("Aggregating base salary components.", pa.GetCycleYearRange(targetDate));
+
+            IEnumerable<Compensation> compensationsInCurrentPeriod =
+                pa.GetCompensations(targetDate).ToList();
+
+            Salary currentSalary = compensationsInCurrentPeriod
+                .Where(c => c is Salary)
+                .Select(c => c as Salary)
+                .FirstOrDefault();
+
+            if (currentSalary == null)
             {
-                pa.LogError(ex.Message, pa.GetCycleYearRange(targetDate));
-                return false;
+                DateTime startDate = pa.GetCycleStartDate(targetDate);
+                currentSalary = new Salary()
+                {
+                    StartDate = startDate,
+                    EndDate = startDate.AddYears(1).AddDays(-1)
+                };
+                pa.Compensations.Add(currentSalary);
             }
+
+            //Resetting the Calue and IsProjection flags of the current salary
+            currentSalary.Value = pastSalary.Value;
+            currentSalary.IsProjection = false;
+
+            foreach (Compensation c in compensationsInCurrentPeriod)
+            {
+                if (c == currentSalary)
+                    continue;
+
+                //Add all values of compensations in the current period to the current salary value
+                currentSalary.Value += c.Value;
+
+                //If any compensation in the current period is a projection then set
+                //the current salary also to be a projection.
+                currentSalary.IsProjection |= c.IsProjection;
+            }
+
+            currentSalary.Value = Math.Round(currentSalary.Value);
+            pa.LogInfo("Aggregated salary: $" + currentSalary.Value, pa.GetCycleYearRange(targetDate));
+            return true;
         }
     }
 }

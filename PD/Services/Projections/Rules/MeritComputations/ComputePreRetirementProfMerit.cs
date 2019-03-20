@@ -17,6 +17,9 @@ namespace PD.Services.Projections.Rules.MeritComputations
 
         public override bool Execute(ref PositionAssignment pa, DateTime targetDate)
         {
+            if (!pa.IsPaidOn(targetDate))
+                return true;
+
             throw new NotImplementedException();
         }
     }

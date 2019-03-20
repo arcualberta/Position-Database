@@ -78,6 +78,20 @@ namespace PD.Models
         public PositionAssignment Succcessor { get; set; }
 
 
+        public bool IsPaidOn(DateTime targetDate)
+        {
+            //Position assignments in following status values get paid
+            //if the given targetDate is within their start and end dates
+            bool pay = (Status == eStatus.Active
+                       || Status == eStatus.PostRetirement
+                       || Status == eStatus.PreRetirement
+                       )
+                       && StartDate <= targetDate
+                       && (EndDate.HasValue == false || EndDate >= targetDate);
+
+            return pay;
+        }
+
         /// <summary>
         /// Returns the projected or confirmed compensation of the give type T for the target date
         /// from the compensations already loaded into memory.        
@@ -93,6 +107,22 @@ namespace PD.Models
                 .FirstOrDefault() as T;
         }
 
+        public IEnumerable<T> GetCompensations<T>(DateTime targetDate) where T : Compensation
+        {
+            return Compensations
+                .Where(c => c is T
+                    && c.StartDate <= targetDate
+                    && (c.EndDate.HasValue == false || c.EndDate > targetDate))
+                .Select(c => c as T);
+        }
+
+        public IEnumerable<Compensation> GetCompensations(DateTime targetDate)
+        {
+            return Compensations
+                .Where(c => 
+                    c.StartDate <= targetDate
+                    && (c.EndDate.HasValue == false || c.EndDate > targetDate));
+        }
 
         /// <summary>
         /// Returns the confirmed compensation of the give type T for the target date

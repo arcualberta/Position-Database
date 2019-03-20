@@ -9,5 +9,8 @@ namespace PD.Models.AppViewModels
     {
         public List<string> Successes { get; set; } = new List<string>();
         public List<string> Errors { get; set; } = new List<string>();
+
+        public int SuccessCount { get; set; } = 0;
+        public int ErrorCount { get; set; } = 0;
     }
 }

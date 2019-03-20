@@ -81,7 +81,7 @@
                                 if (tooltipItem.index > 0) {
                                     budgetVals = data.datasets[0].data;
                                     var diff = Math.round(budgetVals[tooltipItem.index] - budgetVals[tooltipItem.index - 1]);
-                                    if (diff > 0)
+                                    if (diff != 0)
                                         tips.push("Difference: " + currencyString(diff));
                                 }
                             }

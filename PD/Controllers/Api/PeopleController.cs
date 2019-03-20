@@ -110,6 +110,7 @@ namespace PD.Controllers.Api
                 .Include(pa => pa.Position)
                 .Include(pa => pa.Compensations)
                 .Include(pa => pa.Position.PrimaryDepartment)
+                .Include(pa => pa.AuditTrail)
                 .ToArrayAsync();
 
             return positionAssignments;

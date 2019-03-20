@@ -18,23 +18,17 @@ namespace PD.Services.Projections.Rules.ContractSettlementComputations
 
         public override bool Execute(ref PositionAssignment pa, DateTime targetDate)
         {
-                //Previous year's salary
-                Salary pastSalary = pa.GetCompensation<Salary>(targetDate.AddYears(-1), PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
-            if (pastSalary == null)
-                throw new Exception(string.Format("Past year's salary not found for the target date of {0} for the position of {1} of {2}", 
-                    targetDate, pa.Position.Title, Dp.Decrypt(pa.Person.Name)));
+            if (!pa.IsPaidOn(targetDate))
+                return true;
 
+            //Previous year's salary
+            Salary pastSalary = GetPastSalary(pa, targetDate);
+
+            //Current year's salary scale
             SalaryScale scale = GetSalaryScale(pa.Position.Title, targetDate);
-            if (scale == null)
-                throw new Exception(string.Format("Salary scale not found for the year of {0} for the position of {1} of {2}",
-                    targetDate, pa.Position.Title, Dp.Decrypt(pa.Person.Name)));
 
             pa.LogInfo("Computing contract settlement.", pa.GetCycleYearRange(targetDate));
-            ContractSettlement atb = pa.Compensations
-                .Where(c => c is ContractSettlement
-                    && c.StartDate <= targetDate
-                    && (c.EndDate.HasValue == false || c.EndDate > targetDate))
-                .FirstOrDefault() as ContractSettlement;
+            ContractSettlement atb = pa.GetCompensations<ContractSettlement>(targetDate).FirstOrDefault();
 
             //If no contract settlement exist for the specified perior, create a new one.
             //Note that contract settlements always has an end date.

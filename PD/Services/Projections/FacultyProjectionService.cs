@@ -64,33 +64,73 @@ namespace PD.Services.Projections
             return pa;
         }
 
+        protected List<AbstractProjectionRule> GetSalaryCalculationRules()
+        {
+            //Creating instances of salary-calculation rules in the correct order of applying them
+            List<AbstractProjectionRule> rules = new List<AbstractProjectionRule>()
+            {
+                new ComputeContractSettlement(Db, _dataProtector),
+                new ComputeMerit(Db, _dataProtector) /*,
+                new ComputeFullProfessorMerit(Db)*/,
+                new AggregateBaseSalaryComponents(Db, _dataProtector)/*,
+                new HandleNonFullProfessorPromotions(Db),
+                new HandleUpperSalaryLimits(Db)*/
+            };
 
-        //////public void ProjectSalaries(DateTime targetDate)
-        //////{
-        //////    decimal defaultMeritDecision = 1;
-        //////    bool updateDatabase = true;
+            return rules;
+        }
 
-        //////    List<PositionAssignment> facultyPositions = Db.PositionAssignments
-        //////        .Include(pa => pa.Position)
-        //////        .Include(pa => pa.Person)
-        //////        .Include(pa => pa.Compensations)
-        //////        .Where(pa => pa.Position is Faculty && pa.StartDate <= targetDate && (pa.EndDate.HasValue == false || pa.EndDate >= targetDate))
-        //////        .ToList();
+        public void ComputeSalaries(
+            int positionAssignmentId,
+            DateTime from,
+            DateTime to,
+            int stepInMonths = 12,
+            List<AbstractProjectionRule> computationRules = null,
+            ComputationResult statusAggregator = null)
+        {
+            //Select all faculty position assignments which are active by the given target date
+            PositionAssignment positionAssignment = Db.PositionAssignments
+                .Include(pa => pa.Position)
+                .Include(pa => pa.Person)
+                .Include(pa => pa.Compensations)
+                .Where(pa => pa.Id == positionAssignmentId)
+                .FirstOrDefault();
 
-        //////    foreach (PositionAssignment pa in facultyPositions)
-        //////    {
-        //////        try
-        //////        {
-        //////            PositionAssignment updated = ProjectSalary(pa, targetDate, defaultMeritDecision, updateDatabase);
-        //////        }
-        //////        catch (Exception ex)
-        //////        {
+            if (positionAssignment == null)
+                return;
 
-        //////        }
-        //////    }
+            for(DateTime targetDate = from; targetDate <= to; targetDate = targetDate.AddMonths(stepInMonths))
+                ComputeSalaries(positionAssignment, targetDate, computationRules, statusAggregator);
+        }
 
-        //////}
+        public void ComputeSalaries(
+            PositionAssignment pa,
+            DateTime targetDate,
+            List<AbstractProjectionRule> computationRules = null,
+            ComputationResult statusAggregator = null)
+        {
+            if (computationRules == null)
+                computationRules = GetSalaryCalculationRules();
 
+            foreach (AbstractProjectionRule rule in computationRules)
+            {
+                try
+                {
+                    rule.Execute(ref pa, targetDate);
+                    if (statusAggregator != null)
+                        ++statusAggregator.SuccessCount;
+                }
+                catch (Exception ex)
+                {
+                    if (statusAggregator != null)
+                    {
+                        ++statusAggregator.ErrorCount;
+                        statusAggregator.Errors.Add(ex.Message);
+                    }
+                }
+            }
+            Db.SaveChanges();
+        }
 
         /// <summary>
         /// Projects the faculty salaries for the period identified by the targetDate.
@@ -99,63 +139,37 @@ namespace PD.Services.Projections
         /// </summary>
         /// <param name="targetDate">The target date.
         /// </param>
-        public ComputationResult ProjectFacultySalaries(DateTime targetDate)
+        public ComputationResult ProjectFacultySalaries(DateTime targetDate, bool clearPastAuditLog)
         {
             //Creating instances of salary-calculation rules in the correct order of applying them
-            List<AbstractProjectionRule> rules = new List<AbstractProjectionRule>()
-            {
-                new ComputeContractSettlement(Db, _dataProtector)/*,
-                new ComputeMerit(Db),
-                new ComputeFullProfessorMerit(Db),
-                new AggregateBaseSalaryComponents(Db),
-                new HandleNonFullProfessorPromotions(Db),
-                new HandleUpperSalaryLimits(Db)*/
-            };
+            List<AbstractProjectionRule> rules = GetSalaryCalculationRules();
 
             //Select all faculty position assignments which are active by the given target date
-            List<PositionAssignment> facultyPositions = Db.PositionAssignments
+            IQueryable<PositionAssignment> query = Db.PositionAssignments
                 .Include(pa => pa.Position)
                 .Include(pa => pa.Person)
-                .Include(pa => pa.AuditTrail)
-                .Include(pa => pa.Compensations)
-                .Where(pa => pa.Position is Faculty
+                .Include(pa => pa.Compensations);
+
+            if (clearPastAuditLog)
+                query = query.Include(pa => pa.AuditTrail);
+
+            query = query.Where(pa => pa.Position is Faculty
                             && pa.StartDate <= targetDate
-                            && (pa.EndDate.HasValue == false || pa.EndDate >= targetDate))
-                .ToList();
+                            && (pa.EndDate.HasValue == false || pa.EndDate >= targetDate));
+
+            List<PositionAssignment> facultyPositions = query.ToList();
 
             //Iterating through each position assignment
             ComputationResult result = new ComputationResult();
-            int successCount = 0;
-            foreach(PositionAssignment posAssignment in facultyPositions)
+            foreach(PositionAssignment pa in facultyPositions)
             {
-                PositionAssignment pa = posAssignment;
+                if (clearPastAuditLog)
+                    pa.AuditTrail.Clear();
 
-                //Removing non-log type messges from the audit trail
-                var oldMessages = pa.AuditTrail.Where(au =>
-                    au.AuditType == AuditRecord.eAuditRecordType.Info ||
-                    au.AuditType == AuditRecord.eAuditRecordType.Warning ||
-                    au.AuditType == AuditRecord.eAuditRecordType.Error)
-                .ToList();
-                foreach (var message in oldMessages)
-                    pa.AuditTrail.Remove(message);
-
-                foreach (AbstractProjectionRule rule in rules)
-                {
-                    try
-                    {
-                        rule.Execute(ref pa, targetDate);
-                        ++successCount;
-                    }
-                    catch (Exception ex)
-                    {
-                        result.Errors.Add(ex.Message);
-                    }
-                }
-
-                Db.SaveChanges();
-
+                ComputeSalaries(pa, targetDate, rules, result);
             }
-            result.Successes.Add(string.Format("{0} salaries calcuated", successCount));
+
+            result.Successes.Add(string.Format("{0} rule-executions completed successfully", result.SuccessCount));
 
             return result;
         }

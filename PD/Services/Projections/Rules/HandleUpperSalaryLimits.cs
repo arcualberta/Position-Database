@@ -19,6 +19,9 @@ namespace PD.Services.Projections.Rules
 
         public override bool Execute(ref PositionAssignment pa, DateTime targetDate)
         {
+            if (!pa.IsPaidOn(targetDate))
+                return true;
+
             try
             {
                 if (pa.Position.Title == Faculty.eRank.Professor3.ToString())

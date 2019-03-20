@@ -109,8 +109,30 @@ namespace PD.Test
             ApplicationDbContext db = server.Db;
 
             FacultyProjectionService srv = _serviceProvider.GetService<FacultyProjectionService>();
-            var result = srv.ProjectFacultySalaries(new DateTime(2016, 7, 1).Date);
+            var result = srv.ProjectFacultySalaries(new DateTime(2016, 7, 1).Date, true);
             var successes = result.Successes;
         }
+
+        [Fact]
+        public void ComputetOneEmployeeSalaries()
+        {
+            SqlServerDb server = new SqlServerDb();
+            ApplicationDbContext db = server.Db;
+
+            var dp = _serviceProvider.GetService<IPdDataProtector>();
+            string employeeName = "Altamirano-Jimenez,Isabel";
+            var employees = db.Persons.Include(p => p.PositionAssignments).ToList();
+            var pa_Id = employees
+                .Where(empl => dp.Decrypt(empl.Name) == employeeName)
+                .FirstOrDefault()
+                .PositionAssignments.Select(pa => pa.Id)
+                .FirstOrDefault();
+
+            FacultyProjectionService srv = _serviceProvider.GetService<FacultyProjectionService>();
+            srv.ComputeSalaries(pa_Id,
+                new DateTime(2016, 7, 1).Date,
+                new DateTime(2019, 7, 1).Date);
+        }
+
     }
 }
