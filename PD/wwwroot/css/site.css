@@ -80,6 +80,10 @@ div.clear{
     margin-left: 10px;
     margin-right: 10px;
 }
+
+.pd-compensation-action-panel{
+    float:right;
+}
 /*Table formatting*/
 /*
 .fixed_header {

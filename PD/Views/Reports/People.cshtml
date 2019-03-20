@@ -31,6 +31,7 @@
 </div>
 <div class="clear"></div>
 <script>
+    $.guid = 0;
     $(function () {
 
         // peopleTable - initialization
@@ -181,9 +182,17 @@
             //Creating a new panel and adding it to the array of panels if it hasn't been created yet.
             if (matchedCompensation == undefined) {
                 matchedCompensation = { interval: key };
+
                 matchedCompensation.value = $('<div class="panel panel-default pd-inner-panel"></div>');
-                matchedCompensation.value.append($('<div class="panel-heading"><b>' + yearRange + '</b></div>'));
-                matchedCompensation.value.append($('<div class="panel-body"><div>Period: ' + key + '</div>'));
+
+                var compensationPanelHead = $('<div class="panel-heading"><b>' + yearRange + '</b></div>');
+                matchedCompensation.value.append(compensationPanelHead);
+
+                var panelBodyId = 'compPanel' + $.guid++;
+                var btnPanel = createCompensationButtonPanel(posAssignment.Id, comp.startDate, comp.endDate, panelBodyId);
+                compensationPanelHead.append(btnPanel);
+
+                matchedCompensation.value.append($('<div class="panel-body" id="' + panelBodyId +'"><div>Period: ' + key + '</div>'));
                 timeDelimitedGroups.push(matchedCompensation);
             }
 
@@ -226,6 +235,24 @@
         });
 
         return panel;
+    }
+
+    function createCompensationButtonPanel(paId, compStartDate, compEndDate, panelBodyId) {
+        var panel = $("<span class='pd-compensation-action-panel'></span>");
+        var btn = $('<button/>', {
+            text: 'calculate',
+            id: panelBodyId + '_btn_',
+            click: function () {
+                alert(compStartDate);
+            }
+        });
+      
+        panel.append(btn);
+        return panel;
+    }
+
+    function computeComensation(compensationStartDate, compensationEndDate) {
+
     }
 </script>
 
