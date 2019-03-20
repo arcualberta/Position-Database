@@ -10,8 +10,10 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using PD.Data;
 using PD.Models;
+using PD.Models.AppViewModels;
 using PD.Models.AppViewModels.DataTables;
 using PD.Services;
+using PD.Services.Projections;
 
 namespace PD.Controllers.Api
 {
@@ -22,11 +24,13 @@ namespace PD.Controllers.Api
     {
         private readonly ApplicationDbContext _context;
         private readonly DataService _dataService;
+        private readonly FacultyProjectionService _facultyProjectionService;
 
-        public PeopleController(ApplicationDbContext context, DataService dataService)
+        public PeopleController(ApplicationDbContext context, DataService dataService, FacultyProjectionService facultyProjectionService)
         {
             _context = context;
             _dataService = dataService;
+            _facultyProjectionService = facultyProjectionService;
         }
 
         ////// POST: api/People/

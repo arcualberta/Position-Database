@@ -85,8 +85,8 @@ namespace PD.Services.Projections
             DateTime from,
             DateTime to,
             int stepInMonths = 12,
-            List<AbstractProjectionRule> computationRules = null,
-            ComputationResult statusAggregator = null)
+            ComputationResult statusAggregator = null,
+            List<AbstractProjectionRule> computationRules = null)
         {
             //Select all faculty position assignments which are active by the given target date
             PositionAssignment positionAssignment = Db.PositionAssignments
@@ -100,18 +100,42 @@ namespace PD.Services.Projections
                 return;
 
             for(DateTime targetDate = from; targetDate <= to; targetDate = targetDate.AddMonths(stepInMonths))
-                ComputeSalaries(positionAssignment, targetDate, computationRules, statusAggregator);
+                ComputeCompensation(positionAssignment, targetDate, statusAggregator, computationRules);
         }
 
-        public void ComputeSalaries(
+        public bool ComputeCompensation(
+            int positionAssignmentId,
+            DateTime targetDate,
+            ComputationResult statusAggregator = null,
+            List<AbstractProjectionRule> computationRules = null)
+        {
+            PositionAssignment positionAssignment = Db.PositionAssignments
+                .Include(pa => pa.Position)
+                .Include(pa => pa.Person)
+                .Include(pa => pa.Compensations)
+                .Where(pa => pa.Id == positionAssignmentId)
+                .FirstOrDefault();
+
+            if(positionAssignment == null)
+            {
+                if (statusAggregator != null)
+                    statusAggregator.Errors.Add(string.Format("No position assignment with id {0} found.", positionAssignmentId));
+                return false;
+            }
+
+            return ComputeCompensation(positionAssignment, targetDate, statusAggregator, computationRules);
+        }
+
+        public bool ComputeCompensation(
             PositionAssignment pa,
             DateTime targetDate,
-            List<AbstractProjectionRule> computationRules = null,
-            ComputationResult statusAggregator = null)
+            ComputationResult statusAggregator = null,
+            List<AbstractProjectionRule> computationRules = null)
         {
             if (computationRules == null)
                 computationRules = GetSalaryCalculationRules();
 
+            bool updated = false;
             foreach (AbstractProjectionRule rule in computationRules)
             {
                 try
@@ -119,6 +143,7 @@ namespace PD.Services.Projections
                     rule.Execute(ref pa, targetDate);
                     if (statusAggregator != null)
                         ++statusAggregator.SuccessCount;
+                    updated = true;
                 }
                 catch (Exception ex)
                 {
@@ -130,6 +155,8 @@ namespace PD.Services.Projections
                 }
             }
             Db.SaveChanges();
+
+            return updated;
         }
 
         /// <summary>
@@ -166,7 +193,7 @@ namespace PD.Services.Projections
                 if (clearPastAuditLog)
                     pa.AuditTrail.Clear();
 
-                ComputeSalaries(pa, targetDate, rules, result);
+                ComputeCompensation(pa, targetDate, result, rules);
             }
 
             result.Successes.Add(string.Format("{0} rule-executions completed successfully", result.SuccessCount));

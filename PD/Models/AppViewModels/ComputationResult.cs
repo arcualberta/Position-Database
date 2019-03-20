@@ -12,5 +12,7 @@ namespace PD.Models.AppViewModels
 
         public int SuccessCount { get; set; } = 0;
         public int ErrorCount { get; set; } = 0;
+
+        public object Data { get; set; }
     }
 }

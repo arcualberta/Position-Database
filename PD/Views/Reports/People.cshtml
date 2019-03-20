@@ -31,7 +31,6 @@
 </div>
 <div class="clear"></div>
 <script>
-    $.guid = 0;
     $(function () {
 
         // peopleTable - initialization
@@ -188,11 +187,11 @@
                 var compensationPanelHead = $('<div class="panel-heading"><b>' + yearRange + '</b></div>');
                 matchedCompensation.value.append(compensationPanelHead);
 
-                var panelBodyId = 'compPanel' + $.guid++;
-                var btnPanel = createCompensationButtonPanel(posAssignment.Id, comp.startDate, comp.endDate, panelBodyId);
+                var btnPanel = createCompensationButtonPanel(posAssignment.id, comp.startDate, comp.endDate);
                 compensationPanelHead.append(btnPanel);
 
-                matchedCompensation.value.append($('<div class="panel-body" id="' + panelBodyId +'"><div>Period: ' + key + '</div>'));
+                var panelBodyId = compensationPanelId(start, stop);
+                matchedCompensation.value.append($('<div class="panel-body" id="' + panelBodyId +'"></div>'));
                 timeDelimitedGroups.push(matchedCompensation);
             }
 
@@ -237,13 +236,70 @@
         return panel;
     }
 
-    function createCompensationButtonPanel(paId, compStartDate, compEndDate, panelBodyId) {
+    function compensationPanelId(beginDate, endDate) {
+        return 'compensation-panel_' + beginDate.substr(0, 10) + '_' + endDate.substr(0, 10);
+    }
+   
+    function updateCompensationPanelContent(compensations, start, stop, container, successMessages, errorMessages) {
+        if (container == undefined) {
+
+            var panelId = compensationPanelId(start, stop);
+            container = $('#' + panelId);
+        }
+
+        $(container).empty();
+
+        $.each(compensations, function (idx, comp) {
+            var compensationType = comp.$type;
+            compensationType = compensationType.substr(0, compensationType.lastIndexOf(','));
+            compensationType = compensationType.substr(compensationType.lastIndexOf('.') + 1);
+            var indicator = comp.isProjection ? "<span style='color:red'>*</span>" : "";
+            switch (compensationType) {
+                case "Salary":
+                    container.append($('<div>Salary: $' + comp.value.toLocaleString("en") + indicator + '</div>'));
+                    if (comp.manualOverride > 0) {
+                        container.append($('<div>Salary Override: $' + comp.manualOverride.toLocaleString("en") + '</div>'));
+                    }
+                    break;
+                case "Adjustment":
+                    container.append($('<div>' + comp.name + ': $' + comp.value.toLocaleString("en") + indicator + '</div>'));
+                    break;
+                case "ContractSettlement":
+                    container.append($('<div>ATB: $' + comp.value.toLocaleString("en") + indicator + '</div>'));
+                    break;
+                case "Merit":
+                    container.append($('<div>Merit Decision: ' + comp.meritDecision + indicator + '</div>'));
+                    container.append($('<div>Merit: $' + comp.value.toLocaleString("en") + indicator + '</div>'));
+                    break;
+                default:
+                    container.append($('<div>' + comp.name + ': $' + comp.value.toLocaleString("en") + indicator + '</div>'));
+                    break;
+            }
+        });
+
+        if (successMessages != undefined && successMessages.length > 0) {
+            var info = $('<div class="alert alert-success"></div>');
+            container.append(info);
+            $.each(successMessages, function (idx, message) {
+                info.append($('<div>' + message + '</div>'));
+            });
+        }
+
+        if (errorMessages != undefined && errorMessages.length > 0) {
+            var info = $('<div class="alert alert-danger"></div>');
+            container.append(info);
+            $.each(errorMessages, function (idx, message) {
+                info.append($('<div>' + message + '</div>'));
+            });
+        }
+    }
+
+    function createCompensationButtonPanel(paId, compStartDate, compEndDate) {
         var panel = $("<span class='pd-compensation-action-panel'></span>");
         var btn = $('<button/>', {
             text: 'calculate',
-            id: panelBodyId + '_btn_',
             click: function () {
-                alert(compStartDate);
+                computeComensation(paId, compStartDate, compEndDate)
             }
         });
       
@@ -251,26 +307,23 @@
         return panel;
     }
 
-    function computeComensation(compensationStartDate, compensationEndDate) {
-
+    function computeComensation(paId, compStartDate, compEndDate) {
+        $.ajax({
+            url: '/api/compensations/compute/' + paId + '/' + compStartDate + '/' + compEndDate,
+            type: "post",
+            contentType: "application/json",
+            dataType: "json",
+            success: function (result, status, jqXHR) {
+                updateCompensationPanelContent(
+                    result.data,
+                    compStartDate,
+                    compEndDate, null,
+                    result.successes,
+                    result.errors)
+            },
+            error: function (jqXHR, status, err) {
+                console.error(err);
+            },
+        });
     }
 </script>
-
-
-
-@*<div class="panel panel-default">
-    <div class="panel-heading">Position Details</div>
-    <div class="panel-body">
-
-        <div id="person-info">
-
-            <table id="positionAssignmentsTable" class="display" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>Position</th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
-    </div>
-</div>*@
