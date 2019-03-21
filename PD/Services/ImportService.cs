@@ -557,13 +557,13 @@ namespace PD.Services
 
         protected bool AddFacultySalaryScale(string name, DateTime startDate, decimal minSalary, decimal maxSalary, decimal salaryStep, decimal contractSettlement, decimal defaultMeritDecision)
         {
-            if (Db.FacultySalaryScales.Where(sc => sc.StartDate == startDate && sc.Name == name).Any())
+            if (Db.FacultySalaryScales.Where(sc => sc.StartDate == startDate && sc.Category == name).Any())
                 return false;
             else
             {
                 FacultySalaryScale scale = new FacultySalaryScale()
                 {
-                    Name = name,
+                    Category = name,
                     StartDate = startDate,
                     EndDate = startDate.AddYears(1).AddDays(-1),
                     ContractSettlement = contractSettlement,

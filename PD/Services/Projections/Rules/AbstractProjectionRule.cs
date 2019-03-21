@@ -34,7 +34,7 @@ namespace PD.Services.Projections.Rules
         public SalaryScale GetSalaryScale(string positionTitle, DateTime targetDate)
         {
             SalaryScale scale = Db.SalaryScales
-                .Where(sc => sc.StartDate <= targetDate && sc.EndDate >= targetDate && sc.Name == positionTitle)
+                .Where(sc => sc.StartDate <= targetDate && sc.EndDate >= targetDate && sc.Category == positionTitle)
                 .FirstOrDefault();
 
             if (scale == null)

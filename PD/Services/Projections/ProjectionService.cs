@@ -57,7 +57,7 @@ namespace PD.Services
         public SalaryScale GetSalaryScale(string positionTitle, DateTime targetDate)
         {
             return Db.SalaryScales
-                .Where(sc => sc.StartDate <= targetDate && sc.EndDate >= targetDate && sc.Name == positionTitle)
+                .Where(sc => sc.StartDate <= targetDate && sc.EndDate >= targetDate && sc.Category == positionTitle)
                 .FirstOrDefault();
         }
 
