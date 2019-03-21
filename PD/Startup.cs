@@ -90,11 +90,13 @@ namespace PD
 
             #endregion
 
-            #region Service Class Registration
-            services.AddScoped<DataService, DataService>();
-            services.AddScoped<ImportService, ImportService>();
-            services.AddScoped<ReportService, ReportService>();
-            services.AddScoped<FacultyProjectionService, FacultyProjectionService>();
+            #region Service and Utility Class Registration
+            services.AddScoped<DataService>();
+            services.AddScoped<ImportService>();
+            services.AddScoped<ReportService>();
+            services.AddScoped<FacultyProjectionService>();
+            services.AddSingleton<AppConfig>();
+
             #endregion
 
             //HangFire background job processing

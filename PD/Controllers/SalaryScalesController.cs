@@ -13,10 +13,12 @@ namespace PD.Controllers
     public class SalaryScalesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly AppConfig _appConfig;
 
-        public SalaryScalesController(ApplicationDbContext context)
+        public SalaryScalesController(ApplicationDbContext context, AppConfig appConfig)
         {
             _context = context;
+            _appConfig = appConfig;
         }
 
         // GET: SalaryScales
