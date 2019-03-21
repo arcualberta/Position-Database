@@ -48,6 +48,7 @@ namespace PD.Controllers
         // GET: SalaryScales/Create
         public IActionResult Create()
         {
+            ViewBag.PositionTypes = _appConfig.FacultyTypes;
             return View();
         }
 
