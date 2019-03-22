@@ -57,7 +57,7 @@ namespace PD.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Minimum,Maximum,StepValue,ContractSettlement,DefaultMeritDecision,IsProjection,StartDate,EndDate")] SalaryScale salaryScale)
+        public async Task<IActionResult> Create(SalaryScale salaryScale)
         {
             if (ModelState.IsValid)
             {
@@ -65,6 +65,7 @@ namespace PD.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.PositionTypes = _appConfig.FacultyTypes;
             return View(salaryScale);
         }
 
@@ -81,6 +82,7 @@ namespace PD.Controllers
             {
                 return NotFound();
             }
+            ViewBag.PositionTypes = _appConfig.FacultyTypes;
             return View(salaryScale);
         }
 
@@ -89,7 +91,7 @@ namespace PD.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Minimum,Maximum,StepValue,ContractSettlement,DefaultMeritDecision,IsProjection,StartDate,EndDate")] SalaryScale salaryScale)
+        public async Task<IActionResult> Edit(int id, SalaryScale salaryScale)
         {
             if (id != salaryScale.Id)
             {
@@ -116,6 +118,7 @@ namespace PD.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.PositionTypes = _appConfig.FacultyTypes;
             return View(salaryScale);
         }
 
