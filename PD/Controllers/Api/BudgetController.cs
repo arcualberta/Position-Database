@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using PD.Data;
 using PD.Models.AppViewModels;
 using Microsoft.EntityFrameworkCore;
+using PD.Models.Compensations;
 
 namespace PD.Controllers.Api
 {
@@ -45,11 +46,20 @@ namespace PD.Controllers.Api
                     compensations = compensations.Where(comp => comp.PositionAssignment.Position.PrimaryDepartmentId == deptId);
                 var x = compensations.ToList();
                 decimal budget = await compensations.Select(c => c.Value).SumAsync();
+                decimal salary = await compensations.Where(c => c is Salary).Select(c => c.Value).SumAsync();
+                decimal merits = await compensations.Where(c => c is Merit).Select(c => c.Value).SumAsync();
+                decimal atb = await compensations.Where(c => c is ContractSettlement).Select(c => c.Value).SumAsync();
+                decimal adjustments = await compensations.Where(c => c is Adjustment).Select(c => c.Value).SumAsync();
+
                 int positionCount = await compensations.Select(c => c.PositionAssignment.Id).Distinct().CountAsync();
                 BudgetSummary budgetSummary = new BudgetSummary()
                 {
                     Date = t,
                     Budget = budget > 0 ? budget : (decimal?)null,
+                    Salary = salary,
+                    Merits = merits,
+                    ContractSettlement = atb,
+                    Adjustments = adjustments,
                     PositionCount = positionCount > 0 ? positionCount : (int?)null
                 };
                 ret.Add(budgetSummary);

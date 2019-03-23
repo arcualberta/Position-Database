@@ -1,7 +1,31 @@
 ﻿
-<div style="width:75%;">
+<div class="col-md-8">
     <canvas id="canvas"></canvas>
 </div>
+<div class="col-md-4">
+    <div>
+        <input type="radio" id="total" name="graph-selection" value="total" />
+        <label for="total">Total Budget</label>
+    </div>
+    <div>
+        <input type="radio" id="salaries" name="graph-selection" value="salaries" />
+        <label for="salaries">Salaries</label>
+    </div>
+    <div>
+        <input type="radio" id="merit" name="graph-selection" value="merit" />
+        <label for="merit">Merits</label>
+    </div>
+    <div>
+        <input type="radio" id="atb" name="graph-selection" value="atb" />
+        <label for="atb">Contract Settlements</label>
+    </div>
+    <div>
+        <input type="radio" id="adjustments" name="graph-selection" value="adjustments" />
+        <label for="adjustments">Adjustments</label>
+    </div>
+
+</div>
+<div class="clear"></div>
 <script>
     $(function () {
         loadBudgetInfo('2015-07-01', '2019-06-30', 6);

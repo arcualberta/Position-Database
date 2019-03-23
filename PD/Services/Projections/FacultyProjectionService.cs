@@ -70,11 +70,11 @@ namespace PD.Services.Projections
             List<AbstractProjectionRule> rules = new List<AbstractProjectionRule>()
             {
                 new ComputeContractSettlement(Db, _dataProtector),
-                new ComputeMerit(Db, _dataProtector) /*,
-                new ComputeFullProfessorMerit(Db)*/,
-                new AggregateBaseSalaryComponents(Db, _dataProtector)/*,
-                new HandleNonFullProfessorPromotions(Db),
-                new HandleUpperSalaryLimits(Db)*/
+                new ComputeMerit(Db, _dataProtector) ,
+                new ComputeFullProfessorMerit(Db, _dataProtector),
+                new AggregateBaseSalaryComponents(Db, _dataProtector),
+                new HandleNonFullProfessorPromotions(Db, _dataProtector),
+                new HandleUpperSalaryLimits(Db, _dataProtector)
             };
 
             return rules;
