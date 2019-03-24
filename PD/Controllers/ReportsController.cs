@@ -12,6 +12,7 @@ using PD.Data;
 using PD.Models;
 using PD.Models.AppViewModels;
 using PD.Models.AppViewModels.Filters;
+using PD.Models.Compensations;
 using PD.Services;
 
 namespace PD.Controllers
@@ -36,10 +37,18 @@ namespace PD.Controllers
                 .OrderBy(d => d.Name)
                 .ToList();
 
-            ViewBag.BudgetComponent = _context.Compensations
+            //Getting all non-base salary component names
+            List<string> components = _context.Compensations
+                .Where(c => c is Adjustment)
+                .Select(c => c as Adjustment)
+                .Select(adj => new { adj.Name, adj.IsBaseSalaryComponent })
+                .ToList()
+                .Where(obj => obj.IsBaseSalaryComponent == false)
                 .Select(c => c.Name)
                 .Distinct()
                 .ToList();
+            components.Insert(0, "Base Salary");
+            ViewBag.BudgetComponent = components;
 
             ViewBag.PositionTypes = _appConfig.FacultyTypes;
 

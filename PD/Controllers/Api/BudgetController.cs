@@ -54,7 +54,11 @@ namespace PD.Controllers.Api
                 if (deptId > 0)
                     compensations = compensations.Where(comp => comp.PositionAssignment.Position.PrimaryDepartmentId == deptId);
 
-                compensations = compensations.Where(comp => requestedBudgetOptions.Contains(comp.Name));
+                bool includeBaseSalary = requestedBudgetOptions.Contains("Base Salary");
+                compensations = compensations.Where(comp => 
+                    requestedBudgetOptions.Contains(comp.Name) ||
+                    includeBaseSalary && comp is Salary
+                    );
                 compensations = compensations.Where(comp => requestedPositionTypes.Contains(comp.PositionAssignment.Position.Title));
 
                 var x = compensations.ToList(); 
