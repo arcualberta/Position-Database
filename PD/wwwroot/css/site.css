@@ -89,6 +89,10 @@ div.clear{
     float:right;
 }
 
+.pd-check-bulk-control{
+    margin:10px 0 !important;
+}
+
 /*Table formatting*/
 /*
 .fixed_header {

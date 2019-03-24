@@ -71,6 +71,21 @@ namespace PD.Test
         }
 
         [Fact]
+        public void ComputeFacultySalaries()
+        {
+            SqlServerDb server = new SqlServerDb();
+            ApplicationDbContext db = server.Db;
+
+            FacultyProjectionService srv = _serviceProvider.GetService<FacultyProjectionService>();
+            for (int year = 2016; year < 2021; ++year)
+            {
+                var result = srv.ProjectFacultySalaries(new DateTime(year, 7, 1).Date, true);
+                var errors = result.Errors.Distinct().ToList();
+                var successes = result.Successes;
+            }
+        }
+
+        [Fact]
         public void ImportFacultyData_2018_19()
         {
             ImportService ds = _serviceProvider.GetService<ImportService>();
@@ -99,19 +114,6 @@ namespace PD.Test
                 'T' - 'A' + 1 //Merit reason column for the given FEC year
                  );
 
-        }
-
-
-        [Fact]
-        public void ProjectFacultySalaries()
-        {
-            SqlServerDb server = new SqlServerDb();
-            ApplicationDbContext db = server.Db;
-
-            FacultyProjectionService srv = _serviceProvider.GetService<FacultyProjectionService>();
-            var result = srv.ProjectFacultySalaries(new DateTime(2017, 7, 1).Date, true);
-            var errors = result.Errors.Distinct().ToList();
-            var successes = result.Successes;
         }
 
         [Fact]

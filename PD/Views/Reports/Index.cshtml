@@ -1,42 +1,125 @@
 ﻿
-<div class="col-md-8">
-    <canvas id="canvas"></canvas>
-</div>
 <div class="col-md-4">
     <div>
-        <input type="radio" id="total" name="graph-selection" value="total" />
-        <label for="total">Total Budget</label>
+        <h3>Department</h3>
+        <div>
+            <select id="ui-dept"
+                    asp-items='new SelectList(@ViewBag.Departments, "Id", "Name")'
+                    onchange="loadBudgetInfo();">
+                <option value="0" selected="selected">All</option>
+            </select>
+        </div>
     </div>
     <div>
-        <input type="radio" id="salaries" name="graph-selection" value="salaries" />
-        <label for="salaries">Salaries</label>
-    </div>
-    <div>
-        <input type="radio" id="merit" name="graph-selection" value="merit" />
-        <label for="merit">Merits</label>
-    </div>
-    <div>
-        <input type="radio" id="atb" name="graph-selection" value="atb" />
-        <label for="atb">Contract Settlements</label>
-    </div>
-    <div>
-        <input type="radio" id="adjustments" name="graph-selection" value="adjustments" />
-        <label for="adjustments">Adjustments</label>
+        <h3>Position Types</h3>
+        <div class="pd-check-bulk-control">
+            Select:
+            <input type="checkbox" id="pos-types-all" onchange="setChecked('ui-position-type', true);" /> All &nbsp;&nbsp;
+            <input type="checkbox" id="pos-types-none" onchange="setChecked('ui-position-type', false);" /> None
+        </div>
+        @foreach (string str in ViewBag.PositionTypes)
+        {
+            var id = str.Replace(" ", "");
+            <div>
+                <input class="ui-position-type"
+                       type="checkbox"
+                       id="@id"
+                       name="@id"
+                       value="@str"
+                       checked="checked"
+                       onchange="loadBudgetInfo();" />
+                <label for="@id">@str</label>
+            </div>
+        }
     </div>
 
+    <div>
+        <h3>Budget Components</h3>
+        <div class="pd-check-bulk-control">
+            Select:
+            <input type="checkbox" id="budget-comp-all" onchange="setChecked('ui-budget-component', true);" /> All &nbsp;&nbsp;
+            <input type="checkbox" id="budget-comp-none" onchange="setChecked('ui-budget-component', false);" /> None
+        </div>
+        @foreach (string str in ViewBag.BudgetComponent)
+        {
+            var id = str.Replace(" ", "");
+            <div>
+                <input class="ui-budget-component"
+                       type="checkbox"
+                       id="@id"
+                       name="@id"
+                       value="@str"
+                       checked="checked"
+                       onchange="loadBudgetInfo();" />
+                <label for="@id">@str</label>
+            </div>
+        }
+    </div>
 </div>
+
+<div class="col-md-8">
+    <h3>Budget</h3>
+    <canvas id="canvas"></canvas>
+</div>
+
 <div class="clear"></div>
 <script>
+    var dispConfig = {};
+
     $(function () {
-        loadBudgetInfo('2015-07-01', '2019-06-30', 6);
+        dispConfig.from = '2015-07-01';
+        dispConfig.to = '2019-06-30';
+        dispConfig.stepInMonths = 6;
+
+        loadBudgetInfo();
     });
 
-    function loadBudgetInfo(from, to, stepInMonths, deptId) {
-        if (deptId == undefined)
-            deptId = "";
+    function setChecked(cssClass, status) {
+        $('.' + cssClass).prop('checked', status);
+        loadBudgetInfo();
+    }
+
+    function loadBudgetInfo() {
+        var dept = $('#ui-dept').val();
+
+        var budgetOptions = [];
+        var allBudgetOptionsSelected = true;
+        var noBudgetOptionsSelected = true;
+        $('.ui-budget-component').each(function () {
+            if ($(this).prop('checked')) {
+                budgetOptions.push($(this).val());
+                noBudgetOptionsSelected = false;
+            }
+            else {
+                allBudgetOptionsSelected = false;
+            }
+        });
+        $('#budget-comp-all').prop('checked', allBudgetOptionsSelected);
+        $('#budget-comp-none').prop('checked', noBudgetOptionsSelected);
+
+        var positionTypes = [];
+        var allPositionTypesSelected = true;
+        var noPositionTypesSelected = true;
+        $('.ui-position-type').each(function () {
+            if ($(this).prop('checked')) {
+                positionTypes.push($(this).val());
+                noPositionTypesSelected = false;
+            }
+            else {
+                allPositionTypesSelected = false;
+            }
+        });
+        $('#pos-types-all').prop('checked', allPositionTypesSelected);
+        $('#pos-types-none').prop('checked', noPositionTypesSelected);
+
 
         $.ajax({
-            url: '/api/budget/?from=' + from + '&to=' + to + '&stepInMonths=' + stepInMonths + '&deptId=' + deptId,
+            url: '/api/budget/?from=' + dispConfig.from
+                + '&to=' + dispConfig.to
+                + '&stepInMonths=' + dispConfig.stepInMonths
+                + '&deptId=' + dept
+                + '&budgetOptions=' + budgetOptions
+                + '&positionTypes=' + positionTypes,
             type: "get",
             contentType: "application/json",
             dataType: "json",
@@ -85,7 +168,7 @@
                 hoverMode: 'index',
                 stacked: false,
                 title: {
-                    display: true,
+                    display: false,
                     text: 'Chart.js Line Chart - Multi Axis'
                 },
                 tooltips: {

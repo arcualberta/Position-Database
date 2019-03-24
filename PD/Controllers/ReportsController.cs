@@ -21,14 +21,27 @@ namespace PD.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ReportService _reportService;
-        public ReportsController(ApplicationDbContext context, ReportService reportService/*, IPdDataProtector dataProtector*/)
+        private readonly AppConfig _appConfig;
+
+        public ReportsController(ApplicationDbContext context, ReportService reportService, AppConfig appConfig)
         {
             _context = context;
             _reportService = reportService;
+            _appConfig = appConfig;
         }
 
         public IActionResult Index()
         {
+            ViewBag.Departments = _context.Departments
+                .OrderBy(d => d.Name)
+                .ToList();
+
+            ViewBag.BudgetComponent = _context.Compensations
+                .Select(c => c.Name)
+                .Distinct()
+                .ToList();
+
+            ViewBag.PositionTypes = _appConfig.FacultyTypes;
 
             return View();
         }

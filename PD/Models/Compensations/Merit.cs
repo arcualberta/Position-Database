@@ -14,6 +14,12 @@ namespace PD.Models.Compensations
         [Display(Name = "Merit Decision")]
         public decimal MeritDecision { get; set; }
 
+        public Merit()
+            :base("Merit")
+        {
+
+        }
+
         public override Compensation Clone()
         {
             Merit child = Clone<Merit>();

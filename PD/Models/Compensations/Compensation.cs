@@ -12,6 +12,7 @@ namespace PD.Models.Compensations
     {
         [Key]
         public int Id { get; set; }
+
         /// <summary>
         /// Gets or sets the compensation value calculated in dollars.
         /// </summary>
@@ -19,6 +20,8 @@ namespace PD.Models.Compensations
         /// The compensation value calculated in dollars.
         /// </value>
         public decimal Value { get; set; }
+
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the manually-overriden value of compensation in dollars, if any.
@@ -76,5 +79,10 @@ namespace PD.Models.Compensations
 
 
         public abstract Compensation Clone();
-     }
+
+        public Compensation(string name)
+        {
+            Name = name;
+        }
+    }
 }

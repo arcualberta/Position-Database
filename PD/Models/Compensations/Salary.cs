@@ -11,6 +11,12 @@ namespace PD.Models.Compensations
         [Display(Name = "Is Maxed")]
         public bool IsMaxed { get; set; }
 
+        public Salary()
+            :base("Salary")
+        {
+
+        }
+
         public override Compensation Clone()
         {
             Salary child = Clone<Salary>();
