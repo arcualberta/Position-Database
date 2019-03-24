@@ -416,8 +416,7 @@ namespace PD.Services
                             {
                                 Value = empl.Salary.CurrentSalary,
                                 StartDate = currentYearStartDate,
-                                EndDate = currentYearEndDate,
-                                IsProjection = false
+                                EndDate = currentYearEndDate
                             };
                             pa.Compensations.Add(salary);
                             Db.SaveChanges();
@@ -435,19 +434,23 @@ namespace PD.Services
                                 EndDate = nextYearEndDate,
                                 MeritDecision = (empl.Salary as FacultySalaryViewModel).MeritDecision,
                                 Notes = (empl.Salary as FacultySalaryViewModel).MeritReason,
-                                IsPromoted = (empl.Salary as FacultySalaryViewModel).IsPromoted,
-                                IsProjection = false
+                                IsPromoted = (empl.Salary as FacultySalaryViewModel).IsPromoted
                             };
                             pa.Compensations.Add(merit);
                             Db.SaveChanges();
                         }
 
                         //Special adjustment for the NEXT year
+                        //These special adjustments are part of the base salary and they always
+                        //have start and end dates. 
                         string name = "Special Adjustment";
                         if (empl.FacultySalary.SpecialAdjustment > 0)
                         {
                             Adjustment sa = Db.Adjustments
-                            .Where(a => a.PositionAssignmentId == pa.Id && a.StartDate == nextYearStartDate && a.EndDate == nextYearEndDate && a.Name == name && a.IsProjection == false)
+                                .Where(a => a.PositionAssignmentId == pa.Id
+                                    && a.StartDate == nextYearStartDate 
+                                    && a.EndDate == nextYearEndDate 
+                                    && a.Name == name)
                                 .FirstOrDefault();
 
                             if (sa == null)
@@ -458,7 +461,6 @@ namespace PD.Services
                                     EndDate = nextYearEndDate,
                                     Value = empl.FacultySalary.SpecialAdjustment,
                                     Name = name,
-                                    IsProjection = false,
                                     IsBaseSalaryComponent = true
                                 };
                                 pa.Compensations.Add(sa);
@@ -470,16 +472,40 @@ namespace PD.Services
                         name = "Market Supplement";
                         if (empl.FacultySalary.MarketSupplement > 0)
                         {
+                            //There can be only one Market Supplement can exist at a given time 
+                            //and it can have an open end date. Therefore, here we select the 
+                            //first active market supplement, if any, for this period.
+                            //In this import method, we are not going to set end dates.
                             Adjustment sa = Db.Adjustments
-                                .Where(a => a.PositionAssignmentId == pa.Id && a.StartDate == nextYearStartDate && a.EndDate == nextYearEndDate && a.Name == name && a.IsProjection == false)
+                                .Where(a => a.PositionAssignmentId == pa.Id 
+                                    && a.StartDate <= nextYearStartDate
+                                    && a.EndDate.HasValue == false || a.EndDate >= nextYearEndDate
+                                    && a.Name == name)
                                 .FirstOrDefault();
+
+                            if(sa != null && sa.Value != empl.FacultySalary.MarketSupplement)
+                            {
+                                //Market suppliment exist for the period but it's value is different.
+
+                                //If the start date is the same, then we simply update the value
+                                if (sa.StartDate == nextYearStartDate)
+                                    sa.Value = empl.FacultySalary.MarketSupplement;
+                                else
+                                {
+                                    //Here we need to put and end date for the existing Market Supplement
+                                    //and recreate a new one. For the re-creation, we will simply set 
+                                    //the variable to null and a new one will be created in the code of
+                                    //"if(sa == null) case.
+                                    sa.EndDate = nextYearStartDate.AddDays(-1);
+                                    sa = null;
+                                }
+                            }
 
                             if (sa == null)
                             {
                                 sa = new Adjustment()
                                 {
                                     StartDate = nextYearStartDate,
-                                    EndDate = nextYearEndDate,
                                     Value = empl.FacultySalary.MarketSupplement,
                                     Name = name,
                                     IsProjection = false,

@@ -44,7 +44,7 @@ namespace PD.Controllers.Api
                 var compensations = _context.Compensations
                     .Include(comp => comp.PositionAssignment)
                     .Where(comp => t >= comp.StartDate
-                                   && t <= comp.EndDate
+                                   && (comp.EndDate.HasValue == false  || t <= comp.EndDate)
                                    && (comp.PositionAssignment.Status == Models.PositionAssignment.eStatus.Active
                                       || comp.PositionAssignment.Status == Models.PositionAssignment.eStatus.PostRetirement
                                       || comp.PositionAssignment.Status == Models.PositionAssignment.eStatus.PreRetirement

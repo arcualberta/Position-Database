@@ -44,7 +44,7 @@ namespace PD.Services.Projections.Rules
                 pa.Compensations.Add(currentSalary);
             }
 
-            //Resetting the Calue and IsProjection flags of the current salary
+            //Resetting the Value and IsProjection flags of the current salary
             currentSalary.Value = pastSalary.Value;
             currentSalary.IsProjection = false;
 
@@ -53,12 +53,17 @@ namespace PD.Services.Projections.Rules
                 if (c == currentSalary)
                     continue;
 
-                //Add all values of compensations in the current period to the current salary value
-                currentSalary.Value += c.Value;
+                //If c is a base salary component then add it's value to the new salary
+                if (c is Merit || c is ContractSettlement ||
+                    (c is Adjustment) && (c as Adjustment).IsBaseSalaryComponent
+                   )
+                {
+                    currentSalary.Value += c.Value;
 
-                //If any compensation in the current period is a projection then set
-                //the current salary also to be a projection.
-                currentSalary.IsProjection |= c.IsProjection;
+                    //If any compensation in the current period is a projection then set
+                    //the current salary also to be a projection.
+                    currentSalary.IsProjection |= c.IsProjection;
+                }
             }
 
             currentSalary.Value = Math.Round(currentSalary.Value);

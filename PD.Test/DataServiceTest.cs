@@ -77,7 +77,7 @@ namespace PD.Test
             ApplicationDbContext db = server.Db;
 
             FacultyProjectionService srv = _serviceProvider.GetService<FacultyProjectionService>();
-            for (int year = 2016; year < 2021; ++year)
+            for (int year = 2016; year < 2026; ++year)
             {
                 var result = srv.ProjectFacultySalaries(new DateTime(year, 7, 1).Date, true);
                 var errors = result.Errors.Distinct().ToList();
