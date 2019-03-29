@@ -31,10 +31,11 @@ namespace PD.Services.Projections.Rules.ContractSettlementComputations
             ContractSettlement atb = pa.GetCompensations<ContractSettlement>(targetDate).FirstOrDefault();
 
             //If no contract settlement exist for the specified perior, create a new one.
-            //Note that contract settlements always has an end date.
+            //Note that contract settlements always has an end date, which is the end of the 
+            //salary year by default.
             if (atb == null)
             {
-                DateTime startDate = pa.GetCycleStartDate(targetDate);
+                DateTime startDate = pa.GetSalaryCycleStartDate(targetDate);
                 atb = new ContractSettlement()
                 {
                     StartDate = startDate,

@@ -38,7 +38,7 @@ namespace PD.Services.Projections.Rules.MeritComputations
             Merit merit = pa.GetCompensations<Merit>(targetDate).FirstOrDefault();
             if (merit == null)
             {
-                DateTime startDate = pa.GetCycleStartDate(targetDate);
+                DateTime startDate = pa.GetSalaryCycleStartDate(targetDate);
                 merit = new Merit()
                 {
                     StartDate = startDate,

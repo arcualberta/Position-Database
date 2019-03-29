@@ -41,7 +41,7 @@ namespace PD.Services
             bool updateDatabase = false)
         {
             //Creating data structures to be able to calculate the projection
-            DateTime cycleStartDate = pa.GetCycleStartDate(targetDate);
+            DateTime cycleStartDate = pa.GetSalaryCycleStartDate(targetDate);
             if (!InitializeProjection(pa, targetDate, cycleStartDate, cycleStartDate.AddYears(1).AddDays(-1), defaultMeritDecision))
                 return null; ;
 

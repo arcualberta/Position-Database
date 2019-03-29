@@ -100,6 +100,7 @@ namespace PD.Models
         /// <param name="targetDate">The target date.</param>
         /// <param name="isProjection">if set to <c>true</c> then returns the projected compensation. Otherwise, retutns the confirmed compensation.</param>
         /// <returns></returns>
+        [Obsolete("This method is obsolete. Call GetCompensations<T>(DateTime targetDate) instead.", false)]
         public T GetCompensation<T>(DateTime targetDate, bool isProjection) where T : Compensation
         {
             return Compensations
@@ -107,6 +108,12 @@ namespace PD.Models
                 .FirstOrDefault() as T;
         }
 
+        /// <summary>
+        /// Returns all compensations of given type which are active at the given target date.
+        /// </summary>
+        /// <typeparam name="T">Type of compensations requested.</typeparam>
+        /// <param name="targetDate">The target date.</param>
+        /// <returns></returns>
         public IEnumerable<T> GetCompensations<T>(DateTime targetDate) where T : Compensation
         {
             return Compensations
@@ -172,8 +179,12 @@ namespace PD.Models
 
             return adjustments;
         }
-
-        public DateTime GetCycleStartDate(DateTime targetDate)
+        /// <summary>
+        /// Gets the salary-cycle start date of the period which includes the given target date.
+        /// </summary>
+        /// <param name="targetDate">The target date.</param>
+        /// <returns></returns>
+        public DateTime GetSalaryCycleStartDate(DateTime targetDate)
         {
             DateTime cycleStartDate = new DateTime(targetDate.Year, SalaryCycleStartMonth, SalaryCycleStartDay);
 
@@ -183,17 +194,14 @@ namespace PD.Models
             return cycleStartDate;
         }
 
-        public DateTime GetCycleEndDate(DateTime targetDate)
+        /// <summary>
+        /// Gets the salary-cycle end date of the period which includes the given target date.
+        /// </summary>
+        /// <param name="targetDate">The target date.</param>
+        /// <returns></returns>
+        public DateTime GetSalaryCycleEndDate(DateTime targetDate)
         {
-            return GetCycleStartDate(targetDate).AddYears(1).AddDays(-1);
-        }
-
-        public string GetCycleYearRange(DateTime targetDate)
-        {
-            DateTime cycleStartDate = GetCycleStartDate(targetDate);
-            return cycleStartDate.Month == 1 
-                ? cycleStartDate.Year.ToString() 
-                : string.Format("{0}-{1}", cycleStartDate.Year.ToString(), (cycleStartDate.Year + 1).ToString());
+            return GetSalaryCycleStartDate(targetDate).AddYears(1).AddDays(-1);
         }
 
         public void LogError(string message, DateTime targetDate)
@@ -201,8 +209,8 @@ namespace PD.Models
             AuditRecord record = new AuditRecord(AuditRecord.eAuditRecordType.Error)
             {
                 Message = message,
-                SalaryCycleStartDate = GetCycleStartDate(targetDate),
-                SalaryCycleEndDate = GetCycleEndDate(targetDate)
+                SalaryCycleStartDate = GetSalaryCycleStartDate(targetDate),
+                SalaryCycleEndDate = GetSalaryCycleEndDate(targetDate)
             };
             AuditTrail.Add(record);
         }
@@ -212,8 +220,8 @@ namespace PD.Models
             AuditRecord record = new AuditRecord(AuditRecord.eAuditRecordType.Warning)
             {
                 Message = message,
-                SalaryCycleStartDate = GetCycleStartDate(targetDate),
-                SalaryCycleEndDate = GetCycleEndDate(targetDate)
+                SalaryCycleStartDate = GetSalaryCycleStartDate(targetDate),
+                SalaryCycleEndDate = GetSalaryCycleEndDate(targetDate)
             };
             AuditTrail.Add(record);
         }
@@ -223,8 +231,8 @@ namespace PD.Models
             AuditRecord record = new AuditRecord(AuditRecord.eAuditRecordType.Info)
             {
                 Message = message,
-                SalaryCycleStartDate = GetCycleStartDate(targetDate),
-                SalaryCycleEndDate = GetCycleEndDate(targetDate)
+                SalaryCycleStartDate = GetSalaryCycleStartDate(targetDate),
+                SalaryCycleEndDate = GetSalaryCycleEndDate(targetDate)
             };
             AuditTrail.Add(record);
         }

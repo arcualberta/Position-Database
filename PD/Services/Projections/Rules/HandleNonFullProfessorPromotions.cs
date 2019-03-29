@@ -47,7 +47,7 @@ namespace PD.Services.Projections.Rules
 
                 //Putting an end date for the current position assignment and it's associated position
                 PositionAssignment oldPositionAssignment = pa;
-                oldPositionAssignment.EndDate = pa.GetCycleStartDate(targetDate).AddYears(1).AddDays(-1);
+                oldPositionAssignment.EndDate = pa.GetSalaryCycleStartDate(targetDate).AddYears(1).AddDays(-1);
                 oldPositionAssignment.Position.EndDate = oldPositionAssignment.EndDate;
 
                 //Creating a new position assignment

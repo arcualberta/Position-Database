@@ -48,7 +48,7 @@ namespace PD.Services.Projections.Rules.MeritComputations
             Merit merit = pa.GetCompensation<Merit>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
             if (merit == null)
             {
-                DateTime startDate = pa.GetCycleStartDate(targetDate);
+                DateTime startDate = pa.GetSalaryCycleStartDate(targetDate);
                 merit = new Merit()
                 {
                     StartDate = startDate,
@@ -118,7 +118,7 @@ namespace PD.Services.Projections.Rules.MeritComputations
                     //Since this individual got automatically promoted as the upper limit of 
                     //the previous scale was passed, we needs to close the current position and open a new one
 
-                    bool status = PromoteToFacultyPosition(ref pa, scheme.PromotedTitle, pa.GetCycleStartDate(targetDate));
+                    bool status = PromoteToFacultyPosition(ref pa, scheme.PromotedTitle, pa.GetSalaryCycleStartDate(targetDate));
                     if (!status)
                         throw new Exception(string.Format("Promoting to position {0} failed.", scheme.PromotedTitle));
 

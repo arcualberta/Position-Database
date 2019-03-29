@@ -35,7 +35,7 @@ namespace PD.Services.Projections.Rules
 
             if (currentSalary == null)
             {
-                DateTime startDate = pa.GetCycleStartDate(targetDate);
+                DateTime startDate = pa.GetSalaryCycleStartDate(targetDate);
                 currentSalary = new Salary()
                 {
                     StartDate = startDate,

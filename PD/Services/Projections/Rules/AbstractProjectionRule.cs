@@ -46,7 +46,7 @@ namespace PD.Services.Projections.Rules
 
         public Salary GetPastSalary(PositionAssignment pa, DateTime targetDate)
         {
-            DateTime lastDayOfPastSalaryCycle = pa.GetCycleStartDate(targetDate).AddDays(-1);
+            DateTime lastDayOfPastSalaryCycle = pa.GetSalaryCycleStartDate(targetDate).AddDays(-1);
 
             Salary pastSalary = GetSalary(pa, lastDayOfPastSalaryCycle);
 

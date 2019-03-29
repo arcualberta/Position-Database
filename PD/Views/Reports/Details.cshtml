@@ -57,7 +57,7 @@
     <div class="audit-summary">
         <h4>Audit Trail</h4>
         @{
-            DateTime cycle = Model.GetCycleStartDate(filter.Date);
+            DateTime cycle = Model.GetSalaryCycleStartDate(filter.Date);
             foreach (var log in Model.AuditTrail)
             {
                 if (log.SalaryCycleStartDate == cycle)
