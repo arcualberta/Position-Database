@@ -27,7 +27,7 @@ namespace PD.Services.Projections.Rules.ContractSettlementComputations
             //Current year's salary scale
             SalaryScale scale = GetSalaryScale(pa.Position.Title, targetDate);
 
-            pa.LogInfo("Computing contract settlement.", pa.GetCycleYearRange(targetDate));
+            pa.LogInfo("Computing contract settlement.", targetDate);
             ContractSettlement atb = pa.GetCompensations<ContractSettlement>(targetDate).FirstOrDefault();
 
             //If no contract settlement exist for the specified perior, create a new one.
@@ -51,7 +51,7 @@ namespace PD.Services.Projections.Rules.ContractSettlementComputations
             //is also a projection.
             atb.IsProjection = scale.IsProjection;
 
-            pa.LogInfo("Contract Settlement: $" + atb.Value, pa.GetCycleYearRange(targetDate));
+            pa.LogInfo("Contract Settlement: $" + atb.Value, targetDate);
             return true;
         }
     }

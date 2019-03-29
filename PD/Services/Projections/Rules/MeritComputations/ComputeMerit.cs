@@ -33,7 +33,7 @@ namespace PD.Services.Projections.Rules.MeritComputations
             //Current year's salary scale
             SalaryScale scale = GetSalaryScale(pa.Position.Title, targetDate);
 
-            pa.LogInfo("Computing merit for none-full professors", pa.GetCycleYearRange(targetDate));
+            pa.LogInfo("Computing merit for none-full professors", targetDate);
 
             Merit merit = pa.GetCompensations<Merit>(targetDate).FirstOrDefault();
             if (merit == null)
@@ -52,7 +52,7 @@ namespace PD.Services.Projections.Rules.MeritComputations
             merit.Value = merit.MeritDecision * scale.StepValue * pa.Position.Workload;
             merit.Value = Math.Round(merit.Value);
 
-            pa.LogInfo("Merit: $" + merit.Value, pa.GetCycleYearRange(targetDate));
+            pa.LogInfo("Merit: $" + merit.Value, targetDate);
             return true;
         }
     }

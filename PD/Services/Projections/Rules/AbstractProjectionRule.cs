@@ -137,13 +137,13 @@ namespace PD.Services.Projections.Rules
                         (c as Merit).IsPromoted = false;
                 }
 
-                pa.LogInfo("New position created", pa.GetCycleYearRange(promotionStartDate));
+                pa.LogInfo("New position created", promotionStartDate);
 
                 return true;
             }
             catch (Exception ex)
             {
-                pa.LogError(ex.Message, pa.GetCycleYearRange(promotionStartDate));
+                pa.LogError(ex.Message, promotionStartDate);
                 return false;
             }
         }

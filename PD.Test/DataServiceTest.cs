@@ -68,6 +68,8 @@ namespace PD.Test
             Assert.True(File.Exists(dataFile));
             ds.InjestFacultySalaryAdjustmentData(dataFile, false, worksheet2015_16, new DateTime(2015, 7, 1).Date,
                         new DateTime(2016, 06, 30).Date, new DateTime(2017, 06, 30).Date);
+
+            ComputeFacultySalaries();
         }
 
         [Fact]
@@ -77,9 +79,9 @@ namespace PD.Test
             ApplicationDbContext db = server.Db;
 
             FacultyProjectionService srv = _serviceProvider.GetService<FacultyProjectionService>();
-            for (int year = 2016; year < 2026; ++year)
+            for (int year = 2016; year < 2020; ++year)
             {
-                var result = srv.ProjectFacultySalaries(new DateTime(year, 7, 1).Date, true);
+                var result = srv.ProjectFacultySalaries(new DateTime(year, 7, 1).Date);
                 var errors = result.Errors.Distinct().ToList();
                 var successes = result.Successes;
             }

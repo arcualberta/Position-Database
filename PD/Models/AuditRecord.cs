@@ -15,8 +15,11 @@ namespace PD.Models
         public DateTime Timestamp { get; set; } = DateTime.Now;
         public string Message { get; set; }
         public eAuditRecordType AuditType { get; set; }
-        public string SalaryCycle { get; set; }
-
+        public DateTime SalaryCycleStartDate { get; set; }
+        public DateTime SalaryCycleEndDate { get; set; }
+        public int? PositionAssignmentId { get; set; }
+        public PositionAssignment PositionAssignment { get; set; }
+        public bool IsHistoric { get; set; } = false;
 
         public AuditRecord()
         {

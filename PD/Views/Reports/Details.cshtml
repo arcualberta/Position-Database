@@ -57,10 +57,10 @@
     <div class="audit-summary">
         <h4>Audit Trail</h4>
         @{
-            string cycle = Model.GetCycleYearRange(filter.Date);
+            DateTime cycle = Model.GetCycleStartDate(filter.Date);
             foreach (var log in Model.AuditTrail)
             {
-                if (log.SalaryCycle == cycle)
+                if (log.SalaryCycleStartDate == cycle)
                 {
                     <div>
                         <div>@*@log.Timestamp.ToLongDateString()*@</div>

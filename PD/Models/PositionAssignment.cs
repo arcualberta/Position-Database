@@ -181,7 +181,11 @@ namespace PD.Models
                 cycleStartDate = cycleStartDate.AddYears(-1);
 
             return cycleStartDate;
+        }
 
+        public DateTime GetCycleEndDate(DateTime targetDate)
+        {
+            return GetCycleStartDate(targetDate).AddYears(1).AddDays(-1);
         }
 
         public string GetCycleYearRange(DateTime targetDate)
@@ -192,36 +196,37 @@ namespace PD.Models
                 : string.Format("{0}-{1}", cycleStartDate.Year.ToString(), (cycleStartDate.Year + 1).ToString());
         }
 
-        public void LogError(string message, string salaryCycle)
+        public void LogError(string message, DateTime targetDate)
         {
             AuditRecord record = new AuditRecord(AuditRecord.eAuditRecordType.Error)
             {
                 Message = message,
-                SalaryCycle = salaryCycle
+                SalaryCycleStartDate = GetCycleStartDate(targetDate),
+                SalaryCycleEndDate = GetCycleEndDate(targetDate)
             };
             AuditTrail.Add(record);
         }
 
-        public void LogWarning(string message, string salaryCycle)
+        public void LogWarning(string message, DateTime targetDate)
         {
             AuditRecord record = new AuditRecord(AuditRecord.eAuditRecordType.Warning)
             {
                 Message = message,
-                SalaryCycle = salaryCycle
+                SalaryCycleStartDate = GetCycleStartDate(targetDate),
+                SalaryCycleEndDate = GetCycleEndDate(targetDate)
             };
             AuditTrail.Add(record);
         }
 
-        public void LogInfo(string message, string salaryCycle)
+        public void LogInfo(string message, DateTime targetDate)
         {
             AuditRecord record = new AuditRecord(AuditRecord.eAuditRecordType.Info)
             {
                 Message = message,
-                SalaryCycle = salaryCycle
+                SalaryCycleStartDate = GetCycleStartDate(targetDate),
+                SalaryCycleEndDate = GetCycleEndDate(targetDate)
             };
             AuditTrail.Add(record);
         }
-
-
     }
 }

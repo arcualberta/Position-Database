@@ -23,7 +23,7 @@ namespace PD.Services.Projections.Rules
             //Previous year's salary
             Salary pastSalary = GetPastSalary(pa, targetDate);
 
-            pa.LogInfo("Aggregating base salary components.", pa.GetCycleYearRange(targetDate));
+            pa.LogInfo("Aggregating base salary components.", targetDate);
 
             IEnumerable<Compensation> compensationsInCurrentPeriod =
                 pa.GetCompensations(targetDate).ToList();
@@ -67,7 +67,7 @@ namespace PD.Services.Projections.Rules
             }
 
             currentSalary.Value = Math.Round(currentSalary.Value);
-            pa.LogInfo("Aggregated salary: $" + currentSalary.Value, pa.GetCycleYearRange(targetDate));
+            pa.LogInfo("Aggregated salary: $" + currentSalary.Value, targetDate);
             return true;
         }
     }

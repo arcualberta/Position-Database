@@ -166,7 +166,7 @@ namespace PD.Services.Projections
         /// </summary>
         /// <param name="targetDate">The target date.
         /// </param>
-        public ComputationResult ProjectFacultySalaries(DateTime targetDate, bool clearPastAuditLog)
+        public ComputationResult ProjectFacultySalaries(DateTime targetDate)
         {
             //Creating instances of salary-calculation rules in the correct order of applying them
             List<AbstractProjectionRule> rules = GetSalaryCalculationRules();
@@ -175,10 +175,8 @@ namespace PD.Services.Projections
             IQueryable<PositionAssignment> query = Db.PositionAssignments
                 .Include(pa => pa.Position)
                 .Include(pa => pa.Person)
-                .Include(pa => pa.Compensations);
-
-            if (clearPastAuditLog)
-                query = query.Include(pa => pa.AuditTrail);
+                .Include(pa => pa.Compensations)
+                .Include(pa => pa.AuditTrail);
 
             query = query.Where(pa => pa.Position is Faculty
                             && pa.StartDate <= targetDate
@@ -190,8 +188,13 @@ namespace PD.Services.Projections
             ComputationResult result = new ComputationResult();
             foreach(PositionAssignment pa in facultyPositions)
             {
-                if (clearPastAuditLog)
-                    pa.AuditTrail.Clear();
+                DateTime salaryCycleStart = pa.GetCycleStartDate(targetDate);
+                List<AuditRecord> pastMatchingRecords = pa.AuditTrail
+                    .Where(r => r.SalaryCycleStartDate == salaryCycleStart && r.SalaryCycleEndDate == salaryCycleStart.AddYears(1).AddDays(-1))
+                    .ToList();
+
+                foreach (var au in pastMatchingRecords)
+                    au.IsHistoric = true;
 
                 ComputeCompensation(pa, targetDate, result, rules);
             }

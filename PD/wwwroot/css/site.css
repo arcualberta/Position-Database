@@ -93,6 +93,10 @@ div.clear{
     margin:10px 0 !important;
 }
 
+#alertsPane{
+    margin-top: 20px;
+}
+
 /*Table formatting*/
 /*
 .fixed_header {

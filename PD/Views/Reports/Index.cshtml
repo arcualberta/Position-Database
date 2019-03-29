@@ -60,6 +60,9 @@
 <div class="col-md-8">
     <h3>Budget</h3>
     <canvas id="canvas"></canvas>
+    <div id="alertsPane" class="alert alert-warning" style="display:none;">
+
+    </div>
 </div>
 
 <div class="clear"></div>
@@ -112,7 +115,7 @@
         $('#pos-types-all').prop('checked', allPositionTypesSelected);
         $('#pos-types-none').prop('checked', noPositionTypesSelected);
 
-
+        //Loading budget-summary graph
         $.ajax({
             url: '/api/budget/?from=' + dispConfig.from
                 + '&to=' + dispConfig.to
@@ -125,6 +128,25 @@
             dataType: "json",
             success: function (data, status, jqXHR) {
                 plotBudget(data);
+            },
+            error: function (jqXHR, status, err) {
+                console.error(err);
+            },
+        });
+
+        //Loading alert summary
+        $('#alertsPane').hide();
+        $('#alertsPane').empty();
+        $.ajax({
+            url: '/api/budget/alerts/' + dispConfig.from + '/' + dispConfig.to + '/' + dept + '/' + positionTypes,
+            type: "get",
+            contentType: "application/json",
+            dataType: "json",
+            success: function (data, status, jqXHR) {
+                if (data.length > 0) {
+                    $('#alertsPane').html(data.join('<br />'));
+                    $('#alertsPane').show();
+                }
             },
             error: function (jqXHR, status, err) {
                 console.error(err);
@@ -158,7 +180,6 @@
                 yAxisID: 'y-axis-2'
             }]
         };
-
 
         var ctx = document.getElementById('canvas').getContext('2d');
         if (window.budgetChart) {
@@ -232,6 +253,8 @@
                 }
             });
         }
+
+        //alertsPane
     }
 
     function currencyString(value) {
