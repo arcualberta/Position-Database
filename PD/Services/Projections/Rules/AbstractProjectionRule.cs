@@ -66,6 +66,24 @@ namespace PD.Services.Projections.Rules
                 .FirstOrDefault() as Salary;
         }
 
+        /// <summary>
+        /// Gets the start and end date for the contract settlement for the
+        /// period which include the given target date for a given position assignment.
+        /// </summary>
+        /// <param name="pa">The position assignment.</param>
+        /// <param name="targetDate">The target date.</param>
+        /// <returns>The start and end date for the contract settlement</returns>
+        public DateTime[] GetContractSettlementPeriod(PositionAssignment pa, DateTime targetDate)
+        {
+            //For faculty positions, the contract settlement period is as same as their salary cycle.
+            if(pa.Position is Faculty)
+            {
+                return new DateTime[] { pa.GetSalaryCycleStartDate(targetDate), pa.GetSalaryCycleEndDate(targetDate) };
+            }
+
+            throw new NotImplementedException("GetContractSettlementPeriod method is not implemented for non-faculty positions yet.");
+        }
+
         public bool PromoteToFacultyPosition(ref PositionAssignment pa, string newPositionTitle, DateTime promotionStartDate)
         {
             try

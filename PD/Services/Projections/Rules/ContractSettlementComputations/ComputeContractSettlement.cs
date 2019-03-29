@@ -35,11 +35,11 @@ namespace PD.Services.Projections.Rules.ContractSettlementComputations
             //salary year by default.
             if (atb == null)
             {
-                DateTime startDate = pa.GetSalaryCycleStartDate(targetDate);
+                DateTime[] periodLimits = GetContractSettlementPeriod(pa, targetDate);
                 atb = new ContractSettlement()
                 {
-                    StartDate = startDate,
-                    EndDate = startDate.AddYears(1).AddDays(-1)
+                    StartDate = periodLimits[0],
+                    EndDate = periodLimits[1]
                 };
                 pa.Compensations.Add(atb);
             }
