@@ -147,6 +147,8 @@ namespace PD.Services.Projections
                 }
                 catch (Exception ex)
                 {
+                    pa.LogError(ex.Message, targetDate);
+
                     if (statusAggregator != null)
                     {
                         ++statusAggregator.ErrorCount;
