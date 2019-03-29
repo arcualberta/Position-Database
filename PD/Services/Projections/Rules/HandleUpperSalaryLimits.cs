@@ -58,7 +58,7 @@ namespace PD.Services.Projections.Rules
                 pa.LogInfo("Adjusted merit: $" + merit.Value, targetDate);
             }
 
-            //Rule 2: if excess is still positive, try to reduce it by bringing down atb
+            //Rule 2: if excess is still positive, try to reduce it by bringing down the contract settlement
             if (excess > 0m)
             {
                 pa.LogInfo("Salary exceeds the upper limit by $" + excess, targetDate);
