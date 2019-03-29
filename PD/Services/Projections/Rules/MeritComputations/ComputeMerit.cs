@@ -44,7 +44,7 @@ namespace PD.Services.Projections.Rules.MeritComputations
                     StartDate = startDate,
                     EndDate = startDate.AddYears(1).AddDays(-1),
                     MeritDecision = scale.DefaultMeritDecision,
-                    IsProjection = true
+                    IsProjection = true //set to true because we are using the DefaultMeritDecision
                 };
                 pa.Compensations.Add(merit);
             }

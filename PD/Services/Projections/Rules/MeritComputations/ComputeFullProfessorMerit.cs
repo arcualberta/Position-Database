@@ -32,7 +32,9 @@ namespace PD.Services.Projections.Rules.MeritComputations
             if ((pa.Position as Faculty).ContractType == Position.eContractType.S)
                 throw new Exception("Position contract status was set to \"S\". This individual should hold a pre-retirement or post-retirement rank, not a professor rank.");
 
-            Salary pastSalary = pa.GetCompensation<Salary>(targetDate.AddYears(-1), PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
+            Salary pastSalary = GetPastSalary(pa, targetDate);
+
+            DateTime salaryCycleStartDate = pa.GetSalaryCycleStartDate(targetDate);
 
             //Finding the salary scale on which this individual sat in the previous year
             SalaryScale scale = Db.SalaryScales
@@ -45,17 +47,15 @@ namespace PD.Services.Projections.Rules.MeritComputations
                 .FirstOrDefault();
 
             //Merit for the target year
-            Merit merit = pa.GetCompensation<Merit>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
+            Merit merit = pa.GetCompensations<Merit>(targetDate).FirstOrDefault();
             if (merit == null)
             {
-                DateTime startDate = pa.GetSalaryCycleStartDate(targetDate);
                 merit = new Merit()
                 {
-                    StartDate = startDate,
-                    EndDate = startDate.AddYears(1).AddDays(-1),
+                    StartDate = salaryCycleStartDate,
+                    EndDate = salaryCycleStartDate.AddYears(1).AddDays(-1),
                     MeritDecision = scale.DefaultMeritDecision,
-                    IsProjection = true,
-                    Notes = string.Format("Projected on {0}", DateTime.Now)
+                    IsProjection = true //set to true because we are using the DefaultMeritDecision
                 };
                 pa.Compensations.Add(merit);
             }

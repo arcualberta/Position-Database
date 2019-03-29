@@ -20,7 +20,7 @@ namespace PD.Services.Projections.Rules.MeritComputations
             if (!pa.IsPaidOn(targetDate))
                 return true;
 
-            throw new NotImplementedException();
+            throw new NotImplementedException("ComputePostRetirementProfMerit.Execute not implemented yet.");
         }
     }
 }
