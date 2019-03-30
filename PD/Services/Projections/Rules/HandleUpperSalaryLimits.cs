@@ -25,7 +25,7 @@ namespace PD.Services.Projections.Rules
             if (pa.Position.Title == Faculty.eRank.Professor3.ToString())
                 return false; //No upper limit for full professor 3
 
-            Salary salary = GetPastSalary(pa, targetDate);
+            Salary salary = GetSalary(pa, targetDate);
 
             SalaryScale scale = GetSalaryScale(pa.Position.Title, targetDate);
 
