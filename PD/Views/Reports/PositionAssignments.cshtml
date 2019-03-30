@@ -90,17 +90,17 @@
                 string startDate = item.Position.StartDate.HasValue ? item.Position.StartDate.Value.ToString("yyyy-MM-dd") : "";
                 string endDate = item.Position.EndDate.HasValue ? item.Position.EndDate.Value.ToString("yyyy-MM-dd") : "";
 
-                var previousSalary = item.GetCompensation<Salary>(filter.Date.AddYears(-1), false);
+                var previousSalary = item.GetCompensations<Salary>(filter.Date.AddYears(-1)).FirstOrDefault();
                 string previousSalaryVal = previousSalary != null ? previousSalary.Value.ToString("N") : "";
 
-                var atbVal = item.GetCompensation<ContractSettlement>(filter.Date, true);
+                var atbVal = item.GetCompensations<ContractSettlement>(filter.Date).FirstOrDefault();
                 string atb = atbVal != null ? atbVal.Value.ToString("N") : "";
 
-                var salary = item.GetCompensation<Salary>(filter.Date, false);
+                var salary = item.GetCompensations<Salary>(filter.Date).FirstOrDefault();
                 string projectedBaseSalaryVal = salary != null && salary.Value > 0 ? salary.Value.ToString("N") : "";
                 string actualBaseSalaryVal = salary != null && salary.ManualOverride.HasValue ? salary.ManualOverride.Value.ToString("N") : "";
 
-                var merit = item.GetCompensation<Merit>(filter.Date, false);
+                var merit = item.GetCompensations<Merit>(filter.Date).FirstOrDefault();
                 string meritIncrement = merit != null ? merit.Value.ToString("N") : "";
                 string promoted = merit != null && merit.IsPromoted ? "promoted" : "";
 

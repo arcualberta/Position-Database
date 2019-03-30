@@ -22,42 +22,42 @@ namespace PD.Services.Projections
         {
         }
 
-        /// <summary>
-        /// Calculates the salary of the given position assignment for the specified target year.
-        /// Note that this method relies on the necessary compensation components to be already loaded on to the given "pa"
-        /// </summary>
-        /// <param name="pa">The PositionAssignment to be updated.</param>
-        /// <param name="targetDate">The target date.</param>
-        /// <param name="projectionModeFlag">If set to true, then updates the projected salary. Otherwise, updates the confirmed salary </param>
-        public override PositionAssignment CalculateSalary(PositionAssignment pa, DateTime targetDate, bool projectionModeFlag)
-        {
-            //This service method is specifically designed only for faculty positions. Therefore, all
-            //positions must be faculty positions.
-            Faculty position = pa.Position as Faculty;
-            if (position == null)
-                throw new Exception("Error: a faculty position is expected.");
+        /////////////////// <summary>
+        /////////////////// Calculates the salary of the given position assignment for the specified target year.
+        /////////////////// Note that this method relies on the necessary compensation components to be already loaded on to the given "pa"
+        /////////////////// </summary>
+        /////////////////// <param name="pa">The PositionAssignment to be updated.</param>
+        /////////////////// <param name="targetDate">The target date.</param>
+        /////////////////// <param name="projectionModeFlag">If set to true, then updates the projected salary. Otherwise, updates the confirmed salary </param>
+        ////////////////public override PositionAssignment CalculateSalary(PositionAssignment pa, DateTime targetDate, bool projectionModeFlag)
+        ////////////////{
+        ////////////////    //This service method is specifically designed only for faculty positions. Therefore, all
+        ////////////////    //positions must be faculty positions.
+        ////////////////    Faculty position = pa.Position as Faculty;
+        ////////////////    if (position == null)
+        ////////////////        throw new Exception("Error: a faculty position is expected.");
 
-            //Target year's merit. Give priority for confirmed merits.
-            Merit merit = pa.GetCompensation<Merit>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
+        ////////////////    //Target year's merit. Give priority for confirmed merits.
+        ////////////////    Merit merit = pa.GetCompensation<Merit>(targetDate, PositionAssignment.eCompensationRetrievalPriority.ConfirmedFirst);
 
-            if (position.Rank == Faculty.eRank.Professor1 || position.Rank == Faculty.eRank.Professor2 || position.Rank == Faculty.eRank.Professor3)
-            {
-                pa = CalculateSalaryFullProfessor(pa, targetDate, projectionModeFlag);
-            }
-            else
-            {
-                if (merit.IsPromoted)
-                {
-                    //TODO: handle prmotions
-                }
-                else
-                {
-                    Salary newSalary = ProjectRegularSalary(pa, targetDate);
-                }
-            }
+        ////////////////    if (position.Rank == Faculty.eRank.Professor1 || position.Rank == Faculty.eRank.Professor2 || position.Rank == Faculty.eRank.Professor3)
+        ////////////////    {
+        ////////////////        pa = CalculateSalaryFullProfessor(pa, targetDate, projectionModeFlag);
+        ////////////////    }
+        ////////////////    else
+        ////////////////    {
+        ////////////////        if (merit.IsPromoted)
+        ////////////////        {
+        ////////////////            //TODO: handle prmotions
+        ////////////////        }
+        ////////////////        else
+        ////////////////        {
+        ////////////////            Salary newSalary = ProjectRegularSalary(pa, targetDate);
+        ////////////////        }
+        ////////////////    }
 
-            return pa;
-        }
+        ////////////////    return pa;
+        ////////////////}
 
         public PositionAssignment CalculateSalaryFullProfessor(PositionAssignment pa, DateTime targetDate, bool projectionModeFlag)
         {

@@ -26,7 +26,7 @@ namespace PD.Models
             LeaveWithoutPay
         }
 
-        public enum eCompensationRetrievalPriority { ProjectionFirst, ConfirmedFirst }
+        ////////////////public enum eCompensationRetrievalPriority { ProjectionFirst, ConfirmedFirst }
 
         [Key]
         public int Id { get; set; }
@@ -92,21 +92,21 @@ namespace PD.Models
             return pay;
         }
 
-        /// <summary>
-        /// Returns the projected or confirmed compensation of the give type T for the target date
-        /// from the compensations already loaded into memory.        
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="targetDate">The target date.</param>
-        /// <param name="isProjection">if set to <c>true</c> then returns the projected compensation. Otherwise, retutns the confirmed compensation.</param>
-        /// <returns></returns>
-        [Obsolete("This method is obsolete. Call GetCompensations<T>(DateTime targetDate) instead.", false)]
-        public T GetCompensation<T>(DateTime targetDate, bool isProjection) where T : Compensation
-        {
-            return Compensations
-                .Where(c => c is T && c.StartDate <= targetDate && c.EndDate >= targetDate && c.IsProjection == isProjection)
-                .FirstOrDefault() as T;
-        }
+        /////////////////// <summary>
+        /////////////////// Returns the projected or confirmed compensation of the give type T for the target date
+        /////////////////// from the compensations already loaded into memory.        
+        /////////////////// </summary>
+        /////////////////// <typeparam name="T"></typeparam>
+        /////////////////// <param name="targetDate">The target date.</param>
+        /////////////////// <param name="isProjection">if set to <c>true</c> then returns the projected compensation. Otherwise, retutns the confirmed compensation.</param>
+        /////////////////// <returns></returns>
+        ////////////////[Obsolete("This method is obsolete. Call GetCompensations<T>(DateTime targetDate) instead.", false)]
+        ////////////////public T GetCompensation<T>(DateTime targetDate, bool isProjection) where T : Compensation
+        ////////////////{
+        ////////////////    return Compensations
+        ////////////////        .Where(c => c is T && c.StartDate <= targetDate && c.EndDate >= targetDate && c.IsProjection == isProjection)
+        ////////////////        .FirstOrDefault() as T;
+        ////////////////}
 
         /// <summary>
         /// Returns all compensations of given type which are active at the given target date.
@@ -131,34 +131,34 @@ namespace PD.Models
                     && (c.EndDate.HasValue == false || c.EndDate > targetDate));
         }
 
-        /// <summary>
-        /// Returns the confirmed compensation of the give type T for the target date
-        /// from the compensations already loaded into memory. If it's not available but a projected one available that matches the criteria, then 
-        /// returns that projected one.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="targetDate">The target date.</param>
-        /// <returns></returns>
-        public T GetCompensation<T>(DateTime targetDate, eCompensationRetrievalPriority priority) where T : Compensation
-        {
-            //Set the flag to true if we should give a pririty for retrieving projections, and set false otherwise.
-            bool flag = priority == eCompensationRetrievalPriority.ProjectionFirst;
+        /////////////////// <summary>
+        /////////////////// Returns the confirmed compensation of the give type T for the target date
+        /////////////////// from the compensations already loaded into memory. If it's not available but a projected one available that matches the criteria, then 
+        /////////////////// returns that projected one.
+        /////////////////// </summary>
+        /////////////////// <typeparam name="T"></typeparam>
+        /////////////////// <param name="targetDate">The target date.</param>
+        /////////////////// <returns></returns>
+        ////////////////public T GetCompensation<T>(DateTime targetDate, eCompensationRetrievalPriority priority) where T : Compensation
+        ////////////////{
+        ////////////////    //Set the flag to true if we should give a pririty for retrieving projections, and set false otherwise.
+        ////////////////    bool flag = priority == eCompensationRetrievalPriority.ProjectionFirst;
 
-            //Get the projected compensation
-            T compensation = GetCompensation<T>(targetDate, flag); 
+        ////////////////    //Get the projected compensation
+        ////////////////    T compensation = GetCompensation<T>(targetDate, flag); 
 
-            //If the projected compensation does not exist then get the actual/confirmed compensation
-            if(compensation == null)
-                compensation = GetCompensation<T>(targetDate, !flag);
+        ////////////////    //If the projected compensation does not exist then get the actual/confirmed compensation
+        ////////////////    if(compensation == null)
+        ////////////////        compensation = GetCompensation<T>(targetDate, !flag);
 
-            //If the requested compensation is not found in the current position assignment BUT if a 
-            //pedecessor position assignment exists, then obtain the requested compensation from that 
-            //predecessor.
-            if (compensation == null && Predecessor != null)
-                compensation = Predecessor.GetCompensation<T>(targetDate, priority);
+        ////////////////    //If the requested compensation is not found in the current position assignment BUT if a 
+        ////////////////    //pedecessor position assignment exists, then obtain the requested compensation from that 
+        ////////////////    //predecessor.
+        ////////////////    if (compensation == null && Predecessor != null)
+        ////////////////        compensation = Predecessor.GetCompensation<T>(targetDate, priority);
 
-            return compensation;
-        }
+        ////////////////    return compensation;
+        ////////////////}
 
 
         /// <summary>
