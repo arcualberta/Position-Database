@@ -536,31 +536,6 @@ namespace PD.Services
 
                     }//End: foreach(var empl in employees)
 
-                    //Salary Scales
-                    //=============
-                    bool newDataAdded = AddFacultySalaryScale("AssistantProfessor", new DateTime(2015, 07, 01), new DateTime(2016, 06, 30), 76534, 106402, 2489, 1, 1, false);
-                    newDataAdded |= AddFacultySalaryScale("AssistantProfessor", new DateTime(2016, 07, 01), new DateTime(2017, 06, 30), 77299, 107467, 2514, 1, 1, false);
-                    newDataAdded |= AddFacultySalaryScale("AssistantProfessor", new DateTime(2017, 07, 01), new DateTime(2018, 06, 30), 78458, 109082, 2552, 1, 1, false);
-
-                    newDataAdded |= AddFacultySalaryScale("AssociateProfessor", new DateTime(2015, 07, 01), new DateTime(2016, 06, 30), 88971, 133645, 3191, 1, 1, false);
-                    newDataAdded |= AddFacultySalaryScale("AssociateProfessor", new DateTime(2016, 07, 01), new DateTime(2017, 06, 30), 89861, 134983, 3223, 1, 1, false);
-                    newDataAdded |= AddFacultySalaryScale("AssociateProfessor", new DateTime(2017, 07, 01), new DateTime(2016, 06, 30), 91209, 137003, 3271, 1, 1, false);
-
-                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2015, 07, 01), new DateTime(2016, 06, 30), 110715, 133226, 3752, 1, 1, false);
-                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2016, 07, 01), new DateTime(2017, 06, 30), 111822, 134561, 3790, 1, 1, false);
-                    newDataAdded |= AddFacultySalaryScale("Professor1", new DateTime(2017, 07, 01), new DateTime(2018, 06, 30), 113499, 136580, 3847, 1, 1, false);
-
-                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2015, 07, 01), new DateTime(2016, 06, 30), 133227, 145990, 3191, 1, 1, false);
-                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2016, 07, 01), new DateTime(2017, 06, 30), 134562, 147453, 3223, 1, 1, false);
-                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2017, 07, 01), new DateTime(2018, 06, 30), 136581, 149664, 3271, 1, 1, false);
-
-                    newDataAdded |= AddFacultySalaryScale("Professor3", new DateTime(2015, 07, 01), new DateTime(2016, 06, 30), 145991, 389913, 2489, 1, 1, false);
-                    newDataAdded |= AddFacultySalaryScale("Professor3", new DateTime(2016, 07, 01), new DateTime(2017, 06, 30), 147454, 393826, 2514, 1, 1, false);
-                    newDataAdded |= AddFacultySalaryScale("Professor2", new DateTime(2017, 07, 01), new DateTime(2018, 06, 30), 149665, 399761, 2552, 1, 1, false);
-
-                    if (newDataAdded)
-                        Db.SaveChanges();
-
                     //Adding promotion schemes
                     if (!Db.PromotionSchemes.Where(s => s.CurrentTitle == Faculty.eRank.AssistantProfessor.ToString()).Any())
                         Db.PromotionSchemes.Add(new PromotionScheme() { CurrentTitle = Faculty.eRank.AssistantProfessor.ToString(), PromotedTitle = Faculty.eRank.AssociateProfessor.ToString() });
@@ -581,7 +556,7 @@ namespace PD.Services
                 System.IO.File.Delete(fileName);
         }
 
-        protected bool AddFacultySalaryScale(string category, 
+        public bool AddFacultySalaryScale(string category, 
             DateTime startDate, 
             DateTime endDate, 
             decimal minSalary, 

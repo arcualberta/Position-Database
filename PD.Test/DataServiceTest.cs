@@ -55,10 +55,54 @@ namespace PD.Test
 
         }
 
+        [Fact]
+        public void CreateSalaryScales()
+        {
+            ImportService ds = _serviceProvider.GetService<ImportService>();
+
+            //Salary Scales
+            //=============
+            DateTime start, end;
+
+            start = new DateTime(2014, 07, 01);
+            end = new DateTime(2015, 06, 30);
+            ds.AddFacultySalaryScale("AssistantProfessor", start, end, 75403, 104827, 2452, 1m, 1.65m, false);
+            ds.AddFacultySalaryScale("AssociateProfessor", start, end, 87656, 131672, 3144, 1m, 1.65m, false);
+            ds.AddFacultySalaryScale("Professor1", start, end, 109079, 131260, 3697, 1m, 1.65m, false);
+            ds.AddFacultySalaryScale("Professor2", start, end, 131261, 143836, 3144, 1m, 1.65m, false);
+            ds.AddFacultySalaryScale("Professor3", start, end, 143837, 0, 2452, 1m, 1.65m, false);
+
+            start = new DateTime(2015, 07, 01);
+            end = new DateTime(2016, 06, 30);
+            ds.AddFacultySalaryScale("AssistantProfessor", start, end, 76534, 106402, 2489, 1m, 1.5m, false);
+            ds.AddFacultySalaryScale("AssociateProfessor", start, end, 88971, 133645, 3191, 1m, 1.5m, false);
+            ds.AddFacultySalaryScale("Professor1", start, end, 110715, 133226, 3752, 1m, 1.5m, false);
+            ds.AddFacultySalaryScale("Professor2", start, end, 133227, 145990, 3191, 1m, 1.5m, false);
+            ds.AddFacultySalaryScale("Professor3", start, end, 145991, 0, 2489, 1m, 1.5m, false);
+
+            start = new DateTime(2016, 07, 01);
+            end = new DateTime(2017, 06, 30);
+            ds.AddFacultySalaryScale("AssistantProfessor", start, end, 77299, 107467, 2514, 1m, 1m, false);
+            ds.AddFacultySalaryScale("AssociateProfessor", start, end, 89861, 134983, 3223, 1m, 1m, false);
+            ds.AddFacultySalaryScale("Professor1", start, end, 111822, 134561, 3790, 1m, 1m, false);
+            ds.AddFacultySalaryScale("Professor2", start, end, 134562, 147453, 3223, 1m, 1m, false);
+            ds.AddFacultySalaryScale("Professor3", start, end, 147454, 0, 2514, 1m, 1m, false);
+
+            start = new DateTime(2017, 07, 01);
+            end = new DateTime(2018, 06, 30);
+            ds.AddFacultySalaryScale("AssistantProfessor", start, end, 78458, 109082, 2552, 1m, 1.5m, false);
+            ds.AddFacultySalaryScale("AssociateProfessor", start, end, 91209, 137003, 3271, 1m, 1.5m, false);
+            ds.AddFacultySalaryScale("Professor1", start, end, 113499, 136580, 3847, 1m, 1.5m, false);
+            ds.AddFacultySalaryScale("Professor2", start, end, 136581, 149664, 3271, 1m, 1.5m, false);
+            ds.AddFacultySalaryScale("Professor3", start, end, 149665, 0, 2552, 1m, 1.5m, false);
+
+            ds.Db.SaveChanges();
+        }
 
         [Fact]
         public void ImportFacultyData2015_16()
         {
+
             SqlServerDb server = new SqlServerDb();
             ApplicationDbContext db = server.Db;
             ImportService ds = _serviceProvider.GetService<ImportService>();
@@ -69,6 +113,7 @@ namespace PD.Test
             ds.InjestFacultySalaryAdjustmentData(dataFile, false, worksheet2015_16, new DateTime(2015, 7, 1).Date,
                         new DateTime(2016, 06, 30).Date, new DateTime(2017, 06, 30).Date);
 
+            CreateSalaryScales();
             ComputeFacultySalaries();
         }
 

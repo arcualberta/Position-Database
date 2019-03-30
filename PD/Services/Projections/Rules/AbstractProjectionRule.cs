@@ -38,7 +38,7 @@ namespace PD.Services.Projections.Rules
                 .FirstOrDefault();
 
             if (scale == null)
-                throw new Exception(string.Format("No {0} salary scale not found for the year containing {0}",
+                throw new Exception(string.Format("No {0} salary scale not found for the year containing {1}",
                     positionTitle, targetDate.ToString("yyyy-MM-dd")));
 
             return scale;
