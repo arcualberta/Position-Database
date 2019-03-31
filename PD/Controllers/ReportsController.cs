@@ -23,12 +23,14 @@ namespace PD.Controllers
         private readonly ApplicationDbContext _context;
         private readonly ReportService _reportService;
         private readonly AppConfig _appConfig;
+        private readonly IPdDataProtector _dataProtector;
 
-        public ReportsController(ApplicationDbContext context, ReportService reportService, AppConfig appConfig)
+        public ReportsController(ApplicationDbContext context, ReportService reportService, AppConfig appConfig, IPdDataProtector dataProtector)
         {
             _context = context;
             _reportService = reportService;
             _appConfig = appConfig;
+            _dataProtector = dataProtector;
         }
 
         public IActionResult Index()
@@ -91,6 +93,21 @@ namespace PD.Controllers
 
             return View(pa);
         }
+
+        [HttpGet]
+        public IActionResult AuditTrail()
+        {
+            List<AuditRecord> audit = _context.AuditTrail
+                .Include(au => au.PositionAssignment)
+                .Include(au => au.PositionAssignment.Person)
+                .Where(au => au.IsHistoric == false)
+                .OrderByDescending(au => au.Timestamp)
+                .ToList();
+
+            ViewBag.DataProtector = _dataProtector;
+            return View(audit);
+        }
+
     }
 }
 

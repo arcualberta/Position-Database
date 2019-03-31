@@ -179,9 +179,9 @@ namespace PD.Test
             Assert.True(File.Exists(dataFile));
             ds.InjestFacultySalaryAdjustmentData(dataFile, false, worksheet2015_16, new DateTime(2015, 7, 1).Date,
                         new DateTime(2016, 06, 30).Date, new DateTime(2017, 06, 30).Date);
-
+            
             CreateSalaryScales();
-            //ComputeFacultySalaries();
+            ComputeFacultySalaries();
         }
 
         [Fact]

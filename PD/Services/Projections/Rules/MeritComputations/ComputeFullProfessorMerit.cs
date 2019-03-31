@@ -38,8 +38,10 @@ namespace PD.Services.Projections.Rules.MeritComputations
 
             //Finding the salary scale on which this individual sat in the previous year
             var scales = Db.SalaryScales
-                .Where(sc => sc.Minimum <= pastSalary.Value && sc.Maximum >= pastSalary.Value
-                    && sc.StartDate <= pastSalary.StartDate && sc.EndDate >= pastSalary.EndDate
+                .Where(sc => sc.Minimum <= pastSalary.Value 
+                    && (sc.Maximum == 0 || sc.Maximum >= pastSalary.Value) //sc.Maximum == 0 means no max limit
+                    && sc.StartDate <= pastSalary.StartDate 
+                    && sc.EndDate >= pastSalary.EndDate
                     && (sc.Category == Faculty.eRank.Professor1.ToString()
                         || sc.Category == Faculty.eRank.Professor2.ToString()
                         || sc.Category == Faculty.eRank.Professor3.ToString())
