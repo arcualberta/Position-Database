@@ -85,8 +85,8 @@ div.clear{
         margin-top: 15px;
     }
 
-.pd-compensation-action-panel{
-    float:right;
+.pd-panel-header-action-panel {
+    float: right;
 }
 
 .pd-check-bulk-control{

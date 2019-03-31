@@ -109,8 +109,11 @@
         var panel = $('<div class="panel panel-default"></div>');
         panel.attr('id', 'pa-' + posAssignment.id);
 
-        var panelHeading = $('<div class="panel-heading"><b>' + posAssignment.position.title + '</b> | ' + posAssignment.position.primaryDepartment.name + '</div>');
+        var panelHeading = $('<div class="panel-heading"><b>' + posAssignment.position.title + '</b> | <span>' + posAssignment.position.primaryDepartment.name + '</span></div>');
         panel.append(panelHeading);
+
+        var buttonPanel = createPositionHeaderButtonPanel(posAssignment.id);
+        panelHeading.append(buttonPanel);
 
         var panelBody = $('<div class="panel-body"></div>')
         panel.append(panelBody);
@@ -222,16 +225,14 @@
                 });
             }
         }
-
-
     }
 
     function createCompensationButtonPanel(paId, compStartDate, compEndDate) {
-        var panel = $("<span class='pd-compensation-action-panel'></span>");
+        var panel = $("<span class='pd-panel-header-action-panel'></span>");
         var btn = $('<button/>', {
             text: 'calculate',
             click: function () {
-                computeComensation(paId, compStartDate, compEndDate)
+                computeComensation(paId, compStartDate, compEndDate);
             }
         });
       
@@ -249,9 +250,44 @@
                 updateCompensationPanelContent(
                     result.data,
                     compStartDate,
-                    compEndDate, null,
+                    compEndDate, 
+                    null,
                     result.successes,
-                    result.errors)
+                    result.errors);
+            },
+            error: function (jqXHR, status, err) {
+                console.error(err);
+            },
+        });
+    }
+
+    function createPositionHeaderButtonPanel(paId) {
+        var panel = $("<span class='pd-panel-header-action-panel'></span>");
+        var btn = $('<button/>', {
+            text: 'add year',
+            click: function () {
+                addCompensationYear(paId);
+            }
+        });
+
+        panel.append(btn);
+        return panel;
+    }
+
+    function addCompensationYear(paId) {
+        $.ajax({
+            url: '/api/compensations/addyear/' + paId,
+            type: "post",
+            contentType: "application/json",
+            dataType: "json",
+            success: function (result, status, jqXHR) {
+                updateCompensationPanelContent(
+                    result.data,
+                    compStartDate,
+                    compEndDate, 
+                    null,
+                    result.successes,
+                    result.errors);
             },
             error: function (jqXHR, status, err) {
                 console.error(err);

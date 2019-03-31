@@ -37,14 +37,16 @@ namespace PD.Services.Projections.Rules.MeritComputations
             DateTime salaryCycleStartDate = pa.GetSalaryCycleStartDate(targetDate);
 
             //Finding the salary scale on which this individual sat in the previous year
-            SalaryScale scale = Db.SalaryScales
+            var scales = Db.SalaryScales
                 .Where(sc => sc.Minimum <= pastSalary.Value && sc.Maximum >= pastSalary.Value
                     && sc.StartDate <= pastSalary.StartDate && sc.EndDate >= pastSalary.EndDate
                     && (sc.Category == Faculty.eRank.Professor1.ToString()
                         || sc.Category == Faculty.eRank.Professor2.ToString()
                         || sc.Category == Faculty.eRank.Professor3.ToString())
                       )
-                .FirstOrDefault();
+                .ToList();
+
+            SalaryScale scale = scales.FirstOrDefault();
 
             //Merit for the target year
             Merit merit = pa.GetCompensations<Merit>(targetDate).FirstOrDefault();
@@ -122,6 +124,10 @@ namespace PD.Services.Projections.Rules.MeritComputations
                     if (!status)
                         throw new Exception(string.Format("Promoting to position {0} failed.", scheme.PromotedTitle));
 
+                    //Since a new position and position assignment created, we save the
+                    //Db changes right away so that we get Ids for newly created objects, in case they
+                    //were needed for rest of the computations.
+                    Db.SaveChanges();
                 }
             }
 

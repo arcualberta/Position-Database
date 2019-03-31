@@ -10,6 +10,7 @@ using PD.Models.AppViewModels;
 using PD.Services.Projections;
 using Microsoft.AspNetCore.Authorization;
 using PD.Models.Compensations;
+using PD.Models;
 
 namespace PD.Controllers.Api
 {
@@ -55,6 +56,30 @@ namespace PD.Controllers.Api
 
             //Removing duplicate error messages
             result.Errors = result.Errors.Distinct().ToList();
+            return result;
+        }
+
+        [HttpPost("addyear/{positionAssignmentId}")]
+        public ActionResult<ComputationResult> AddYear(int positionAssignmentId)
+        {
+            ComputationResult result = new ComputationResult();
+
+            try
+            {
+                Compensation[] newCompensations = _facultyProjectionService.AddCompensationsForNextYear(positionAssignmentId);
+
+                //Eliminating unnecessary data for the view
+                foreach (var d in newCompensations)
+                    d.PositionAssignment = null;
+
+                result.Data = newCompensations;
+            }
+            catch(Exception ex)
+            {
+                result.Errors.Add(ex.Message);
+                result.ErrorCount = 1;
+            }
+
             return result;
         }
     }

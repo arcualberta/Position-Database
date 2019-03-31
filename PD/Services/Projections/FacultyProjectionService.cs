@@ -126,6 +126,36 @@ namespace PD.Services.Projections
             return ComputeCompensation(positionAssignment, targetDate, statusAggregator, computationRules);
         }
 
+        public Compensation[] AddCompensationsForNextYear(int positionAssignmentId)
+        {
+            PositionAssignment positionAssignment = Db.PositionAssignments
+                .Include(pa => pa.Position)
+                .Include(pa => pa.Compensations)
+                .Where(pa => pa.Id == positionAssignmentId)
+                .FirstOrDefault();
+
+            if (positionAssignment == null)
+                throw new Exception($"Requested position assignment with ID {positionAssignmentId} not found");
+
+            Compensation latestCompensationRecord = positionAssignment.Compensations
+                .OrderByDescending(c => c.StartDate)
+                .FirstOrDefault();
+
+            DateTime newCompensationStartDate = latestCompensationRecord != null
+                ? latestCompensationRecord.StartDate.AddYears(1)
+                : DateTime.Now.Date;
+
+            Salary salary = new Salary()
+            {
+                StartDate = newCompensationStartDate,
+                EndDate = newCompensationStartDate.AddYears(1).AddDays(-1)
+            };
+            positionAssignment.Compensations.Add(salary);
+
+            Db.SaveChanges();
+            return new Compensation[] { salary };
+        }
+
         public bool ComputeCompensation(
             PositionAssignment pa,
             DateTime targetDate,
@@ -178,6 +208,7 @@ namespace PD.Services.Projections
                 .Include(pa => pa.Position)
                 .Include(pa => pa.Person)
                 .Include(pa => pa.Compensations)
+                .Include(pa => pa.Predecessor)
                 .Include(pa => pa.AuditTrail);
 
             query = query.Where(pa => pa.Position is Faculty

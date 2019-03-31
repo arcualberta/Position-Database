@@ -6,6 +6,7 @@ using PD.Models.SalaryScales;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace PD.Services.Projections.Rules
@@ -51,8 +52,20 @@ namespace PD.Services.Projections.Rules
             Salary pastSalary = GetSalary(pa, lastDayOfPastSalaryCycle);
 
             if (pastSalary == null)
-                throw new Exception(string.Format("Past year's salary not found for the target date of {0} for the position of {1} of {2}",
-                    targetDate, pa.Position.Title, Dp.Decrypt(pa.Person.Name)));
+            {
+                if (pa.PredecessorId != null)
+                {
+                    PositionAssignment predecessor = Db.PositionAssignments
+                        .Include(pas => pas.Compensations)
+                        .Where(pas => pas.Id == pa.PredecessorId)
+                        .FirstOrDefault();
+                    pastSalary = GetPastSalary(predecessor, targetDate);
+
+                }
+                else
+                    throw new Exception(string.Format("Past year's salary not found for the target date of {0} for the position of {1} of {2}",
+                        targetDate, pa.Position.Title, Dp.Decrypt(pa.Person.Name)));
+            }
 
             return pastSalary;
         }
@@ -101,7 +114,7 @@ namespace PD.Services.Projections.Rules
                     SalaryCycleStartDay = oldPositionAssignment.SalaryCycleStartDay,
                     SalaryCycleStartMonth = oldPositionAssignment.SalaryCycleStartMonth,
                     PositionId = oldPositionAssignment.PositionId,
-                    Status = oldPositionAssignment.Status,
+                    Status = oldPositionAssignment.Status
                 };
                 Db.PositionAssignments.Add(pa);
 
@@ -116,6 +129,7 @@ namespace PD.Services.Projections.Rules
                     StartDate = pa.StartDate,
                     Title = newPositionTitle,
                     Workload = oldPositionAssignment.Position.Workload,
+                    PrimaryDepartmentId = oldPositionAssignment.Position.PrimaryDepartmentId
                 };
                 position.PositionAssignments.Add(pa);
                 pa.Position = position;
@@ -128,7 +142,8 @@ namespace PD.Services.Projections.Rules
                 //Transferring all compensations recorded for the target year in the old position account 
                 //into the new one
                 List<Compensation> compensations = oldPositionAssignment.Compensations
-                    .Where(c => c.StartDate <= promotionStartDate && c.EndDate >= promotionStartDate)
+                    .Where(c => c.StartDate <= promotionStartDate 
+                        && (c.EndDate.HasValue == false || c.EndDate >= promotionStartDate))
                     .ToList();
                 foreach (Compensation c in compensations)
                 {
