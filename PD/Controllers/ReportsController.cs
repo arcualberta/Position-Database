@@ -95,13 +95,15 @@ namespace PD.Controllers
         }
 
         [HttpGet]
-        public IActionResult AuditTrail()
+        public IActionResult AuditTrail(int offset = 0, int take = 200)
         {
             List<AuditRecord> audit = _context.AuditTrail
                 .Include(au => au.PositionAssignment)
                 .Include(au => au.PositionAssignment.Person)
                 .Where(au => au.IsHistoric == false)
                 .OrderByDescending(au => au.Timestamp)
+                .Skip(offset)
+                .Take(take)
                 .ToList();
 
             ViewBag.DataProtector = _dataProtector;

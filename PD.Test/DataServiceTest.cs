@@ -181,7 +181,7 @@ namespace PD.Test
                         new DateTime(2016, 06, 30).Date, new DateTime(2017, 06, 30).Date);
             
             CreateSalaryScales();
-            ComputeFacultySalaries();
+            //ComputeFacultySalaries();
         }
 
         [Fact]

@@ -120,6 +120,7 @@ namespace PD.Services.Projections.Rules
 
                 //Linking the previous position assignment as the predecessor for this position assignment
                 pa.Predecessor = oldPositionAssignment;
+                pa.PredecessorId = oldPositionAssignment.Id;
 
                 Position position = new Faculty()
                 {

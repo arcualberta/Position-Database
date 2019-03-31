@@ -73,7 +73,7 @@ namespace PD.Services.Projections
                 new ComputeMerit(Db, _dataProtector) ,
                 new ComputeFullProfessorMerit(Db, _dataProtector),
                 new AggregateBaseSalaryComponents(Db, _dataProtector),
-                new HandleNonFullProfessorPromotions(Db, _dataProtector),
+                //new HandleNonFullProfessorPromotions(Db, _dataProtector),
                 new HandleUpperSalaryLimits(Db, _dataProtector)
             };
 
@@ -165,6 +165,9 @@ namespace PD.Services.Projections
             if (computationRules == null)
                 computationRules = GetSalaryCalculationRules();
 
+            pa.LogInfo($"Computing Compensation: {_dataProtector.Decrypt(pa.Person.Name)}", targetDate);
+            Db.SaveChanges();
+
             bool updated = false;
             foreach (AbstractProjectionRule rule in computationRules)
             {
@@ -208,7 +211,6 @@ namespace PD.Services.Projections
                 .Include(pa => pa.Position)
                 .Include(pa => pa.Person)
                 .Include(pa => pa.Compensations)
-                .Include(pa => pa.Predecessor)
                 .Include(pa => pa.AuditTrail);
 
             query = query.Where(pa => pa.Position is Faculty
