@@ -71,6 +71,11 @@ namespace PD.Test
             ds.AddFacultySalaryScale("Professor1", start, end, 109079, 131260, 3697, 1m, 1.65m, false);
             ds.AddFacultySalaryScale("Professor2", start, end, 131261, 143836, 3144, 1m, 1.65m, false);
             ds.AddFacultySalaryScale("Professor3", start, end, 143837, 0, 2452, 1m, 1.65m, false);
+            ds.AddFacultySalaryScale("FSO1", start, end, 63739, 88699, 2080, 1m, 1.65m, false);
+            ds.AddFacultySalaryScale("FSO2", start, end, 70500, 104828, 2452, 1m, 1.65m, false);
+            ds.AddFacultySalaryScale("FSO3", start, end, 87656, 131672, 3144, 1m, 1.65m, false);
+            ds.AddFacultySalaryScale("FSO41", start, end, 109079, 131260, 3697, 1m, 1.65m, false);
+            ds.AddFacultySalaryScale("FSO42", start, end, 131261, 143837, 3144, 1m, 1.65m, false);
 
             start = new DateTime(2015, 07, 01);
             end = new DateTime(2016, 06, 30);
@@ -79,6 +84,11 @@ namespace PD.Test
             ds.AddFacultySalaryScale("Professor1", start, end, 110715, 133226, 3752, 1m, 1.5m, false);
             ds.AddFacultySalaryScale("Professor2", start, end, 133227, 145990, 3191, 1m, 1.5m, false);
             ds.AddFacultySalaryScale("Professor3", start, end, 145991, 0, 2489, 1m, 1.5m, false);
+            ds.AddFacultySalaryScale("FSO1", start, end, 64695, 90027, 2111, 1m, 1.5m, false);
+            ds.AddFacultySalaryScale("FSO2", start, end, 71558, 106404, 2489, 1m, 1.5m, false);
+            ds.AddFacultySalaryScale("FSO3", start, end, 88971, 133645, 3191, 1m, 1.5m, false);
+            ds.AddFacultySalaryScale("FSO41", start, end, 110715, 133226, 3752, 1m, 1.5m, false);
+            ds.AddFacultySalaryScale("FSO42", start, end, 133227, 145991, 3191, 1m, 1.5m, false);
 
             start = new DateTime(2016, 07, 01);
             end = new DateTime(2017, 06, 30);
@@ -87,6 +97,11 @@ namespace PD.Test
             ds.AddFacultySalaryScale("Professor1", start, end, 111822, 134561, 3790, 1m, 1m, false);
             ds.AddFacultySalaryScale("Professor2", start, end, 134562, 147453, 3223, 1m, 1m, false);
             ds.AddFacultySalaryScale("Professor3", start, end, 147454, 0, 2514, 1m, 1m, false);
+            ds.AddFacultySalaryScale("FSO1", start, end, 65342, 90926, 2132, 1m, 1m, false);
+            ds.AddFacultySalaryScale("FSO2", start, end, 72274, 107470, 2514, 1m, 1m, false);
+            ds.AddFacultySalaryScale("FSO3", start, end, 89861, 134983, 3223, 1m, 1m, false);
+            ds.AddFacultySalaryScale("FSO41", start, end, 111822, 134561, 3790, 1m, 1m, false);
+            ds.AddFacultySalaryScale("FSO42", start, end, 134562, 147454, 3223, 1m, 1m, false);
 
             start = new DateTime(2017, 07, 01);
             end = new DateTime(2018, 06, 30);
@@ -95,6 +110,11 @@ namespace PD.Test
             ds.AddFacultySalaryScale("Professor1", start, end, 113499, 136580, 3847, 1m, 1.5m, false);
             ds.AddFacultySalaryScale("Professor2", start, end, 136581, 149664, 3271, 1m, 1.5m, false);
             ds.AddFacultySalaryScale("Professor3", start, end, 149665, 0, 2552, 1m, 1.5m, false);
+            ds.AddFacultySalaryScale("FSO1", start, end, 66322, 92290, 2164, 1m, 1m, false);
+            ds.AddFacultySalaryScale("FSO2", start, end, 73358, 109086, 2552, 1m, 1m, false);
+            ds.AddFacultySalaryScale("FSO3", start, end, 91209, 137003, 3271, 1m, 1m, false);
+            ds.AddFacultySalaryScale("FSO41", start, end, 113499, 136580, 3847, 1m, 1m, false);
+            ds.AddFacultySalaryScale("FSO42", start, end, 136581, 149665, 3271, 1m, 1m, false);
 
 
             //Predicted values
@@ -162,6 +182,71 @@ namespace PD.Test
             ds.AddFacultySalaryScale("Professor3", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 165209, 0, 2816, 1m, 1.2m, true);
             ds.AddFacultySalaryScale("Professor3", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 167152, 0, 2849, 1m, 1.2m, true);
             ds.AddFacultySalaryScale("Professor3", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 169095, 0, 2882, 1m, 1.2m, true);
+
+            start_y = 2017;
+            end_y = 2018;
+            ds.AddFacultySalaryScale("FSO1", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 67183, 93487, 2192, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO1", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 68044, 94684, 2220, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO1", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 68905, 95881, 2248, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO1", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 69766, 97078, 2276, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO1", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 70627, 98275, 2304, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO1", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 71488, 99472, 2332, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO1", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 72349, 100669, 2360, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO1", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 73210, 101866, 2388, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO1", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 74071, 103063, 2416, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO1", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 74932, 104260, 2444, 1m, 1.2m, true);
+
+            start_y = 2017;
+            end_y = 2018;
+            ds.AddFacultySalaryScale("FSO2", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 74311, 110505, 2585, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO2", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 75264, 111924, 2618, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO2", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 76217, 113343, 2651, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO2", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 77170, 114762, 2684, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO2", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 78123, 116181, 2717, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO2", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 79076, 117600, 2750, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO2", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 80029, 119019, 2783, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO2", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 80982, 120438, 2816, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO2", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 81935, 121857, 2849, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO2", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 82888, 123276, 2882, 1m, 1.2m, true);
+
+            start_y = 2017;
+            end_y = 2018;
+            ds.AddFacultySalaryScale("FSO3", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 92393, 138780, 3313, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO3", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 93577, 140557, 3355, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO3", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 94761, 142334, 3397, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO3", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 95945, 144111, 3439, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO3", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 97129, 145888, 3481, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO3", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 98313, 147665, 3523, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO3", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 99497, 149442, 3565, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO3", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 100681, 151219, 3607, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO3", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 101865, 152996, 3649, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO3", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 103049, 154773, 3691, 1m, 1.2m, true);
+
+            start_y = 2017;
+            end_y = 2018;
+            ds.AddFacultySalaryScale("FSO41", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 114972, 138353, 3897, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO41", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 116445, 140126, 3947, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO41", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 117918, 141899, 3997, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO41", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 119391, 143672, 4047, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO41", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 120864, 145445, 4097, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO41", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 122337, 147218, 4147, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO41", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 123810, 148991, 4197, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO41", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 125283, 150764, 4247, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO41", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 126756, 152537, 4297, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO41", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 128229, 154310, 4347, 1m, 1.2m, true);
+
+            start_y = 2017;
+            end_y = 2018;
+            ds.AddFacultySalaryScale("FSO42", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 138354, 151608, 3313, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO42", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 140127, 153551, 3355, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO42", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 141900, 155494, 3397, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO42", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 143673, 157437, 3439, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO42", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 145446, 159380, 3481, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO42", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 147219, 161323, 3523, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO42", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 148992, 163266, 3565, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO42", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 150765, 165209, 3607, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO42", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 152538, 167152, 3649, 1m, 1.2m, true);
+            ds.AddFacultySalaryScale("FSO42", new DateTime(++start_y, 07, 01), new DateTime(++end_y, 06, 30), 154311, 169095, 3691, 1m, 1.2m, true);
 
             ds.Db.SaveChanges();
         }

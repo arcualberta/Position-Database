@@ -19,10 +19,12 @@ namespace PD.Controllers.Api
     public class BudgetController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IPdDataProtector _dataProtector;
 
-        public BudgetController(ApplicationDbContext context)
+        public BudgetController(ApplicationDbContext context, IPdDataProtector dataProtector)
         {
             _context = context;
+            _dataProtector = dataProtector;
         }
 
         // GET: api/People/5
@@ -90,6 +92,7 @@ namespace PD.Controllers.Api
             //the requested time period
             var query = _context.AuditTrail
                 .Include(au => au.PositionAssignment.Position)
+                .Include(au => au.PositionAssignment.Person)
                 .Where(au =>
                     requestedPositionTypes.Contains(au.PositionAssignment.Position.Title)
                     && au.IsHistoric == false
@@ -99,7 +102,7 @@ namespace PD.Controllers.Api
 
             if (deptId > 0)
                 query = query.Where(au => au.PositionAssignment.Position.PrimaryDepartmentId == deptId);
-
+            
             string[] alerts = await query.Select(au => au.Message).Distinct().ToArrayAsync();
 
             return alerts;

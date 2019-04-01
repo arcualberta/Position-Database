@@ -223,6 +223,9 @@ namespace PD.Services.Projections
             ComputationResult result = new ComputationResult();
             foreach(PositionAssignment pa in facultyPositions)
             {
+                ////////if (!pa.Position.Title.StartsWith("FSO"))
+                ////////    continue;
+
                 DateTime salaryCycleStart = pa.GetSalaryCycleStartDate(targetDate);
                 List<AuditRecord> pastMatchingRecords = pa.AuditTrail
                     .Where(r => r.SalaryCycleStartDate == salaryCycleStart && r.SalaryCycleEndDate == salaryCycleStart.AddYears(1).AddDays(-1))

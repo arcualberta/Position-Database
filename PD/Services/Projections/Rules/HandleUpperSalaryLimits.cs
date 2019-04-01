@@ -37,7 +37,7 @@ namespace PD.Services.Projections.Rules
             pa.LogInfo("Handling upper salary limit", targetDate);
             salary.IsMaxed = true;
 
-            decimal excess = salary.Value - scale.Maximum;
+            decimal overpayment = salary.Value - scale.Maximum;
 
             //Rule 1: reduce the merit if, if applicable
             Merit merit = pa.GetCompensations<Merit>(targetDate).FirstOrDefault();
@@ -45,23 +45,30 @@ namespace PD.Services.Projections.Rules
             {
                 pa.LogInfo("Adjusting merits to handle upper salary limit.", targetDate);
                 pa.LogInfo("Original merit: $" + merit.Value, targetDate);
-                if (merit.Value >= excess)
+                if (merit.Value >= overpayment)
                 {
-                    merit.Value = merit.Value - excess;
-                    excess = 0;
+                    //Here, we can reduce the merit and nullify the overpayment. 
+                    //We also adjust the salary accordingly
+                    merit.Value = merit.Value - overpayment;
+                    salary.Value = salary.Value - overpayment;
+                    overpayment = 0;
                 }
                 else
                 {
-                    excess = excess - merit.Value;
+                    //Here we set the merit to zero and adjust the salary accordingly but
+                    //we will still have some overpayment left.
+                    salary.Value = salary.Value - merit.Value;
+                    overpayment = overpayment - merit.Value;
                     merit.Value = 0;
+
                 }
                 pa.LogInfo("Adjusted merit: $" + merit.Value, targetDate);
             }
 
-            //Rule 2: if excess is still positive, try to reduce it by bringing down the contract settlement
-            if (excess > 0m)
+            //Rule 2: if overpayment is still positive, try to reduce it by bringing down the contract settlement
+            if (overpayment > 0m)
             {
-                pa.LogInfo("Salary exceeds the upper limit by $" + excess, targetDate);
+                pa.LogInfo("Salary exceeds the upper limit by $" + overpayment, targetDate);
 
                 ContractSettlement atb = pa.GetCompensations<ContractSettlement>(targetDate).FirstOrDefault();
                 if (atb != null && atb.Value > 0.01m)
@@ -69,14 +76,20 @@ namespace PD.Services.Projections.Rules
                     pa.LogInfo("Adjusting contract settlement to handle upper salary limit.", targetDate);
                     pa.LogInfo("Original contract settlement: $" + atb.Value, targetDate);
 
-                    if (atb.Value >= excess)
+                    if (atb.Value >= overpayment)
                     {
-                        atb.Value = atb.Value - excess;
-                        excess = 0;
+                        //Here, we can reduce the contract settlement and nullify the overpayment
+                        //We also adjust the salary accordingly
+                        atb.Value = atb.Value - overpayment;
+                        salary.Value = salary.Value - overpayment;
+                        overpayment = 0;
                     }
                     else
                     {
-                        excess = excess - atb.Value;
+                        //Here we set the contract settlement to zero and adjust the salary accordingly.
+                        //However, we may still have some overpayment left.
+                        salary.Value = salary.Value - atb.Value;
+                        overpayment = overpayment - atb.Value;
                         atb.Value = 0;
                     }
                     pa.LogInfo("Adjusted contract settlement: $" + atb.Value, targetDate);
@@ -84,7 +97,7 @@ namespace PD.Services.Projections.Rules
             }
 
             //If we still have excess, then we will report it as a warning.
-            if (excess > 0m)
+            if (overpayment > 0m)
                 pa.LogWarning("Overpaid beyond the max salary limit for the scale!", targetDate);
 
             return true;
