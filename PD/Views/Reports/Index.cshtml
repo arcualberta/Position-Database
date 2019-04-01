@@ -11,6 +11,17 @@
         </div>
     </div>
     <div>
+        <h3>Period</h3>
+        <div>
+            @{
+                DateTime from = new DateTime(DateTime.Today.Year - 4, 07, 01).Date;
+                DateTime to = from.AddYears(5).Date;
+            }
+            <input name="from" id="budget-period-from" type="date" onchange="loadBudgetInfo();" value="@from.ToString("yyyy-MM-dd")" /> - 
+            <input name="to" id="budget-period-to" type="date" onchange="loadBudgetInfo();" value="@to.ToString("yyyy-MM-dd")" />
+        </div>
+    </div>
+    <div>
         <h3>Position Types</h3>
         <div class="pd-check-bulk-control">
             Select:
@@ -70,8 +81,6 @@
     var dispConfig = {};
 
     $(function () {
-        dispConfig.from = '2015-07-01';
-        dispConfig.to = '2019-06-30';
         dispConfig.stepInMonths = 6;
 
         loadBudgetInfo();
@@ -84,6 +93,8 @@
 
     function loadBudgetInfo() {
         var dept = $('#ui-dept').val();
+        var from = $('#budget-period-from').val();
+        var to = $('#budget-period-to').val();
 
         var budgetOptions = [];
         var allBudgetOptionsSelected = true;
@@ -117,8 +128,8 @@
 
         //Loading budget-summary graph
         $.ajax({
-            url: '/api/budget/?from=' + dispConfig.from
-                + '&to=' + dispConfig.to
+            url: '/api/budget/?from=' + from
+                + '&to=' + to
                 + '&stepInMonths=' + dispConfig.stepInMonths
                 + '&deptId=' + dept
                 + '&budgetOptions=' + budgetOptions
