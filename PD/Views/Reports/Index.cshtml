@@ -149,7 +149,7 @@
         $('#alertsPane').hide();
         $('#alertsPane').empty();
         $.ajax({
-            url: '/api/budget/alerts/' + dispConfig.from + '/' + dispConfig.to + '/' + dept + '/' + positionTypes,
+            url: '/api/budget/alerts/' + from + '/' + to + '/' + dept + '/' + positionTypes,
             type: "get",
             contentType: "application/json",
             dataType: "json",
