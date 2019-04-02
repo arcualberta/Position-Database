@@ -64,22 +64,6 @@ namespace PD.Services.Projections
             return pa;
         }
 
-        protected List<AbstractProjectionRule> GetSalaryCalculationRules()
-        {
-            //Creating instances of salary-calculation rules in the correct order of applying them
-            List<AbstractProjectionRule> rules = new List<AbstractProjectionRule>()
-            {
-                new ComputeContractSettlement(Db, _dataProtector),
-                new ComputeMerit(Db, _dataProtector) ,
-                new ComputeFullProfessorMerit(Db, _dataProtector),
-                new AggregateBaseSalaryComponents(Db, _dataProtector),
-                //new HandleNonFullProfessorPromotions(Db, _dataProtector),
-                new HandleUpperSalaryLimits(Db, _dataProtector)
-            };
-
-            return rules;
-        }
-
         public void ComputeSalaries(
             int positionAssignmentId,
             DateTime from,

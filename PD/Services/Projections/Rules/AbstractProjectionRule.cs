@@ -32,44 +32,50 @@ namespace PD.Services.Projections.Rules
             Dp = dp;
         }
 
+        protected Person Person;
+        public void Execute(Person person, DateTime targetDate)
+        {
+            Person = person;
+
+            List<PositionAssignment> activePositionAssignments = person.PositionAssignments
+                .Where(pa => pa.StartDate <= targetDate
+                            && (pa.EndDate.HasValue == false || pa.EndDate >= targetDate)
+                      )
+                .ToList();
+
+            foreach(PositionAssignment pa in activePositionAssignments)
+            {
+                PositionAssignment p = pa;
+                Execute(ref p, targetDate);
+            }
+        }
+
+
+
+
+        private List<SalaryScale> _salaryScales;
         public SalaryScale GetSalaryScale(string positionTitle, DateTime targetDate)
         {
-            SalaryScale scale = Db.SalaryScales
-                .Where(sc => sc.StartDate <= targetDate && sc.EndDate >= targetDate && sc.Category == positionTitle)
+            if (_salaryScales == null)
+                _salaryScales = Db.SalaryScales.ToList();
+
+            var scale = _salaryScales.Where(sc => sc.StartDate <= targetDate && sc.EndDate >= targetDate && sc.Category == positionTitle)
                 .FirstOrDefault();
 
             if (scale == null)
-                throw new Exception(string.Format("No {0} salary scale not found for the year containing {1}",
-                    positionTitle, targetDate.ToString("yyyy-MM-dd")));
+                throw new Exception($"No {positionTitle} salary scale not found for the year containing {targetDate.ToString("yyyy-MM-dd")}");
 
             return scale;
         }
 
+        [Obsolete("AbstractProcessingRule.GetPastSalary deprecated. Use PositionAssignment.GetPastSalary method instead.")]
         public Salary GetPastSalary(PositionAssignment pa, DateTime targetDate)
         {
-            DateTime lastDayOfPastSalaryCycle = pa.GetSalaryCycleStartDate(targetDate).AddDays(-1);
-
-            Salary pastSalary = GetSalary(pa, lastDayOfPastSalaryCycle);
-
-            if (pastSalary == null)
-            {
-                if (pa.PredecessorId != null)
-                {
-                    PositionAssignment predecessor = Db.PositionAssignments
-                        .Include(pas => pas.Compensations)
-                        .Where(pas => pas.Id == pa.PredecessorId)
-                        .FirstOrDefault();
-                    pastSalary = GetPastSalary(predecessor, targetDate);
-
-                }
-                else
-                    throw new Exception(string.Format("Past year's salary not found for the target date of {0} for the position of {1} of {2}",
-                        targetDate, pa.Position.Title, Dp.Decrypt(pa.Person.Name)));
-            }
-
-            return pastSalary;
+            return pa.GetPastSalary(targetDate);
         }
 
+
+        [Obsolete("AbstractProcessingRule.GetSalary deprecated. Use PositionAssignment.GetSalary method instead.")]
         public Salary GetSalary(PositionAssignment pa, DateTime targetDate)
         {
             return pa.Compensations

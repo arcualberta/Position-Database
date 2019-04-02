@@ -92,21 +92,59 @@ namespace PD.Models
             return pay;
         }
 
-        /////////////////// <summary>
-        /////////////////// Returns the projected or confirmed compensation of the give type T for the target date
-        /////////////////// from the compensations already loaded into memory.        
-        /////////////////// </summary>
-        /////////////////// <typeparam name="T"></typeparam>
-        /////////////////// <param name="targetDate">The target date.</param>
-        /////////////////// <param name="isProjection">if set to <c>true</c> then returns the projected compensation. Otherwise, retutns the confirmed compensation.</param>
-        /////////////////// <returns></returns>
-        ////////////////[Obsolete("This method is obsolete. Call GetCompensations<T>(DateTime targetDate) instead.", false)]
-        ////////////////public T GetCompensation<T>(DateTime targetDate, bool isProjection) where T : Compensation
-        ////////////////{
-        ////////////////    return Compensations
-        ////////////////        .Where(c => c is T && c.StartDate <= targetDate && c.EndDate >= targetDate && c.IsProjection == isProjection)
-        ////////////////        .FirstOrDefault() as T;
-        ////////////////}
+        /// <summary>
+        /// Gets the salary for the salary cycle which includes the given targetDate.
+        /// </summary>
+        /// <param name="targetDate">The target date.</param>
+        /// <returns></returns>
+        public Salary GetSalary(DateTime targetDate)
+        {
+            return Compensations
+                .Where(c => c is Salary
+                    && c.StartDate <= targetDate
+                    && (c.EndDate.HasValue == false || c.EndDate >= targetDate))
+                .FirstOrDefault() as Salary;
+        }
+
+        /// <summary>
+        /// Gets the salary from the salary cycle which is immediately before
+        /// a given targetDate.
+        /// </summary>
+        /// <param name="targetDate">The target date.</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public Salary GetPastSalary(DateTime targetDate)
+        {
+            DateTime lastDayOfPastSalaryCycle = GetSalaryCycleStartDate(targetDate).AddDays(-1);
+
+            Salary pastSalary = GetSalary(lastDayOfPastSalaryCycle);
+
+            if (pastSalary == null)
+            {
+                //If this position assignment has a predecessor then get the past 
+                //salary from it.
+                if (PredecessorId != null)
+                {
+                    //Get the predecessor object from the person object associated 
+                    //with this position assignment
+                    PositionAssignment predecessor = Person.PositionAssignments
+                        .Where(pa => pa.Id == PredecessorId)
+                        .FirstOrDefault();
+
+                    if (predecessor == null)
+                        throw new Exception($"Predecessor ID {PredecessorId} is assigned to the position assignment {Id} but it is not loaded to the associated person object {Person.Id}.");
+
+                    pastSalary = predecessor.GetSalary(lastDayOfPastSalaryCycle);
+                }
+            }
+
+            if (pastSalary == null)
+                throw new Exception($"Past year's salary not found for the target date of {targetDate} for the position of {Position.Title} of the person {Person.Id}");
+
+            return pastSalary;
+        }
+
+
 
         /// <summary>
         /// Returns all compensations of given type which are active at the given target date.

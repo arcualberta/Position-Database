@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.DataProtection;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PD.Data;
 using PD.Models;
@@ -275,12 +272,18 @@ namespace PD.Test
             ApplicationDbContext db = server.Db;
 
             FacultyProjectionService srv = _serviceProvider.GetService<FacultyProjectionService>();
-            for (int year = 2016; year < 2026; ++year)
-            {
-                var result = srv.ProjectFacultySalaries(new DateTime(year, 7, 1).Date);
-                var errors = result.Errors.Distinct().ToList();
-                var successes = result.Successes;
-            }
+            ////for (int year = 2016; year < 2026; ++year)
+            ////{
+            ////    var result = srv.ProjectFacultySalaries(new DateTime(year, 7, 1).Date);
+            ////    var errors = result.Errors.Distinct().ToList();
+            ////    var successes = result.Successes;
+            ////}
+
+            string employeeId = "1086342";
+            srv.ComputeSalaries(
+                new DateTime(2016, 07, 01),
+                new DateTime(2026, 07, 01),
+                employeeId);
         }
 
         [Fact]
@@ -330,9 +333,13 @@ namespace PD.Test
                 .FirstOrDefault();
 
             FacultyProjectionService srv = _serviceProvider.GetService<FacultyProjectionService>();
-            srv.ComputeSalaries(pa_Id,
+            for (int year = 2016; year < 2026; ++year)
+            {
+                srv.ComputeSalaries(pa_Id,
                 new DateTime(2016, 7, 1).Date,
                 new DateTime(2019, 7, 1).Date);
+            }
+
         }
 
     }
