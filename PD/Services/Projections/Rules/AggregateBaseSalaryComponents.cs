@@ -21,7 +21,7 @@ namespace PD.Services.Projections.Rules
                 return true;
 
             //Previous year's salary
-            Salary pastSalary = GetPastSalary(pa, targetDate);
+            Salary pastSalary = pa.GetPastSalary(targetDate);
 
             pa.LogInfo("Aggregating base salary components.", targetDate);
 

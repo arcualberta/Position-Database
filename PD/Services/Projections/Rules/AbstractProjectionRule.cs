@@ -104,10 +104,23 @@ namespace PD.Services.Projections.Rules
                 SalaryCycleStartDay = oldPositionAssignment.SalaryCycleStartDay,
                 SalaryCycleStartMonth = oldPositionAssignment.SalaryCycleStartMonth,
                 PositionId = oldPositionAssignment.PositionId,
-                Status = oldPositionAssignment.Status
+                Status = oldPositionAssignment.Status,
+                Person = person
             };
             person.PositionAssignments.Add(pa);
 
+            //Creating a new position
+            Position position = new Faculty()
+            {
+                ContractType = oldPositionAssignment.Position.ContractType,
+                Number = oldPositionAssignment.Position.Number,
+                Rank = Enum.Parse<Faculty.eRank>(newPositionTitle),
+                Title = newPositionTitle,
+                Workload = oldPositionAssignment.Position.Workload,
+                PrimaryDepartmentId = oldPositionAssignment.Position.PrimaryDepartmentId
+            };
+            position.PositionAssignments.Add(pa);
+            pa.Position = position;
 
             //Setting the new position as the successor in the old position assignment
             //and the old position as the predecessor in the new position assignment

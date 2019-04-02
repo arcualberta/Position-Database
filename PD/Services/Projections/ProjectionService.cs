@@ -60,6 +60,8 @@ namespace PD.Services
                         rule.Execute(person, t);
                 }
             }
+
+            Db.SaveChanges();
         }
 
     }

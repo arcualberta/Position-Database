@@ -22,10 +22,12 @@ namespace PD.Services.Projections.Rules
             if (!pa.IsPaidOn(targetDate))
                 return true;
 
-            if (pa.Position.Title == Faculty.eRank.Professor3.ToString())
-                return false; //No upper limit for full professor 3
+            if (pa.Position.Title == Faculty.eRank.Professor3.ToString()
+                || pa.Position.Title == Faculty.eRank.Professor2.ToString()
+                || pa.Position.Title == Faculty.eRank.Professor1.ToString())
+                return false; //No upper limit for full professors
 
-            Salary salary = GetSalary(pa, targetDate);
+            Salary salary = pa.GetSalary(targetDate);
 
             SalaryScale scale = _salaryScaleService.GetSalaryScale(pa.Position.Title, targetDate);
 

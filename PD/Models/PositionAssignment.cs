@@ -123,19 +123,22 @@ namespace PD.Models
             {
                 //If this position assignment has a predecessor then get the past 
                 //salary from it.
-                if (PredecessorId != null)
+
+                PositionAssignment predecessor = Predecessor;
+                if (predecessor == null && PredecessorId != null)
                 {
                     //Get the predecessor object from the person object associated 
                     //with this position assignment
-                    PositionAssignment predecessor = Person.PositionAssignments
+                    predecessor = Person.PositionAssignments
                         .Where(pa => pa.Id == PredecessorId)
                         .FirstOrDefault();
 
                     if (predecessor == null)
                         throw new Exception($"Predecessor ID {PredecessorId} is assigned to the position assignment {Id} but it is not loaded to the associated person object {Person.Id}.");
-
-                    pastSalary = predecessor.GetSalary(lastDayOfPastSalaryCycle);
                 }
+
+                if(predecessor != null)
+                    pastSalary = predecessor.GetSalary(lastDayOfPastSalaryCycle);
             }
 
             if (pastSalary == null)

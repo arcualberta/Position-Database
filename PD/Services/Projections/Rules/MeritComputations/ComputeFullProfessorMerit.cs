@@ -133,10 +133,10 @@ namespace PD.Services.Projections.Rules.MeritComputations
 
                     PromoteToFacultyPosition(pa.Person, pa, scheme.PromotedTitle, pa.GetSalaryCycleStartDate(targetDate));
 
-                    //Since a new position and position assignment created, we save the
-                    //Db changes right away so that we get Ids for newly created objects, in case they
-                    //were needed for rest of the computations.
-                    Db.SaveChanges();
+                    //////////Since a new position and position assignment created, we save the
+                    //////////Db changes right away so that we get Ids for newly created objects, in case they
+                    //////////were needed for rest of the computations.
+                    ////////Db.SaveChanges();
                 }
             }
 
