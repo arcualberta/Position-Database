@@ -72,24 +72,95 @@ namespace PD.Services.Projections.Rules
                 .FirstOrDefault() as Salary;
         }
 
-        /// <summary>
-        /// Gets the start and end date for the contract settlement for the
-        /// period which include the given target date for a given position assignment.
-        /// </summary>
-        /// <param name="pa">The position assignment.</param>
-        /// <param name="targetDate">The target date.</param>
-        /// <returns>The start and end date for the contract settlement</returns>
-        public DateTime[] GetContractSettlementPeriod(PositionAssignment pa, DateTime targetDate)
+        /////// <summary>
+        /////// Gets the start and end date for the contract settlement for the
+        /////// period which include the given target date for a given position assignment.
+        /////// </summary>
+        /////// <param name="pa">The position assignment.</param>
+        /////// <param name="targetDate">The target date.</param>
+        /////// <returns>The start and end date for the contract settlement</returns>
+        ////public DateTime[] GetContractSettlementPeriod(PositionAssignment pa, DateTime targetDate)
+        ////{
+        ////    //For faculty positions, the contract settlement period is as same as their salary cycle.
+        ////    if(pa.Position is Faculty)
+        ////    {
+        ////        return new DateTime[] { pa.GetSalaryCycleStartDate(targetDate), pa.GetSalaryCycleEndDate(targetDate) };
+        ////    }
+
+        ////    throw new NotImplementedException("GetContractSettlementPeriod method is not implemented for non-faculty positions yet.");
+        ////}
+
+        public void PromoteToFacultyPosition(Person person, PositionAssignment pa, string newPositionTitle, DateTime promotionStartDate)
         {
-            //For faculty positions, the contract settlement period is as same as their salary cycle.
-            if(pa.Position is Faculty)
+            //Putting an end date for the current position assignment
+            PositionAssignment oldPositionAssignment = pa;
+            oldPositionAssignment.EndDate = promotionStartDate.AddDays(-1);
+
+            //Creating a new position assignment
+            pa = new PositionAssignment()
             {
-                return new DateTime[] { pa.GetSalaryCycleStartDate(targetDate), pa.GetSalaryCycleEndDate(targetDate) };
-            }
+                StartDate = oldPositionAssignment.EndDate.Value.AddDays(1),
+                PersonId = oldPositionAssignment.PersonId,
+                SalaryCycleStartDay = oldPositionAssignment.SalaryCycleStartDay,
+                SalaryCycleStartMonth = oldPositionAssignment.SalaryCycleStartMonth,
+                PositionId = oldPositionAssignment.PositionId,
+                Status = oldPositionAssignment.Status
+            };
+            person.PositionAssignments.Add(pa);
 
-            throw new NotImplementedException("GetContractSettlementPeriod method is not implemented for non-faculty positions yet.");
+
+            //Setting the new position as the successor in the old position assignment
+            //and the old position as the predecessor in the new position assignment
+            oldPositionAssignment.Successor = pa;
+            pa.Predecessor = oldPositionAssignment;
+
+
+            //Since we closed the old position assignment and created a new one, we
+            //carry over all compensations recorded for the target year in the old one
+            //into the new one
+            List<Compensation> compensationsToBeCarriedOver = oldPositionAssignment
+                .GetCompensations(promotionStartDate)
+                .ToList();
+
+            foreach (Compensation c in compensationsToBeCarriedOver)
+            {
+                //If the compensation start date is earlier than the start date of the new position assignment
+                //then we split the compensation into two and set the end date of the first half to be a day prior
+                //to the start date of the new position assignment and then we leave this first half with the 
+                //old position assigment, and then we carry over the second half to the new position assignment.
+                //If the start date of this compensation is as same as the start date of the new position assignment,
+                //then we simply carry it over to the new position assignment (and remove it from the old one)
+
+                Compensation comp;
+                if (c.StartDate < pa.StartDate)
+                {
+                    //Clone the compensation and set the new start date
+                    Compensation clone = c.Clone();
+                    clone.StartDate = pa.StartDate.Value;
+                    comp = clone;
+
+                    //Set the end date to the original compensation
+                    c.EndDate = pa.StartDate.Value.AddDays(-1);
+                }
+                else
+                {
+                    //We remove the compensation from the old position assignment
+                    pa.Compensations.Remove(c);
+                    comp = c;
+                }
+
+                //If this compensation is a merit, then we should set it's IsPromoted flag to false
+                //because we already created the promoted position here.
+                if (comp is Merit)
+                    (comp as Merit).IsPromoted = false;
+
+                //Now we add the compensation to the new position
+                pa.Compensations.Add(comp);
+
+            }//END: foreach (Compensation c in compensationsToBeCarriedOver)
+
+            pa.LogInfo("New position created", promotionStartDate);
         }
-
 
         public bool PromoteToFacultyPosition(ref PositionAssignment pa, string newPositionTitle, DateTime promotionStartDate)
         {

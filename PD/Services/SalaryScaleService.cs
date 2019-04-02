@@ -11,17 +11,16 @@ namespace PD.Services
     {
         public ApplicationDbContext _context { get; }
 
+        public readonly List<SalaryScale> _salaryScales;
+
         public SalaryScaleService(ApplicationDbContext ctx)
         {
             _context = ctx;
+            _salaryScales = _context.SalaryScales.ToList();
         }
 
-        private List<SalaryScale> _salaryScales;
         public SalaryScale GetSalaryScale(string positionTitle, DateTime targetDate)
         {
-            if (_salaryScales == null)
-                _salaryScales = _context.SalaryScales.ToList();
-
             var scale = _salaryScales.Where(sc => 
                     sc.StartDate <= targetDate 
                     && sc.EndDate >= targetDate 

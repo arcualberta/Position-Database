@@ -52,7 +52,7 @@ namespace PD.Services
             List<Person> persons = query.ToList();
             List<AbstractProjectionRule> rules = GetSalaryCalculationRules();
             
-            for(DateTime t = from; t<to; t = t.AddYears(1))
+            for(DateTime t = from; t < to; t = t.AddYears(1))
             {
                 foreach(var person in persons)
                 {

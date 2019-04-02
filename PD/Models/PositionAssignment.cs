@@ -145,7 +145,6 @@ namespace PD.Models
         }
 
 
-
         /// <summary>
         /// Returns all compensations of given type which are active at the given target date.
         /// </summary>
@@ -169,36 +168,6 @@ namespace PD.Models
                     && (c.EndDate.HasValue == false || c.EndDate > targetDate));
         }
 
-        /////////////////// <summary>
-        /////////////////// Returns the confirmed compensation of the give type T for the target date
-        /////////////////// from the compensations already loaded into memory. If it's not available but a projected one available that matches the criteria, then 
-        /////////////////// returns that projected one.
-        /////////////////// </summary>
-        /////////////////// <typeparam name="T"></typeparam>
-        /////////////////// <param name="targetDate">The target date.</param>
-        /////////////////// <returns></returns>
-        ////////////////public T GetCompensation<T>(DateTime targetDate, eCompensationRetrievalPriority priority) where T : Compensation
-        ////////////////{
-        ////////////////    //Set the flag to true if we should give a pririty for retrieving projections, and set false otherwise.
-        ////////////////    bool flag = priority == eCompensationRetrievalPriority.ProjectionFirst;
-
-        ////////////////    //Get the projected compensation
-        ////////////////    T compensation = GetCompensation<T>(targetDate, flag); 
-
-        ////////////////    //If the projected compensation does not exist then get the actual/confirmed compensation
-        ////////////////    if(compensation == null)
-        ////////////////        compensation = GetCompensation<T>(targetDate, !flag);
-
-        ////////////////    //If the requested compensation is not found in the current position assignment BUT if a 
-        ////////////////    //pedecessor position assignment exists, then obtain the requested compensation from that 
-        ////////////////    //predecessor.
-        ////////////////    if (compensation == null && Predecessor != null)
-        ////////////////        compensation = Predecessor.GetCompensation<T>(targetDate, priority);
-
-        ////////////////    return compensation;
-        ////////////////}
-
-
         /// <summary>
         /// Returns all adjustment instances which are part of the base salary for the period covering the target date.
         /// </summary>
@@ -217,6 +186,7 @@ namespace PD.Models
 
             return adjustments;
         }
+
         /// <summary>
         /// Gets the salary-cycle start date of the period which includes the given target date.
         /// </summary>
@@ -240,6 +210,17 @@ namespace PD.Models
         public DateTime GetSalaryCycleEndDate(DateTime targetDate)
         {
             return GetSalaryCycleStartDate(targetDate).AddYears(1).AddDays(-1);
+        }
+
+        /// <summary>
+        /// Gets the start and end date for the contract settlement for the
+        /// period which include the given target date for a given position assignment.
+        /// </summary>
+        /// <param name="targetDate">The target date.</param>
+        /// <returns>The start and end date for the contract settlement</returns>
+        public DateTime[] GetContractSettlementPeriod(DateTime targetDate)
+        {
+            return new DateTime[] { GetSalaryCycleStartDate(targetDate), GetSalaryCycleEndDate(targetDate) };
         }
 
         public void LogError(string message, DateTime targetDate)

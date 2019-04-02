@@ -22,7 +22,7 @@ namespace PD.Services.Projections.Rules.ContractSettlementComputations
                 return true;
 
             //Previous year's salary
-            Salary pastSalary = GetPastSalary(pa, targetDate);
+            Salary pastSalary = pa.GetPastSalary(targetDate);
 
             //Current year's salary scale
             SalaryScale scale = _salaryScaleService.GetSalaryScale(pa.Position.Title, targetDate);
@@ -35,7 +35,7 @@ namespace PD.Services.Projections.Rules.ContractSettlementComputations
             //salary year by default.
             if (atb == null)
             {
-                DateTime[] periodLimits = GetContractSettlementPeriod(pa, targetDate);
+                DateTime[] periodLimits = pa.GetContractSettlementPeriod(targetDate);
                 atb = new ContractSettlement()
                 {
                     StartDate = periodLimits[0],
