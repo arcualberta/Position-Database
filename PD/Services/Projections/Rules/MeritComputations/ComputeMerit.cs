@@ -12,8 +12,8 @@ namespace PD.Services.Projections.Rules.MeritComputations
 {
     public class ComputeMerit : AbstractProjectionRule
     {
-        public ComputeMerit(ApplicationDbContext db, IPdDataProtector dp)
-            : base(db, dp, "Compute Merit", "This rule computes the standard merit based on the merit decision, merit step and the position workload.")
+        public ComputeMerit(ApplicationDbContext db, IPdDataProtector dp, SalaryScaleService salaryScaleService)
+            : base(db, dp, salaryScaleService, "Compute Merit", "This rule computes the standard merit based on the merit decision, merit step and the position workload.")
         {
 
         }
@@ -31,7 +31,7 @@ namespace PD.Services.Projections.Rules.MeritComputations
             Salary pastSalary = GetPastSalary(pa, targetDate);
 
             //Current year's salary scale
-            SalaryScale scale = GetSalaryScale(pa.Position.Title, targetDate);
+            SalaryScale scale = _salaryScaleService.GetSalaryScale(pa.Position.Title, targetDate);
 
             pa.LogInfo("Computing merit for none-full professors", targetDate);
 

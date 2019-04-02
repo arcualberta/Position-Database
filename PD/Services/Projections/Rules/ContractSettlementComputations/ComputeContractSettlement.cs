@@ -11,8 +11,8 @@ namespace PD.Services.Projections.Rules.ContractSettlementComputations
 {
     public class ComputeContractSettlement : AbstractProjectionRule
     {
-        public ComputeContractSettlement(ApplicationDbContext db, IPdDataProtector dp)
-            : base(db, dp, "Contract Settlement", "This rule computes contract settlement of the salary")
+        public ComputeContractSettlement(ApplicationDbContext db, IPdDataProtector dp, SalaryScaleService salaryScaleService)
+            : base(db, dp, salaryScaleService, "Contract Settlement", "This rule computes contract settlement of the salary")
         {
         }
 
@@ -25,7 +25,7 @@ namespace PD.Services.Projections.Rules.ContractSettlementComputations
             Salary pastSalary = GetPastSalary(pa, targetDate);
 
             //Current year's salary scale
-            SalaryScale scale = GetSalaryScale(pa.Position.Title, targetDate);
+            SalaryScale scale = _salaryScaleService.GetSalaryScale(pa.Position.Title, targetDate);
 
             pa.LogInfo("Computing contract settlement.", targetDate);
             ContractSettlement atb = pa.GetCompensations<ContractSettlement>(targetDate).FirstOrDefault();

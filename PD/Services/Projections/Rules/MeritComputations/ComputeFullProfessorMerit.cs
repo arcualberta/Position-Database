@@ -12,8 +12,8 @@ namespace PD.Services.Projections.Rules.MeritComputations
 {
     public class ComputeFullProfessorMerit : AbstractProjectionRule
     {
-        public ComputeFullProfessorMerit(ApplicationDbContext db, IPdDataProtector dp)
-            : base(db, dp, "Compute Full Professor Merit", "This rule computes the standard merit based on the merit decision, merit step and the position workload.")
+        public ComputeFullProfessorMerit(ApplicationDbContext db, IPdDataProtector dp, SalaryScaleService salaryScaleService)
+            : base(db, dp, salaryScaleService, "Compute Full Professor Merit", "This rule computes the standard merit based on the merit decision, merit step and the position workload.")
         {
 
         }
@@ -68,7 +68,7 @@ namespace PD.Services.Projections.Rules.MeritComputations
             {
                 //There is no maximum limit for this scale, so simply apply the merit directly based on the 
                 //merit step of the scale for the target year
-                scale = GetSalaryScale(scale.Category, targetDate);
+                scale = _salaryScaleService.GetSalaryScale(scale.Category, targetDate);
                 merit.Value = merit.MeritDecision * scale.StepValue;
             }
             else
@@ -93,7 +93,7 @@ namespace PD.Services.Projections.Rules.MeritComputations
                     //This individual stays within the current scale so we can simply apply the 
                     //same rules that we used for Professor3 calculation here.
                     //Note that, we need to do the calculation based on the scale for the target year.
-                    scale = GetSalaryScale(scale.Category, targetDate);
+                    scale = _salaryScaleService.GetSalaryScale(scale.Category, targetDate);
                     merit.Value = merit.MeritDecision * scale.StepValue;
                 }
                 else
@@ -106,13 +106,13 @@ namespace PD.Services.Projections.Rules.MeritComputations
 
                     //Now calculate the dollar values for these two merit components from those two scales for the 
                     //target year
-                    SalaryScale currentScaleForTargetYear = GetSalaryScale(scale.Category, targetDate);
+                    SalaryScale currentScaleForTargetYear = _salaryScaleService.GetSalaryScale(scale.Category, targetDate);
                     merit.Value = portionOfMeritUsedToFillThisScale * currentScaleForTargetYear.StepValue;
 
                     PromotionScheme scheme = Db.PromotionSchemes.Where(sc => sc.CurrentTitle == scale.Category).FirstOrDefault();
                     if (scheme == null)
                         throw new Exception(string.Format("Promotion scheme for {0} not found", pa.Position.Title));
-                    SalaryScale nextScaleForTargetYear = GetSalaryScale(scheme.PromotedTitle, targetDate);
+                    SalaryScale nextScaleForTargetYear = _salaryScaleService.GetSalaryScale(scheme.PromotedTitle, targetDate);
                     merit.Value = merit.Value + portionOfMeritLeftForNextScale * nextScaleForTargetYear.StepValue;
 
 

@@ -21,15 +21,17 @@ namespace PD.Services.Projections.Rules
 
         public IPdDataProtector Dp { get; set; }
 
+        public readonly SalaryScaleService _salaryScaleService;
 
         public abstract bool Execute(ref PositionAssignment pa, DateTime targetDate);
 
-        public AbstractProjectionRule(ApplicationDbContext db, IPdDataProtector dp, string name, string description)
+        public AbstractProjectionRule(ApplicationDbContext db, IPdDataProtector dp, SalaryScaleService salaryScaleService, string name, string description)
         {
             Name = name;
             Description = description;
             Db = db;
             Dp = dp;
+            _salaryScaleService = salaryScaleService;
         }
 
         protected Person Person;
@@ -52,21 +54,6 @@ namespace PD.Services.Projections.Rules
 
 
 
-
-        private List<SalaryScale> _salaryScales;
-        public SalaryScale GetSalaryScale(string positionTitle, DateTime targetDate)
-        {
-            if (_salaryScales == null)
-                _salaryScales = Db.SalaryScales.ToList();
-
-            var scale = _salaryScales.Where(sc => sc.StartDate <= targetDate && sc.EndDate >= targetDate && sc.Category == positionTitle)
-                .FirstOrDefault();
-
-            if (scale == null)
-                throw new Exception($"No {positionTitle} salary scale not found for the year containing {targetDate.ToString("yyyy-MM-dd")}");
-
-            return scale;
-        }
 
         [Obsolete("AbstractProcessingRule.GetPastSalary deprecated. Use PositionAssignment.GetPastSalary method instead.")]
         public Salary GetPastSalary(PositionAssignment pa, DateTime targetDate)

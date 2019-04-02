@@ -92,6 +92,7 @@ namespace PD
 
             #region Service and Utility Class Registration
             services.AddScoped<DataService>();
+            services.AddScoped<SalaryScaleService>();
             services.AddScoped<ImportService>();
             services.AddScoped<ReportService>();
             services.AddScoped<FacultyProjectionService>();

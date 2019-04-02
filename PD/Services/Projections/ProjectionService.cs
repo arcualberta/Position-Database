@@ -22,14 +22,15 @@ namespace PD.Services
 
         protected List<AbstractProjectionRule> GetSalaryCalculationRules()
         {
+            SalaryScaleService salaryScaleService = new SalaryScaleService(Db);
             //Creating instances of salary-calculation rules in the correct order of applying them
             List<AbstractProjectionRule> rules = new List<AbstractProjectionRule>()
             {
-                new ComputeContractSettlement(Db, _dataProtector),
-                new ComputeMerit(Db, _dataProtector) ,
-                new ComputeFullProfessorMerit(Db, _dataProtector),
-                new AggregateBaseSalaryComponents(Db, _dataProtector),
-                new HandleUpperSalaryLimits(Db, _dataProtector)
+                new ComputeContractSettlement(Db, _dataProtector, salaryScaleService),
+                new ComputeMerit(Db, _dataProtector, salaryScaleService) ,
+                new ComputeFullProfessorMerit(Db, _dataProtector, salaryScaleService),
+                new AggregateBaseSalaryComponents(Db, _dataProtector, salaryScaleService),
+                new HandleUpperSalaryLimits(Db, _dataProtector, salaryScaleService)
             };
 
             return rules;

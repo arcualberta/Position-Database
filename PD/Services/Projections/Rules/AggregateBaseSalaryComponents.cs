@@ -10,8 +10,8 @@ namespace PD.Services.Projections.Rules
 {
     public class AggregateBaseSalaryComponents : AbstractProjectionRule
     {
-        public AggregateBaseSalaryComponents(ApplicationDbContext db, IPdDataProtector dp)
-            : base(db, dp, "Aggregate Base Salary Components", "This rule computes the base salary by aggregating appropriate compensation componenets.")
+        public AggregateBaseSalaryComponents(ApplicationDbContext db, IPdDataProtector dp, SalaryScaleService salaryScaleService)
+            : base(db, dp, salaryScaleService, "Aggregate Base Salary Components", "This rule computes the base salary by aggregating appropriate compensation componenets.")
         {
         }
 

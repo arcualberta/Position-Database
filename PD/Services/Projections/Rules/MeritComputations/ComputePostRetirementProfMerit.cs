@@ -9,8 +9,8 @@ namespace PD.Services.Projections.Rules.MeritComputations
 {
     public class ComputePostRetirementProfMerit : AbstractProjectionRule
     {
-        public ComputePostRetirementProfMerit(ApplicationDbContext db, IPdDataProtector dp)
-            : base(db, dp, "Compute Pre-retirement Professor Merit", "")
+        public ComputePostRetirementProfMerit(ApplicationDbContext db, IPdDataProtector dp, SalaryScaleService salaryScaleService)
+            : base(db, dp, salaryScaleService, "Compute Pre-retirement Professor Merit", "")
         {
 
         }

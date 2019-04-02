@@ -14,8 +14,8 @@ namespace PD.Services.Projections.Rules
 {
     public class HandleNonFullProfessorPromotions : AbstractProjectionRule
     {
-        public HandleNonFullProfessorPromotions(ApplicationDbContext db, IPdDataProtector dp)
-            : base(db, dp, "Handle non-full professor promotions", "")
+        public HandleNonFullProfessorPromotions(ApplicationDbContext db, IPdDataProtector dp, SalaryScaleService salaryScaleService)
+            : base(db, dp, salaryScaleService, "Handle non-full professor promotions", "")
         {
 
         }
@@ -120,9 +120,9 @@ namespace PD.Services.Projections.Rules
             pa.LogInfo("New position created", targetDate);
 
             //Recalculating the merit, atb and the aggregated base salary
-            new ComputeMerit(Db, Dp).Execute(ref pa, targetDate);
-            new ComputeContractSettlement(Db, Dp).Execute(ref pa, targetDate);
-            new AggregateBaseSalaryComponents(Db, Dp).Execute(ref pa, targetDate);
+            new ComputeMerit(Db, Dp, _salaryScaleService).Execute(ref pa, targetDate);
+            new ComputeContractSettlement(Db, Dp, _salaryScaleService).Execute(ref pa, targetDate);
+            new AggregateBaseSalaryComponents(Db, Dp,_salaryScaleService).Execute(ref pa, targetDate);
 
             return true;
 
