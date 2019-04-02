@@ -87,8 +87,6 @@
             @foreach (var item in Model)
             {
                 string name = dp.Decrypt(item.Person.Name);
-                string startDate = item.Position.StartDate.HasValue ? item.Position.StartDate.Value.ToString("yyyy-MM-dd") : "";
-                string endDate = item.Position.EndDate.HasValue ? item.Position.EndDate.Value.ToString("yyyy-MM-dd") : "";
 
                 var previousSalary = item.GetCompensations<Salary>(filter.Date.AddYears(-1)).FirstOrDefault();
                 string previousSalaryVal = previousSalary != null ? previousSalary.Value.ToString("N") : "";
@@ -169,12 +167,6 @@
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Status)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => startDate)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => endDate)
                     </td>
                     <td>
                         @*<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |*@

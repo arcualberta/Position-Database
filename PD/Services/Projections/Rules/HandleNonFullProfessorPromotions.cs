@@ -61,7 +61,6 @@ namespace PD.Services.Projections.Rules
             //Putting an end date for the current position assignment and it's associated position
             PositionAssignment oldPositionAssignment = pa;
             oldPositionAssignment.EndDate = pa.GetSalaryCycleStartDate(targetDate).AddYears(1).AddDays(-1);
-            oldPositionAssignment.Position.EndDate = oldPositionAssignment.EndDate;
 
             //Creating a new position assignment
             pa = new PositionAssignment()
@@ -82,7 +81,6 @@ namespace PD.Services.Projections.Rules
                 ContractType = oldPositionAssignment.Position.ContractType,
                 Number = oldPositionAssignment.Position.Number,
                 Rank = Enum.Parse<Faculty.eRank>(scheme.PromotedTitle),
-                StartDate = pa.StartDate,
                 Title = scheme.PromotedTitle,
                 Workload = oldPositionAssignment.Position.Workload,
             };

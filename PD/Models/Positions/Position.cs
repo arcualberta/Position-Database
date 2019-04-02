@@ -54,23 +54,23 @@ namespace PD.Models.Positions
 
         public eContractType ContractType { get; set; }
 
-        /// <summary>
-        /// Gets or sets the start date.
-        /// </summary>
-        /// <value>
-        /// The start date of this position record. There can be multiple positions
-        /// with the same position number but covering different time periods.
-        /// </value>
-        public DateTime? StartDate { get; set; }
+        /////////// <summary>
+        /////////// Gets or sets the start date.
+        /////////// </summary>
+        /////////// <value>
+        /////////// The start date of this position record. There can be multiple positions
+        /////////// with the same position number but covering different time periods.
+        /////////// </value>
+        ////////public DateTime? StartDate { get; set; }
 
-        /// <summary>
-        /// Gets or sets the end date.
-        /// </summary>
-        /// <value>
-        /// The end date of this position record. There can be multiple positions
-        /// with the same position number but covering different time periods.
-        /// </value>
-        public DateTime? EndDate { get; set; }
+        /////////// <summary>
+        /////////// Gets or sets the end date.
+        /////////// </summary>
+        /////////// <value>
+        /////////// The end date of this position record. There can be multiple positions
+        /////////// with the same position number but covering different time periods.
+        /////////// </value>
+        ////////public DateTime? EndDate { get; set; }
 
         public virtual ICollection<PositionAccount> PositionAccounts { get; set; } = new List<PositionAccount>();
 

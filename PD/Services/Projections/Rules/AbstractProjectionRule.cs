@@ -111,7 +111,6 @@ namespace PD.Services.Projections.Rules
                 //Putting an end date for the current position assignment and it's associated position
                 PositionAssignment oldPositionAssignment = pa;
                 oldPositionAssignment.EndDate = promotionStartDate.AddDays(-1);
-                oldPositionAssignment.Position.EndDate = oldPositionAssignment.EndDate;
 
                 //If the old position assignment has a successor, then use it
                 //as the new assignment
@@ -146,7 +145,6 @@ namespace PD.Services.Projections.Rules
                         ContractType = oldPositionAssignment.Position.ContractType,
                         Number = oldPositionAssignment.Position.Number,
                         Rank = Enum.Parse<Faculty.eRank>(newPositionTitle),
-                        StartDate = pa.StartDate,
                         Title = newPositionTitle,
                         Workload = oldPositionAssignment.Position.Workload,
                         PrimaryDepartmentId = oldPositionAssignment.Position.PrimaryDepartmentId

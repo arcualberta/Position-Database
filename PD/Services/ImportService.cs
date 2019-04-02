@@ -288,18 +288,13 @@ namespace PD.Services
 
                         //Retrieve the active position record with the given position number from the database
                         Faculty position = Db.Faculty
-                            .Where(p => p.Number == empl.PositionNumber
-                                && (p.StartDate.HasValue == false || p.StartDate <= currentYearSampleDate)
-                                && (p.EndDate.HasValue == false || p.EndDate > currentYearSampleDate)
-                                )
+                            .Where(p => p.Number == empl.PositionNumber)
                             .FirstOrDefault();
 
                         if (position == null)
                         {
                             //Create a new position record
                             position = new Faculty();
-                            position.StartDate = currentYearStartDate;
-                            position.EndDate = null; //No end date for employees imported throgh the spreadsheet
                             position.Number = empl.PositionNumber;
                             position.Rank = Enum.Parse<Faculty.eRank>(empl.Rank);
                             position.Workload = empl.Workload;
@@ -318,8 +313,7 @@ namespace PD.Services
                         if (positionAssignments.Count() > 1)
                             throw new Exception("Data Error: Same position has multiple assignments at the time period containig " + currentYearSampleDate.Date);
 
-                        IQueryable<Position> positions = Db.Positions
-                            .Where(p => p.Number == empl.PositionNumber && p.StartDate <= currentYearSampleDate && (!p.EndDate.HasValue || currentYearSampleDate <= p.EndDate));
+                        IQueryable<Position> positions = Db.Positions.Where(p => p.Number == empl.PositionNumber);
                         if (positions.Count() != 1)
                             throw new Exception("Data Error: Exactly 1 position with position number " + empl.PositionNumber + " is requred for the time period " + currentYearSampleDate.Date);
                         Position position = positions.First();
