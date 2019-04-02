@@ -103,7 +103,6 @@ namespace PD.Services.Projections.Rules
                 PersonId = oldPositionAssignment.PersonId,
                 SalaryCycleStartDay = oldPositionAssignment.SalaryCycleStartDay,
                 SalaryCycleStartMonth = oldPositionAssignment.SalaryCycleStartMonth,
-                PositionId = oldPositionAssignment.PositionId,
                 Status = oldPositionAssignment.Status,
                 Person = person
             };
