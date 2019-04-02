@@ -97,6 +97,7 @@ namespace PD.Services.Projections.Rules
             throw new NotImplementedException("GetContractSettlementPeriod method is not implemented for non-faculty positions yet.");
         }
 
+
         public bool PromoteToFacultyPosition(ref PositionAssignment pa, string newPositionTitle, DateTime promotionStartDate)
         {
             try
@@ -106,47 +107,64 @@ namespace PD.Services.Projections.Rules
                 oldPositionAssignment.EndDate = promotionStartDate.AddDays(-1);
                 oldPositionAssignment.Position.EndDate = oldPositionAssignment.EndDate;
 
-                //Creating a new position assignment
-                pa = new PositionAssignment()
+                //If the old position assignment has a successor, then use it
+                //as the new assignment
+                if (oldPositionAssignment.SuccessorId.HasValue)
                 {
-                    StartDate = oldPositionAssignment.EndDate.Value.AddDays(1),
-                    PersonId = oldPositionAssignment.PersonId,
-                    SalaryCycleStartDay = oldPositionAssignment.SalaryCycleStartDay,
-                    SalaryCycleStartMonth = oldPositionAssignment.SalaryCycleStartMonth,
-                    PositionId = oldPositionAssignment.PositionId,
-                    Status = oldPositionAssignment.Status
-                };
-                Db.PositionAssignments.Add(pa);
-
-                //Linking the previous position assignment as the predecessor for this position assignment
-                pa.Predecessor = oldPositionAssignment;
-                pa.PredecessorId = oldPositionAssignment.Id;
-
-                Position position = new Faculty()
+                    pa = Db.PositionAssignments
+                        .Include(p => p.Position)
+                        .Include(p => p.Compensations)
+                        .Where(p => p.Id == oldPositionAssignment.SuccessorId)
+                        .FirstOrDefault();
+                }
+                else
                 {
-                    ContractType = oldPositionAssignment.Position.ContractType,
-                    Number = oldPositionAssignment.Position.Number,
-                    Rank = Enum.Parse<Faculty.eRank>(newPositionTitle),
-                    StartDate = pa.StartDate,
-                    Title = newPositionTitle,
-                    Workload = oldPositionAssignment.Position.Workload,
-                    PrimaryDepartmentId = oldPositionAssignment.Position.PrimaryDepartmentId
-                };
-                position.PositionAssignments.Add(pa);
-                pa.Position = position;
+                    //Creating a new position assignment
+                    pa = new PositionAssignment()
+                    {
+                        StartDate = oldPositionAssignment.EndDate.Value.AddDays(1),
+                        PersonId = oldPositionAssignment.PersonId,
+                        SalaryCycleStartDay = oldPositionAssignment.SalaryCycleStartDay,
+                        SalaryCycleStartMonth = oldPositionAssignment.SalaryCycleStartMonth,
+                        PositionId = oldPositionAssignment.PositionId,
+                        Status = oldPositionAssignment.Status
+                    };
+                    Db.PositionAssignments.Add(pa);
 
-                //Carrying over the same position accounts
-                List<PositionAccount> accounts = Db.PositionAccounts.Where(pacc => pacc.PositionId == oldPositionAssignment.PositionId).ToList();
-                foreach (var acc in accounts)
-                    position.PositionAccounts.Add(acc);
+                    //Linking the previous position assignment as the predecessor for this position assignment
+                    //////pa.Predecessor = oldPositionAssignment;
+                    pa.PredecessorId = oldPositionAssignment.Id;
 
-                //Transferring all compensations recorded for the target year in the old position account 
-                //into the new one
-                List<Compensation> compensations = oldPositionAssignment.Compensations
-                    .Where(c => c.StartDate <= promotionStartDate 
+                    Position position = new Faculty()
+                    {
+                        ContractType = oldPositionAssignment.Position.ContractType,
+                        Number = oldPositionAssignment.Position.Number,
+                        Rank = Enum.Parse<Faculty.eRank>(newPositionTitle),
+                        StartDate = pa.StartDate,
+                        Title = newPositionTitle,
+                        Workload = oldPositionAssignment.Position.Workload,
+                        PrimaryDepartmentId = oldPositionAssignment.Position.PrimaryDepartmentId
+                    };
+                    position.PositionAssignments.Add(pa);
+                    Db.Positions.Add(position);
+                    //////pa.Position = position;
+
+                    //Carrying over the same position accounts
+                    List<PositionAccount> accounts = Db.PositionAccounts.Where(pacc => pacc.PositionId == oldPositionAssignment.PositionId).ToList();
+                    foreach (var acc in accounts)
+                        position.PositionAccounts.Add(acc);
+
+                    Db.SaveChanges();
+                    oldPositionAssignment.SuccessorId = pa.Id;
+                }
+
+                //Compensations to be carried over, i.e. all compensations recorded for the target year
+                //in the old position account 
+                List<Compensation> sourceCompensations = oldPositionAssignment.Compensations
+                    .Where(c => c.StartDate <= promotionStartDate
                         && (c.EndDate.HasValue == false || c.EndDate >= promotionStartDate))
                     .ToList();
-                foreach (Compensation c in compensations)
+                foreach (Compensation c in sourceCompensations)
                 {
                     //If the compensation start date is earlier than the start date of the new position assignment
                     //then we split the compensation into two and set the end date of the first half to be a day prior
@@ -155,21 +173,47 @@ namespace PD.Services.Projections.Rules
                     //If the start date of this compensation is as same as the start date of the new position assignment,
                     //then we simply carry it over to the new position assignment as a whole
 
+                    Compensation comp;
                     if (c.StartDate < pa.StartDate)
                     {
                         c.EndDate = pa.StartDate.Value.AddDays(-1);
                         Compensation clone = c.Clone();
                         clone.StartDate = pa.StartDate.Value;
-                        pa.Compensations.Add(clone);
+                        comp = clone;
                     }
                     else
-                        pa.Compensations.Add(c);
+                        comp = c;
 
                     //If this compensation is a merit, then we should set it's IsPromoted flag to false
                     //because we already created the promoted position here.
-                    if (c is Merit)
-                        (c as Merit).IsPromoted = false;
+                    if (comp is Merit)
+                        (comp as Merit).IsPromoted = false;
+
+                    var match = pa.Compensations.Where(cc =>
+                       cc.StartDate == comp.StartDate
+                       && cc.EndDate == comp.EndDate
+                       && cc.Name == comp.Name)
+                        .FirstOrDefault();
+
+                    if (match != null)
+                        match.Value = comp.Value;
+                    else
+                        pa.Compensations.Add(comp);
                 }
+
+                ////foreach (Compensation comp in compensationsToBeCarriedOver)
+                ////{
+                ////    var match = pa.Compensations.Where(c =>
+                ////       c.StartDate == comp.StartDate
+                ////       && c.EndDate == comp.EndDate
+                ////       && c.GetType() == comp.GetType())
+                ////        .FirstOrDefault();
+
+                ////    if (match != null)
+                ////        match.Value = comp.Value;
+                ////    else
+                ////        pa.Compensations.Add(match);
+                ////}
 
                 pa.LogInfo("New position created", promotionStartDate);
 

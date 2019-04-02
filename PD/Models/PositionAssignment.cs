@@ -65,7 +65,7 @@ namespace PD.Models
         /// </value>
         public PositionAssignment Predecessor { get; set; }
 
-        public int? SucccessorId { get; set; }
+        public int? SuccessorId { get; set; }
         /// <summary>
         /// Succcessor of this position assignment. 
         /// When the Status of a PositionAssignment is changed (e.g. a person goes from active to pre-retirement
@@ -75,7 +75,7 @@ namespace PD.Models
         /// </summary>
         /// <value>
         /// </value>
-        public PositionAssignment Succcessor { get; set; }
+        public PositionAssignment Successor { get; set; }
 
 
         public bool IsPaidOn(DateTime targetDate)
