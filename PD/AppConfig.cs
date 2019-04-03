@@ -10,9 +10,14 @@ namespace PD
     {
         public readonly string[] FacultyTypes;
 
+        public readonly int AuditLogLevel;
+
         public AppConfig(IConfiguration configuration)
         {
             FacultyTypes = configuration.GetSection("PositionTypes:Faculty").Get<string[]>();
+            AuditLogLevel = string.IsNullOrEmpty(configuration.GetSection("Audit:Level").Value) 
+                ? 1 
+                : configuration.GetSection("Audit:Level").Get<int>();
         }
 
 

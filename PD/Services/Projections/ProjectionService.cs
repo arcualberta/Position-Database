@@ -61,11 +61,27 @@ namespace PD.Services
                         foreach (var rule in rules)
                             rule.Execute(person, t);
                     }
-                    catch (Exception ex)
+                    catch (PdException ex)
                     {
-                        AuditRecord au = new AuditRecord() { Message = ex.Message };
+                        AuditRecord au = new AuditRecord()
+                        {
+                            Message = ex.Message,
+                            AuditType = AuditRecord.eAuditRecordType.Error,
+                            SalaryCycleStartDate = ex.SalaryCycleStartDate,
+                            SalaryCycleEndDate = ex.SalaryCycleEndDate
+                        };
                         Db.AuditTrail.Add(au);
                     }
+                    catch (Exception ex)
+                    {
+                        AuditRecord au = new AuditRecord()
+                        {
+                            Message = ex.Message,
+                            AuditType = AuditRecord.eAuditRecordType.Error
+                        };
+                        Db.AuditTrail.Add(au);
+                    }
+
                 }//END: foreach (var person in persons)
             }//END: for(DateTime t = from; t < to; t = t.AddYears(1))
 

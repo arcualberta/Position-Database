@@ -94,8 +94,7 @@ namespace PD.Controllers.Api
                 .Include(au => au.PositionAssignment.Position)
                 .Include(au => au.PositionAssignment.Person)
                 .Where(au =>
-                    requestedPositionTypes.Contains(au.PositionAssignment.Position.Title)
-                    && au.IsHistoric == false
+                    au.IsHistoric == false
                     && (au.AuditType == AuditRecord.eAuditRecordType.Error || au.AuditType == AuditRecord.eAuditRecordType.Warning)
                     && (au.SalaryCycleStartDate >= from && au.SalaryCycleStartDate <= to || au.SalaryCycleEndDate >= from && au.SalaryCycleEndDate <= to)
                     );

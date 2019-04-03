@@ -30,7 +30,9 @@ namespace PD.Services.Projections.Rules.MeritComputations
             pa.LogInfo("Computing merit for full professprs.", targetDate);
 
             if ((pa.Position as Faculty).ContractType == Position.eContractType.S)
-                throw new Exception("Position contract status was set to \"S\". This individual should hold a pre-retirement or post-retirement rank, not a professor rank.");
+                throw new PdException($"Position {pa.Position.Number}: contract status was set to \"S\". This individual should hold a pre-retirement or post-retirement rank, not a professor rank.",
+                          pa, targetDate);
+
 
             Salary pastSalary = pa.GetPastSalary(targetDate);
 
@@ -69,7 +71,7 @@ namespace PD.Services.Projections.Rules.MeritComputations
                 pastPositionTitle = pa.Predecessor.Position.Title;
             }
             else
-                throw new Exception("Don't know how to find past position title.");
+                throw new PdException("Don't know how to find past position title.", pa, targetDate);
 
             pastSalaryScale = _salaryScaleService.GetSalaryScale(pastPositionTitle, pastSalary.StartDate);
 
@@ -148,7 +150,7 @@ namespace PD.Services.Projections.Rules.MeritComputations
 
                     PromotionScheme scheme = Db.PromotionSchemes.Where(sc => sc.CurrentTitle == positionTitle).FirstOrDefault();
                     if (scheme == null)
-                        throw new Exception($"Promotion scheme for {positionTitle} not found");
+                        throw new PdException($"Promotion scheme for {positionTitle} not found", pa, targetDate);
                     SalaryScale nextScaleForTargetYear = _salaryScaleService.GetSalaryScale(scheme.PromotedTitle, targetDate);
                     merit.Value = merit.Value + portionOfMeritLeftForNextScale * nextScaleForTargetYear.StepValue;
 

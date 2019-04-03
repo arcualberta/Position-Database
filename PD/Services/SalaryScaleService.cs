@@ -28,7 +28,7 @@ namespace PD.Services
                 .FirstOrDefault();
 
             if (scale == null)
-                throw new Exception($"No {positionTitle} salary scale not found for the year containing {targetDate.ToString("yyyy-MM-dd")}");
+                throw new PdException($"No {positionTitle} salary scale not found for the year containing {targetDate.ToString("yyyy-MM-dd")}", targetDate, targetDate);
 
             return scale;
         }

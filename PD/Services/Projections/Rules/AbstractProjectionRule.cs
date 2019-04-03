@@ -47,15 +47,8 @@ namespace PD.Services.Projections.Rules
 
             foreach (PositionAssignment pa in activePositionAssignments)
             {
-                if (!(pa.Position.Title == "AssistantProfessor"
-                    || pa.Position.Title == "AssociateProfessor"
-                    || pa.Position.Title == "Professor1"
-                    || pa.Position.Title == "Professor2"
-                    || pa.Position.Title == "Professor3"
-                    || pa.Position.Title == "FSO1"
-                    || pa.Position.Title == "FSO2"
-                    || pa.Position.Title == "FSO3"))
-                    continue;
+                if (pa.Position.Title == "ATS")
+                    throw new PdException("ATS calculations not yet implemented.", pa, targetDate);
 
                 PositionAssignment p = pa;
                 Execute(ref p, targetDate);

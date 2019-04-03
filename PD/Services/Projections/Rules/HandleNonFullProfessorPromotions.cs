@@ -56,7 +56,7 @@ namespace PD.Services.Projections.Rules
             string title = pa.Position.Title;
             PromotionScheme scheme = Db.PromotionSchemes.Where(sc => sc.CurrentTitle == title).FirstOrDefault();
             if (scheme == null)
-                throw new Exception(string.Format("Promotion scheme for {0} not found", pa.Position.Title));
+                throw new PdException($"Promotion scheme for {pa.Position.Title} not found", pa, targetDate);
 
             //Putting an end date for the current position assignment and it's associated position
             PositionAssignment oldPositionAssignment = pa;

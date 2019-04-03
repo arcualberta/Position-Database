@@ -272,15 +272,10 @@ namespace PD.Test
             ApplicationDbContext db = server.Db;
 
             FacultyProjectionService srv = _serviceProvider.GetService<FacultyProjectionService>();
-            ////for (int year = 2016; year < 2026; ++year)
-            ////{
-            ////    var result = srv.ProjectFacultySalaries(new DateTime(year, 7, 1).Date);
-            ////    var errors = result.Errors.Distinct().ToList();
-            ////    var successes = result.Successes;
-            ////}
 
             //string employeeId = "1086342"; // a full professor 1
             //string employeeId = "1143944"; // an associate professor
+            //string employeeId = "1277672";
             string employeeId = null; 
             srv.ComputeSalaries(
                 new DateTime(2016, 07, 01),

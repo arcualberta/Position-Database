@@ -100,7 +100,7 @@ namespace PD.Services.Projections.Rules
 
             //If we still have excess, then we will report it as a warning.
             if (overpayment > 0m)
-                pa.LogWarning("Overpaid beyond the max salary limit for the scale!", targetDate);
+                pa.LogWarning($"Position {pa.Position.Number}: Overpaid beyond the max salary limit for the scale!", targetDate);
 
             return true;
         }
