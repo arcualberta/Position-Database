@@ -279,7 +279,9 @@ namespace PD.Test
             ////    var successes = result.Successes;
             ////}
 
-            string employeeId = "1086342";
+            //string employeeId = "1086342"; // a full professor 1
+            //string employeeId = "1143944"; // an associate professor
+            string employeeId = null; 
             srv.ComputeSalaries(
                 new DateTime(2016, 07, 01),
                 new DateTime(2026, 07, 01),

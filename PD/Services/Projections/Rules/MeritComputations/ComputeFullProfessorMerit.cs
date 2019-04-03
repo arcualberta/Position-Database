@@ -46,6 +46,34 @@ namespace PD.Services.Projections.Rules.MeritComputations
                       )
                 .FirstOrDefault();
 
+            //If the past salary scale cannot be found based on the past salary value.
+            //it could be possible that the individual actually received much less salary
+            //due to having a less workload or so. In that case, we try to obtain the past
+            //salary scale by relying on the position held past year.
+            string pastPositionTitle;
+            if (pa.Compensations.Where(c => c.Id == pastSalary.Id).Any())
+            {
+                //The past salary is in the current position
+                pastPositionTitle = pa.Position.Title;
+            }
+            else if (pa.Predecessor != null || pa.PredecessorId.HasValue)
+            {
+                if (pa.Predecessor == null)
+                {
+                    int predecessorId = pa.PredecessorId.Value;
+                    pa.Predecessor = pa.Position.PositionAssignments
+                        .Where(p => p.Id == predecessorId)
+                        .FirstOrDefault();
+                }
+
+                pastPositionTitle = pa.Predecessor.Position.Title;
+            }
+            else
+                throw new Exception("Don't know how to find past position title.");
+
+            pastSalaryScale = _salaryScaleService.GetSalaryScale(pastPositionTitle, pastSalary.StartDate);
+
+
             //Select the correct job title based on the salary scale held last year
             //Sometimes, this is incorrectly identified in the mannually entered data.
             string positionTitle = pastSalaryScale.Category;
