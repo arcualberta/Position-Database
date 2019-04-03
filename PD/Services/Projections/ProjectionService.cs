@@ -54,20 +54,20 @@ namespace PD.Services
             
             for(DateTime t = from; t < to; t = t.AddYears(1))
             {
-                try
+                foreach (var person in persons)
                 {
-                    foreach (var person in persons)
+                    try
                     {
                         foreach (var rule in rules)
                             rule.Execute(person, t);
                     }
-                }
-                catch(Exception ex)
-                {
-                    AuditRecord au = new AuditRecord() { Message = ex.Message };
-                    Db.AuditTrail.Add(au);
-                }
-            }
+                    catch (Exception ex)
+                    {
+                        AuditRecord au = new AuditRecord() { Message = ex.Message };
+                        Db.AuditTrail.Add(au);
+                    }
+                }//END: foreach (var person in persons)
+            }//END: for(DateTime t = from; t < to; t = t.AddYears(1))
 
             Db.SaveChanges();
         }
