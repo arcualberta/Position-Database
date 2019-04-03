@@ -124,19 +124,29 @@ namespace PD.Services.Projections.Rules.MeritComputations
                     SalaryScale nextScaleForTargetYear = _salaryScaleService.GetSalaryScale(scheme.PromotedTitle, targetDate);
                     merit.Value = merit.Value + portionOfMeritLeftForNextScale * nextScaleForTargetYear.StepValue;
 
-
-                    //Updating the Position Details
-                    //=============================
-                    //
                     //Since this individual got automatically promoted to the next scale we needs to 
-                    //close the current position and open a new one
+                    //close the current position and open a new one.
+                    //However, if the current position has a predecessor and if the past year's
+                    //salary came from that predecessor, then we have already handled the 
+                    //promotion in a previous computation cycle for this period. If this is
+                    //not the case then we need to handle the promotion.
 
-                    PromoteToFacultyPosition(pa.Person, pa, scheme.PromotedTitle, pa.GetSalaryCycleStartDate(targetDate));
+                    var alreadyPromoted = false;
+                    if(pa.Predecessor != null || pa.PredecessorId != null)
+                    {
+                        PositionAssignment current = pa;
+                        if (pa.Predecessor == null)
+                            pa.Predecessor = pa.Position.PositionAssignments
+                                .Where(p => p.Id == current.PredecessorId)
+                                .FirstOrDefault();
 
-                    //////////Since a new position and position assignment created, we save the
-                    //////////Db changes right away so that we get Ids for newly created objects, in case they
-                    //////////were needed for rest of the computations.
-                    ////////Db.SaveChanges();
+                        alreadyPromoted = pa.Predecessor.Compensations
+                            .Where(comp => comp.Id == pastSalary.Id)
+                            .Any();
+                    }
+
+                    if(alreadyPromoted == false)
+                        PromoteToFacultyPosition(pa.Person, pa, scheme.PromotedTitle, pa.GetSalaryCycleStartDate(targetDate));
                 }
             }
 

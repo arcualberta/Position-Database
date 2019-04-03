@@ -157,7 +157,7 @@ namespace PD.Services.Projections.Rules
                 else
                 {
                     //We remove the compensation from the old position assignment
-                    pa.Compensations.Remove(c);
+                    oldPositionAssignment.Compensations.Remove(c);
                     comp = c;
                 }
 
