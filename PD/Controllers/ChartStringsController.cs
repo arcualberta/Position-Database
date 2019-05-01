@@ -11,7 +11,7 @@ using PD.Models;
 
 namespace PD.Controllers
 {
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin")]
     public class ChartStringsController : Controller
     {
         private readonly ApplicationDbContext _context;

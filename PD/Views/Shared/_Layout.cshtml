@@ -45,8 +45,8 @@
                         <ul class="dropdown-menu">
                             <li><a asp-area="" asp-controller="Reports" asp-action="People">People</a></li>
                             <li><a asp-area="" asp-controller="Reports" asp-action="Positions">Positions</a></li>
-                            <li><a asp-area="" asp-controller="ChartStrings" asp-action="Index">Chart Strings</a></li>
-                            <li><a asp-area="" asp-controller="Reports" asp-action="AuditTrail">Audit Trail</a></li>
+                            @*<li><a asp-area="" asp-controller="ChartStrings" asp-action="Index">Chart Strings</a></li>*@
+                            @*<li><a asp-area="" asp-controller="Reports" asp-action="AuditTrail">Audit Trail</a></li>*@
                         </ul>
                     </li>
                     <li class="dropdown">
@@ -60,7 +60,7 @@
                         <ul class="dropdown-menu">
                             <li><a asp-area="" asp-controller="ChartStrings" asp-action="Create">Chart String</a></li>
                             <li><a asp-area="" asp-controller="Positions" asp-action="Create">Position</a></li>
-                            <li><a asp-area="" asp-controller="Persons" asp-action="Create">Person</a></li>
+                            @*<li><a asp-area="" asp-controller="Persons" asp-action="Create">Person</a></li>*@
                         </ul>
                     </li>
                     <li class="dropdown">
@@ -80,7 +80,7 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; 2018 - @DateTime.Now.Year Arts Resource Centre</p>
+            <p>&copy; 2018 - @DateTime.Now.Year Arts Resource Centre, Faculty of Arts, University of Alberta</p>
         </footer>
     </div>
 

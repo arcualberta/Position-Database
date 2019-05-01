@@ -207,5 +207,14 @@ namespace PD.Controllers.Api
         {
             return _context.Persons.Any(e => e.Id == id);
         }
+
+        [AllowAnonymous]
+        [HttpGet("ping")]
+        public ActionResult<int> Ping()
+        {
+            var count = _context.PositionAssignments.Count();
+            return count;
+        }
+
     }
 }

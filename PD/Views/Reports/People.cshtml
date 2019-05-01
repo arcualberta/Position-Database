@@ -3,6 +3,9 @@
 @*
     Child rows in tables: https://datatables.net/examples/api/row_details.html
 *@
+@{ 
+    bool showControlButtons = false; //TODO: enable these buttons to select roles.
+}
 <div id="peoplePanel" class="col-sm-6 pd-panel">
     <div class="panel panel-default">
         <div class="panel-heading">Employees</div>
@@ -25,6 +28,8 @@
 </div>
 <div class="clear"></div>
 <script>
+    var showControlButtons = false; //TODO: enable these buttons to select roles.
+
     $(function () {
 
         // peopleTable - initialization
@@ -114,8 +119,10 @@
         var panelHeading = $('<div class="panel-heading"><b>' + posAssignment.position.title + '</b> | <span>' + posAssignment.position.primaryDepartment.name + '</span></div>');
         panel.append(panelHeading);
 
-        var buttonPanel = createPositionHeaderButtonPanel(posAssignment.id);
-        panelHeading.append(buttonPanel);
+        if (showControlButtons) {
+            var buttonPanel = createPositionHeaderButtonPanel(posAssignment.id);
+            panelHeading.append(buttonPanel);
+        }
 
         var panelBody = $('<div class="panel-body"></div>')
         panel.append(panelBody);
@@ -142,8 +149,10 @@
                 var compensationPanelHead = $('<div class="panel-heading"><b>' + yearRange + '</b></div>');
                 matchedCompensation.panel.append(compensationPanelHead);
 
-                var btnPanel = createCompensationButtonPanel(posAssignment.id, comp.startDate, comp.endDate);
-                compensationPanelHead.append(btnPanel);
+                if (showControlButtons) {
+                    var btnPanel = createCompensationButtonPanel(posAssignment.id, comp.startDate, comp.endDate);
+                    compensationPanelHead.append(btnPanel);
+                }
 
                 var panelBodyId = compensationPanelId(start, stop);
                 matchedCompensation.panel.append($('<div class="panel-body" id="' + panelBodyId +'"></div>'));
