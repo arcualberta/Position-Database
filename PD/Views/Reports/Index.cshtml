@@ -128,7 +128,7 @@
 
         //Loading budget-summary graph
         $.ajax({
-            url: '/api/budget/?from=' + from
+            url: '@ViewBag.AppRoot/api/budget/?from=' + from
                 + '&to=' + to
                 + '&stepInMonths=' + dispConfig.stepInMonths
                 + '&deptId=' + dept
@@ -149,7 +149,7 @@
         $('#alertsPane').hide();
         $('#alertsPane').empty();
         $.ajax({
-            url: '/api/budget/alerts/' + from + '/' + to + '/' + dept + '/' + positionTypes,
+            url: '@ViewBag.AppRoot/api/budget/alerts/' + from + '/' + to + '/' + dept + '/' + positionTypes,
             type: "get",
             contentType: "application/json",
             dataType: "json",

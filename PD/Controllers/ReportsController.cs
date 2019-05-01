@@ -54,6 +54,8 @@ namespace PD.Controllers
 
             ViewBag.PositionTypes = _appConfig.FacultyTypes;
 
+            ViewBag.AppRoot = _appConfig.AppRoot;
+
             return View();
         }
 
@@ -66,6 +68,8 @@ namespace PD.Controllers
 
             //ViewBag.Filter = filter;
             //ViewBag.DataProtector = _reportService._dataProtector;
+
+            ViewBag.AppRoot = _appConfig.AppRoot;
 
             return View();
         }

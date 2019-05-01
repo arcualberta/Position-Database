@@ -130,9 +130,9 @@ namespace PD.Areas.Identity.Pages.Account
 
                         //If no user has Admin role and if AutoSetFirstAdmin is set to
                         //true in the configuration file, then add the Admin role to the first user in the user list.
-                        var checkAdmins = _userManager.GetUsersInRoleAsync("Admin");
-                        checkAdmins.Wait();
-                        if (checkAdmins.Result.Count() == 0 && _configuration.GetValue<bool>("AutoSetFirstAdmin"))
+                        var admins = _userManager.GetUsersInRoleAsync("Admin");
+                        admins.Wait();
+                        if (admins.Result.Count() == 0 && _configuration.GetValue<bool>("AutoSetFirstAdmin"))
                         {
                             var firstUser = _userManager.Users.FirstOrDefault();
                             if (firstUser != null)
@@ -152,6 +152,32 @@ namespace PD.Areas.Identity.Pages.Account
                             }
 
                         }
+
+                        //If the current user is in the pre-set managers list but the user is not yet a manager
+                        //then grant manager role to this user.
+                        var managers = _userManager.GetUsersInRoleAsync("Manager");
+                        managers.Wait();
+                        string presetManagers = _configuration.GetValue<string>("PresetManagers");
+                        if(presetManagers != null && presetManagers.Contains(Input.Email))
+                        {
+                            if(!managers.Result.Where(u => u.Email == Input.Email).Any())
+                            {
+                                Task task = _userManager.AddToRoleAsync(user, "Manager");
+                                task.Wait();
+
+                                if (task.IsCompletedSuccessfully)
+                                {
+                                    _logger.LogInformation("Granted Manager role to " + user.Email);
+
+                                    //Reloading roles of the current user
+                                    await _signInManager.SignInAsync(user, false);
+                                }
+                                else
+                                    _logger.LogError("Failed to assign Manager role to " + user.Email);
+                            }
+                        }
+
+
                         return LocalRedirect(returnUrl);
                     }
                 }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ using PD.Services;
 
 namespace PD.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class UploadController : Controller
     {
         private readonly ApplicationDbContext _context;
