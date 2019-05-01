@@ -168,8 +168,17 @@
     function plotBudget(data) {
         var n = data.length;
         var budget = data.map(x => x.budget);
-        var positionCount = data.map(x => x.positionCount);
         var xLabels = data.map(x => x.date.substr(0, 10));
+
+        var positionCount = data.map(x => x.positionCount);
+        var minPos = positionCount.reduce(function (a, b) { return Math.min(a, b); });
+        var maxPos = positionCount.reduce(function (a, b) { return Math.max(a, b); });
+        var posStepCount = 10;
+        if (maxPos - minPos < posStepCount) {
+            maxPos = maxPos + Math.ceil(0.25 * posStepCount);
+            minPos = maxPos - posStepCount;
+        }
+        var posStepSize = Math.ceil((maxPos - minPos) / posStepCount);
 
         var lineChartData = {
             labels: xLabels,
@@ -249,12 +258,17 @@
                                     return currencyString(value);
                                 }
                             }
-                        }, {
+                            }, 
+                            {
                             type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
                             display: true,
                             position: 'right',
                             id: 'y-axis-2',
-
+                            ticks: {
+                                min: minPos,
+                                max: maxPos,
+                                stepSize: posStepSize
+                            },
                             // grid line settings
                             gridLines: {
                                 drawOnChartArea: false, // only want the grid lines for one axis to show up
