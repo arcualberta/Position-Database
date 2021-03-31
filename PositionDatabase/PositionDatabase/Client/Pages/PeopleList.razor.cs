@@ -19,7 +19,7 @@ namespace PositionDatabase.Client.Pages
 
         private IList<Person> Persons;
         private Person NewPerson = new Person();
-        private string Message = "";
+        private string SuccessMessage = "", ErrorMessage = "";
 
 
         protected override async Task OnInitializedAsync()
@@ -40,15 +40,15 @@ namespace PositionDatabase.Client.Pages
                 && !string.IsNullOrEmpty(NewPerson.LastName)
                 && NewPerson.BirthDate.Year > 1)
             {
-                Message = "";
+                SuccessMessage = "";
+                ErrorMessage = "";
                 //Saving the person
                 using var response = await _http.PostAsJsonAsync("api/persons", NewPerson);
 
                 if (!response.IsSuccessStatusCode)
                 {
                     // set error message for display, log to console and return
-                    Message = response.ReasonPhrase;
-                    Console.WriteLine($"There was an error! {Message}");
+                    ErrorMessage = response.ReasonPhrase;
                     return;
                 }
 
@@ -56,12 +56,12 @@ namespace PositionDatabase.Client.Pages
 
                 Persons.Add(savedPerson);
                 NewPerson = new Person();
-                Message = "User added successfully";
+                SuccessMessage = "User added successfully";
 
                 _ = Task.Run(async () =>
                   {
                       await Task.Delay(3000);
-                      Message = "";
+                      SuccessMessage = "";
                       StateHasChanged();
                   });
 
