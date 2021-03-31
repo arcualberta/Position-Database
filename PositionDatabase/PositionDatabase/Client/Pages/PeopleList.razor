@@ -1,14 +1,8 @@
 ﻿@page "/peoplelist"
-@using PositionDatabase.Shared
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-
-@attribute [Authorize]
-@inject HttpClient Http
 
 <h3>People</h3>
 
-@if (persons == null)
+@if (this.Persons == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -22,7 +16,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var person in persons)
+            @foreach (var person in Persons)
             {
                 <tr>
                     <td>@person.FirstName</td>
@@ -34,14 +28,14 @@ else
 
     <div class="card">
         <div class="card-header">
-            Add a person
+            <div class="float-left">Add a person</div><div class="float-right">@Message</div>
         </div>
         <div class="card-body">
             <table>
                 <tbody>
-                    <tr><td>First name:</td><td><input @bind="newPerson.FirstName" /></td></tr>
-                    <tr><td>Last name:</td><td><input @bind="newPerson.LastName" /></td></tr>
-                    <tr><td>Date of Birth:</td><td><input @bind="newPerson.BirthDate" type="date"/></td></tr>
+                    <tr><td>First name:</td><td><input @bind="NewPerson.FirstName" /></td></tr>
+                    <tr><td>Last name:</td><td><input @bind="NewPerson.LastName" /></td></tr>
+                    <tr><td>Date of Birth:</td><td><input @bind="NewPerson.BirthDate" type="date"/></td></tr>
                 </tbody>
             </table>
             <div class="row">
@@ -52,34 +46,4 @@ else
     <div>
 
     </div>
-}
-
-@code {
-    private IList<Person> persons;
-    private Person newPerson = new Person();
-
-    protected override async Task OnInitializedAsync()
-    {
-        try {
-            persons = await Http.GetFromJsonAsync<IList<Person>>("api/persons");
-        }
-        catch (AccessTokenNotAvailableException exception) {
-            exception.Redirect();
-        }
-    }
-
-    private async void AddPerson()
-    {
-        if (!string.IsNullOrEmpty(newPerson.FirstName)
-            && !string.IsNullOrEmpty(newPerson.LastName)
-            && newPerson.BirthDate.Year > 1)
-        {
-            //Saving the person
-            var response = await Http.PostAsJsonAsync<Person>("api/persons", newPerson);
-            var savedPerson = await response.Content.ReadFromJsonAsync<Person>();
-
-            persons.Add(savedPerson);
-            newPerson = new Person();
-        }
-    }
 }

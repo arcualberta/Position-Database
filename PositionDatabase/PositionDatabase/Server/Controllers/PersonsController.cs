@@ -28,7 +28,7 @@ namespace PositionDatabase.Server.Controllers
         {
             try
             {
-                var persons = await _db.Persons.ToListAsync();
+                var persons = await _db.Persons.OrderBy(p => p.FirstName).ToListAsync();
                 return persons;
             }
             catch(Exception ex)
