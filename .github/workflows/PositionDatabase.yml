@@ -7,7 +7,8 @@ on:
     branches: [ master ]
     
 defaults:
-    run: PositionDatabase
+    run: 
+        working-directory: PositionDatabase
 
 jobs:
   build:
